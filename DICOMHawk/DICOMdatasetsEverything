@@ -1,0 +1,2417 @@
+dicom_files\I4:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 226
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.99.2
+(0002, 0013) Implementation Version Name         SH: 'PIXELMEDJAVA001'
+(0002, 0016) Source Application Entity Title     AE: 'STUDIO5_11112'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\test_file.dcm:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 206
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.826.0.1.3680043.8.498.26851225619652605436855431648461323652
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.8.498.1
+(0002, 0013) Implementation Version Name         SH: 'PYDICOM 2.4.4'
+-------------------------------------------------
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.26851225619652605436855431648461323652
+(0008, 0020) Study Date                          DA: '20240610'
+(0008, 0023) Content Date                        DA: '20240610'
+(0008, 0030) Study Time                          TM: '164202'
+(0008, 0033) Content Time                        TM: '164202'
+(0008, 0060) Modality                            CS: 'CT'
+(0010, 0010) Patient's Name                      PN: 'Test^Patient'
+(0010, 0020) Patient ID                          LO: '123456'
+(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.81724060277844952476019459535692946523
+(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.13356648179801660732727644135631046539
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
+dicom_files\test_file1.dcm:Dataset.file_meta -------------------------------
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.826.0.1.3680043.8.498.98238258217148280375414954589431414271
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.8.498.1
+-------------------------------------------------
+(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.98238258217148280375414954589431414271
+(0008, 0020) Study Date                          DA: '20240610'
+(0008, 0030) Study Time                          TM: '165511'
+(0008, 0060) Modality                            CS: 'CT'
+(0010, 0010) Patient's Name                      PN: 'Test^Patient1'
+(0010, 0020) Patient ID                          LO: '1'
+(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.80838397804454094185627225143865398180
+(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.36752076250938576661967649124097092983
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
+dicom_files\test_file2.dcm:Dataset.file_meta -------------------------------
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.826.0.1.3680043.8.498.91615132843088130322966109821237363209
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.8.498.1
+-------------------------------------------------
+(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.91615132843088130322966109821237363209
+(0008, 0020) Study Date                          DA: '20240610'
+(0008, 0030) Study Time                          TM: '165511'
+(0008, 0060) Modality                            CS: 'CT'
+(0010, 0010) Patient's Name                      PN: 'Test^Patient2'
+(0010, 0020) Patient ID                          LO: '2'
+(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.38945524475562464741808580693409813239
+(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.30426851309736350276182230967738956515
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
+dicom_files\test_file3.dcm:Dataset.file_meta -------------------------------
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.826.0.1.3680043.8.498.32506765052170901231323773877039595835
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.8.498.1
+-------------------------------------------------
+(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.32506765052170901231323773877039595835
+(0008, 0020) Study Date                          DA: '20240610'
+(0008, 0030) Study Time                          TM: '165511'
+(0008, 0060) Modality                            CS: 'CT'
+(0010, 0010) Patient's Name                      PN: 'Test^Patient3'
+(0010, 0020) Patient ID                          LO: '3'
+(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.60953077031261233144094846695549481540
+(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.15812537868841785385063566027051906275
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
+dicom_files\test_file4.dcm:Dataset.file_meta -------------------------------
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.826.0.1.3680043.8.498.51268411539509518644197724223841250363
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.8.498.1
+-------------------------------------------------
+(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.51268411539509518644197724223841250363
+(0008, 0020) Study Date                          DA: '20240610'
+(0008, 0030) Study Time                          TM: '165511'
+(0008, 0060) Modality                            CS: 'CT'
+(0010, 0010) Patient's Name                      PN: 'Test^Patient4'
+(0010, 0020) Patient ID                          LO: '4'
+(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.81479385871674161593658946399951892147
+(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.97561208679913565610791385891152840931
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
+dicom_files\test_file5.dcm:Dataset.file_meta -------------------------------
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.826.0.1.3680043.8.498.99289924208609969489548630806595006723
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.8.498.1
+-------------------------------------------------
+(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.99289924208609969489548630806595006723
+(0008, 0020) Study Date                          DA: '20240610'
+(0008, 0030) Study Time                          TM: '165511'
+(0008, 0060) Modality                            CS: 'CT'
+(0010, 0010) Patient's Name                      PN: 'Test^Patient5'
+(0010, 0020) Patient ID                          LO: '5'
+(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.12639171593992955877007361791049240882
+(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.38384308578550960358826352407772121800
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
+dicom_files\received\1724936291193735:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\received\1724936460476097:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\received\1724936820586733:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\received\1724937466876189:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2607.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010537.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2607.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010537.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '323'
+(0018, 1152) Exposure                            IS: '66'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104830.142+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '2.205691'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '9'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, 20.750]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '20.75'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 181932 elements
+dicom_files\received\1724937498337175:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2698.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010558.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2698.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010558.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '2.5'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '2.5'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '152'
+(0018, 1152) Exposure                            IS: '15'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104834.622+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '7.160163'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2634.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '3'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '65'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, 140.750]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '140.75'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 123240 elements
+dicom_files\received\1724937535980280:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2670.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010554.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2670.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010554.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '2.5'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '2.5'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '334'
+(0018, 1152) Exposure                            IS: '34'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104833.250+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '4.269918'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2634.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '3'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '37'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, 70.750]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '70.75'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 175686 elements
+dicom_files\received\1725009293491571:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\received\1725020763553331:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\storage\1724936291193735:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\storage\1724936460476097:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\storage\1724936820586733:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
+dicom_files\storage\1724937466876189:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2607.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010537.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2607.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010537.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '323'
+(0018, 1152) Exposure                            IS: '66'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104830.142+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '2.205691'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '9'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, 20.750]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '20.75'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 181932 elements
+dicom_files\storage\1724937498337175:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2698.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010558.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2698.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010558.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '2.5'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '2.5'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '152'
+(0018, 1152) Exposure                            IS: '15'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104834.622+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '7.160163'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2634.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '3'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '65'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, 140.750]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '140.75'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 123240 elements
+dicom_files\storage\1724937535980280:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2670.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010554.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2670.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010554.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '2.5'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '2.5'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '334'
+(0018, 1152) Exposure                            IS: '34'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104833.250+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '4.269918'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2634.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '3'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '37'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, 70.750]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '70.75'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 175686 elements
+dicom_files\storage\1725009293491571:Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 212
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])
+(0002, 0012) Implementation Class UID            UI: 1.2.826.0.1.3680043.9.3811.2.0.2
+(0002, 0013) Implementation Version Name         SH: 'PYNETDICOM_202'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AXIAL']
+(0008, 0012) Instance Creation Date              DA: '20100806'
+(0008, 0013) Instance Creation Time              TM: '010536.000'
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2601.0
+(0008, 0020) Study Date                          DA: '20100806'
+(0008, 0021) Series Date                         DA: '20100806'
+(0008, 0022) Acquisition Date                    DA: '20100806'
+(0008, 0023) Content Date                        DA: '20100806'
+(0008, 0030) Study Time                          TM: '010434.000'
+(0008, 0031) Series Time                         TM: '010521.000'
+(0008, 0032) Acquisition Time                    TM: '010531.758'
+(0008, 0033) Content Time                        TM: '010536.000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'CT'
+(0008, 0070) Manufacturer                        LO: 'GE MEDICAL SYSTEMS'
+(0008, 0090) Referring Physician's Name          PN: ''
+(0008, 1090) Manufacturer's Model Name           LO: 'Revolution EVO'
+(0008, 1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008, 1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008, 1155) Referenced SOP Instance UID         UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2595.0
+   ---------
+(0008, 3010) Irradiation Event UID               UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2598.0
+(0010, 0010) Patient's Name                      PN: 'NAME^NONE'
+(0010, 0020) Patient ID                          LO: 'NOID'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0012, 0062) Patient Identity Removed            CS: 'YES'
+(0012, 0063) De-identification Method            LO: ['Deidentified', 'Descriptors removed', 'Patient Characteristics removed', 'Device identity removed', 'Institution identity removed', 'Dates modified', 'Structured content retained', 'Unsafe private removed', 'UIDs remapped']
+(0012, 0064)  De-identification Method Code Sequence  6 item(s) ---- 
+   (0008, 0100) Code Value                          SH: '113100'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Basic Application Confidentiality Profile'
+   ---------
+   (0008, 0100) Code Value                          SH: '210004'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remove all descriptors'
+   ---------
+   (0008, 0100) Code Value                          SH: '113107'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Longitudinal Temporal Information Modified Dates Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210011'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Retain all structured content unchanged'
+   ---------
+   (0008, 0100) Code Value                          SH: '113111'
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 0104) Code Meaning                        LO: 'Retain Safe Private Option'
+   ---------
+   (0008, 0100) Code Value                          SH: '210001'
+   (0008, 0102) Coding Scheme Designator            SH: '99PMP'
+   (0008, 0104) Code Meaning                        LO: 'Remap UIDs'
+   ---------
+(0018, 0022) Scan Options                        CS: 'HELICAL MODE'
+(0018, 0050) Slice Thickness                     DS: '5.0'
+(0018, 0060) KVP                                 DS: '120.0'
+(0018, 0088) Spacing Between Slices              DS: '5.0'
+(0018, 0090) Data Collection Diameter            DS: '320.0'
+(0018, 1000) Device Serial Number                LO: 'SN000000'
+(0018, 1020) Software Versions                   LO: 'cj_kl.89'
+(0018, 1100) Reconstruction Diameter             DS: '250.0'
+(0018, 1110) Distance Source to Detector         DS: '949.147'
+(0018, 1111) Distance Source to Patient          DS: '541.0'
+(0018, 1120) Gantry/Detector Tilt                DS: '0.0'
+(0018, 1130) Table Height                        DS: '169.5'
+(0018, 1140) Rotation Direction                  CS: 'CW'
+(0018, 1150) Exposure Time                       IS: '800'
+(0018, 1151) X-Ray Tube Current                  IS: '325'
+(0018, 1152) Exposure                            IS: '67'
+(0018, 1160) Filter Type                         SH: 'HEAD FILTER'
+(0018, 1170) Generator Power                     IS: '40200'
+(0018, 1190) Focal Spot(s)                       DS: '1.2'
+(0018, 1210) Convolution Kernel                  SH: 'STANDARD'
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0018, 9305) Revolution Time                     FD: 0.8
+(0018, 9306) Single Collimation Width            FD: 0.625
+(0018, 9307) Total Collimation Width             FD: 20.0
+(0018, 9309) Table Speed                         FD: 24.21875
+(0018, 9310) Table Feed per Rotation             FD: 19.375
+(0018, 9311) Spiral Pitch Factor                 FD: 0.96875
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 1010) Station Name                        SH: 'STUDIO5_11112'
+   (0008, 1090) Manufacturer's Model Name           LO: 'DicomCleaner'
+   (0018, 1020) Software Versions                   LO: 'Sat Dec  5 13:17:48 EST 2020'
+   (0018, a002) Contribution DateTime               DT: '20210325104829.836+0000'
+   (0018, a003) Contribution Description            ST: 'Cleaned'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109104'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'De-identifying Equipment'
+      ---------
+   ---------
+(0019, 0010) Private Creator                     LO: 'GEMS_ACQU_01'
+(0019, 1023) [Table Speed [mm/rotation]]         DS: '19.375'
+(0019, 1024) [Mid Scan Time [sec]]               DS: '0.966667'
+(0019, 1027) [Rotation Speed [msec]]             DS: '0.8'
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2592.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2599.0
+(0020, 0010) Study ID                            SH: ''
+(0020, 0011) Series Number                       IS: '2'
+(0020, 0012) Acquisition Number                  IS: '1'
+(0020, 0013) Instance Number                     IS: '3'
+(0020, 0032) Image Position (Patient)            DS: [-122.200, -107.100, -9.250]
+(0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.1761388472.1291962045.1616669124536.2594.0
+(0020, 1040) Position Reference Indicator        LO: 'OM'
+(0020, 1041) Slice Location                      DS: '-9.25'
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.488281, 0.488281]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 16
+(0028, 0102) High Bit                            US: 15
+(0028, 0103) Pixel Representation                US: 1
+(0028, 0120) Pixel Padding Value                 SS: -2000
+(0028, 1050) Window Center                       DS: '30.0'
+(0028, 1051) Window Width                        DS: '100.0'
+(0028, 1052) Rescale Intercept                   DS: '-1024.0'
+(0028, 1053) Rescale Slope                       DS: '1.0'
+(0028, 1054) Rescale Type                        LO: 'HU'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0244) Performed Procedure Step Start Date DA: '20100806'
+(0040, 0245) Performed Procedure Step Start Time TM: '010434.000'
+(0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
+(0043, 1027) [Scan Pitch Ratio]                  SH: '0.969:1'
+(0045, 0010) Private Creator                     LO: 'GEMS_HELIOS_01'
+(0045, 1001) [Number of Macro Rows in Detector]  SS: 32
+(0045, 1002) [Macro width at ISO Center]         FL: 0.625
+(7fe0, 0010) Pixel Data                          OB: Array of 177594 elements
