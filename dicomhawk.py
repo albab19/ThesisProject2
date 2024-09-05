@@ -2,6 +2,7 @@ import logging
 import string
 from lib2to3.fixes.fix_input import context
 from logging.handlers import TimedRotatingFileHandler
+from re import match
 from stat import ST_UID
 
 from flask import Flask, jsonify, render_template, send_from_directory
@@ -45,8 +46,8 @@ from pynetdicom.status import PRINT_JOB_MANAGEMENT_SERVICE_CLASS_STATUS
 logging.getLogger("pynetdicom").handlers = []
 
 # Set up logging
-log_directory = '/logs'
-simplified_log_directory = '/simplified_logs'
+log_directory = './logs'
+simplified_log_directory = './simplified_logs'
 
 log_file_path = os.path.join(log_directory, 'dicom_server.log')
 simplified_log_file_path = os.path.join(simplified_log_directory, 'dicom_simplified.log')
@@ -182,86 +183,203 @@ def handle_assoc(event):
     detailed_logger.info(f"Association requested from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
     version = event.assoc.requestor.implementation_version_name if event.assoc.requestor.implementation_version_name else "N/A"
 
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": assoc_id,
-        "event": "Association requested",
-        "IP": event.assoc.requestor.address,
-        "Port": event.assoc.requestor.port,
-        "level": "warning",
-        "msg": "Connection from",
-        "timestamp": datetime.now().isoformat()
-    })
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": assoc_id,
-        "Version": version,
-        "level": "info",
-        "msg": "Client",
-        "timestamp": datetime.now().isoformat()
-    })
+    #log_simplified_message({
+    #    "session_id": assoc_id,
+    #    "ID": assoc_id,
+    #    "event": "Association requested",
+    #    "IP": event.assoc.requestor.address,
+    #    "Port": event.assoc.requestor.port,
+    #    "level": "warning",
+    #    "msg": "Connection from",
+    #    "timestamp": datetime.now().isoformat()
+    #})
+    #log_simplified_message({
+    #    "session_id": assoc_id,
+    #    "ID": assoc_id,
+    #    "Version": version,
+    #    "level": "info",
+    #    "msg": "Client",
+    #    "timestamp": datetime.now().isoformat()
+    #})
 
 def handle_release(event):
     assoc_id = assoc_sessions.pop(event.assoc, str(int(time.time() * 1000000)))
     detailed_logger.info(f"Association released from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": assoc_id,
-        "event": "Association released",
-        "IP": event.assoc.requestor.address,
-        "Port": event.assoc.requestor.port,
-        "Status": "Finished",
-        "level": "warning",
-        "msg": "Connection",
-        "timestamp": datetime.now().isoformat()
-    })
+    #log_simplified_message({
+    #    "session_id": assoc_id,
+    #    "ID": assoc_id,
+    #    "event": "Association released",
+    #    "IP": event.assoc.requestor.address,
+    #    "Port": event.assoc.requestor.port,
+    #    "Status": "Finished",
+    #    "level": "warning",
+    #    "msg": "Connection",
+    #    "timestamp": datetime.now().isoformat()
+    #})
 
 def handle_find(event):
+
     assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     find_id = str(int(time.time() * 1000000))
     detailed_logger.info(f"C-FIND request received: {event.identifier}")
 
     # Convert PatientName to string for JSON serialization
     term = None
-    for elem in event.identifier:
-        if elem.VR == 'PN' and elem.keyword == 'PatientName':
-            term = str(elem.value)
-            log_simplified_message({
-                "session_id": assoc_id,
-                "ID": find_id,
-                "Term": term,
-                "Type": "PatientName",
-                "level": "info",
-                "msg": "C-FIND Search",
-                "timestamp": datetime.now().isoformat()
-            })
-            break
 
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": find_id,
-        "event": "C-FIND request received",
-        "Command": "C-FIND",
-        "identifier": {tag: str(value) for tag, value in event.identifier.items()},
-        "level": "info",
-        "msg": "Received",
-        "timestamp": datetime.now().isoformat()
-    })
+    instances = []
+    matching = []
 
-    matches = 0
-    for path, ds in dicom_datasets.items():
-        if term is None or ds.PatientName == term or term == '*':
-            matches += 1
-            yield 0xFF00, ds
+    storagedirectory = './dicom_files/received'
 
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": find_id,
-        "Matches": matches,
-        "level": "warning",
-        "msg": "C-FIND Search result",
-        "timestamp": datetime.now().isoformat()
-    })
+    for path in os.listdir(storagedirectory):
+        instances.append(dcmread(os.path.join(storagedirectory, path)))
+
+    if 'QueryRetrieveLevel' not in event.identifier:
+        yield 0xC000, None
+        return
+
+
+    #print("INSTANCES.....", instances)
+    if event.identifier.QueryRetrieveLevel == 'PATIENT':
+        if 'PatientName' in event.identifier:
+            if event.identifier.PatientName not in ['*', '', '?']:
+
+                matching = [
+                    instance for instance in instances if instance.PatientName == event.identifier.PatientName
+                ]
+        elif 'PatientID' in event.identifier:
+            if event.identifier.PatientID not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if str(instance.PatientID) == "*"+str(event.identifier.PatientID)+"*"
+                ]
+        elif 'StudyDate' in event.identifier:
+            if event.identifier.StudyDate not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if instance.StudyDate == event.identifier.StudyDate
+                ]
+        elif 'StudyDesctiption' in event.identifier:
+            if event.identifier.PatientName not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if instance.StudyDesctiption == event.identifier.StudyDesctiption
+                ]
+        elif 'AccessionNumber' in event.identifier:
+            if event.identifier.PatientName not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if instance.AccessionNumber == event.identifier.AccessionNumber
+                ]
+
+
+    #if event.identifier.QueryRetrieveLevel == 'PATIENT':
+    #    if 'PatientName' in event.identifier:
+    #        if event.identifier.PatientName not in ['*', '', '?']:
+    #            matching = [
+    #                instance for instance in instances if instance.PatientName == event.identifier.PatientName
+    #            ]
+    #for instance in matching:
+    #    if event.is_cancelled:
+    #        yield 0xC000, None
+    #        return
+
+    #    identifier = Dataset()
+    #    identifier.PatientName = instance.PatientName
+    #    identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
+
+    #    # Pending
+    #    yield (0xFF00, identifier)
+
+    def date_in_range(datestr, date_range):
+        if '-' in event.identifier.StudyDate:
+            startdate, enddate = event.identifier.StudyDate.split('-')
+            startdateobject = datetime.strptime(startdate, '%Y%m%d')
+            enddateobject = datetime.strptime(enddate, '%Y%m%d')
+        else:
+            startdate= enddate = date_range
+        return startdateobject <= datetime.strptime(datestr, '%Y%m%d') <= enddateobject
+
+
+    if event.identifier.QueryRetrieveLevel == 'STUDY':
+        #study_date = datetime.strptime(event.identifier.StudyDate, '%Y%m%d').date()
+        if 'PatientID' in event.identifier:
+            print("mr",event.identifier.PatientID)
+
+            if event.identifier.PatientID not in ['*', '', '?']:
+
+                for instance in instances:
+                    print("mr2", instance.PatientID)
+                    if "*"+str(instance.PatientID)+"*" == str(event.identifier.PatientID):
+                        print("HELLOMR3")
+                        print("aaaaaaa","*"+str(instance.PatientID)+"*")
+                        matching.append(instance)
+            for m in matching:
+                print("MAAU",m)
+
+        elif 'StudyDate' in event.identifier:
+            if event.identifier.StudyDate not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if date_in_range(instance.StudyDate, event.identifier.StudyDate)
+                ]
+        elif 'StudyDate' in event.identifier:
+            if event.identifier.StudyDate not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if instance.StudyDate == event.identifier.StudyDate
+                ]
+        elif 'StudyDesctiption' in event.identifier:
+            if event.identifier.PatientName not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if instance.StudyDesctiption == event.identifier.StudyDesctiption
+                ]
+        elif 'AccessionNumber' in event.identifier:
+            if event.identifier.PatientName not in ['*', '', '?']:
+                matching = [
+                    instance for instance in instances if instance.AccessionNumber == event.identifier.AccessionNumber
+                ]
+
+   # for m in matching:
+   #     print("MATCHING!", m)
+
+    for instance in matching:
+        if event.is_cancelled:
+            yield 0xC000, None
+            return
+
+        identifier = Dataset()
+
+        #print("LASTIDENTIFIER", identifier)
+        #print(instance.get('PatientName'))
+
+        identifier.PatientID = instance.get('PatientID')
+
+        identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
+        # Pending
+        yield (0xFF00, identifier)
+
+
+       # if event.identifier.QueryRetrieveLevel == 'PATIENT':
+       #     print("THEINSTANCE", instance)
+       #     #identifier.PatientName =
+       #     print("INTTTTT",identifier)
+       #     identifier.PatientID = instance['PatientID']
+       #     identifier.StudyDate = instance.StudyDate
+       #     identifier.StudyDesctiption = instance.StudyDesctiption
+       #     identifier.AccessionNumber = instance.AccessionNumber
+       #     identifier.QueryRetrieveLevel == 'PATIENT'
+
+       # elif event.identifier.QueryRetrieveLevel== 'STUDY':
+       #     identifier.StudyDate = instance.StudyDate
+       #     identifier.StudyDesctiption = instance.StudyDesctiption
+       #     identifier.AccessionNumber = instance.AccessionNumber
+       #     identifier.QueryRetrieveLevel == 'STUDY'
+
+
+
+    #return identifier
+
+    #ds = Dataset()
+    #fds = FileDataset()
+
+    #print("DATASET", Dataset)
+    #print("FILEDATASET", FileDataset)
+
 
 
 def handle_store(event):
