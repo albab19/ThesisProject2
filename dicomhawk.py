@@ -250,7 +250,7 @@ def handle_find(event):
         elif 'PatientID' in event.identifier:
             if event.identifier.PatientID not in ['*', '', '?']:
                 matching = [
-                    instance for instance in instances if str(instance.PatientID) == "*"+str(event.identifier.PatientID)+"*"
+                    instance for instance in instances if str(instance.PatientID) == str(event.identifier.PatientID).strip()
                 ]
         elif 'StudyDate' in event.identifier:
             if event.identifier.StudyDate not in ['*', '', '?']:
@@ -301,17 +301,14 @@ def handle_find(event):
         #study_date = datetime.strptime(event.identifier.StudyDate, '%Y%m%d').date()
         if 'PatientID' in event.identifier:
             print("mr",event.identifier.PatientID)
-
             if event.identifier.PatientID not in ['*', '', '?']:
-
                 for instance in instances:
                     print("mr2", instance.PatientID)
-                    if "*"+str(instance.PatientID)+"*" == str(event.identifier.PatientID):
-                        print("HELLOMR3")
-                        print("aaaaaaa","*"+str(instance.PatientID)+"*")
+                    print("stripped value", event.identifier.PatientID.strip('*'))
+                    if  instance.PatientID == event.identifier.PatientID.strip('*'):
+                        print("aaaaaaa",str(instance.PatientID))
                         matching.append(instance)
-            for m in matching:
-                print("MAAU",m)
+                        print("matchinginstance", instance)
 
         elif 'StudyDate' in event.identifier:
             if event.identifier.StudyDate not in ['*', '', '?']:
@@ -350,6 +347,7 @@ def handle_find(event):
         identifier.PatientID = instance.get('PatientID')
 
         identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
+        #GET with instance and  
         # Pending
         yield (0xFF00, identifier)
 
@@ -538,9 +536,9 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
 ae.supported_contexts = AllStoragePresentationContexts
 
-for cx in ae.supported_contexts:
-    cx.scp_role = True
-    cx.scu_role = False
+#for cx in ae.supported_contexts:
+#    cx.scp_role = True
+#    cx.scu_role = False
 
 
 for context in StoragePresentationContexts + VerificationPresentationContexts + QueryRetrievePresentationContexts:
