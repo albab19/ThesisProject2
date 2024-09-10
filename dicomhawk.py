@@ -4,7 +4,7 @@ from lib2to3.fixes.fix_input import context
 from logging.handlers import TimedRotatingFileHandler
 from re import match
 from stat import ST_UID
-
+from datetime import datetime
 from flask import Flask, jsonify, render_template, send_from_directory
 from pynetdicom import AE, evt, debug_logger, AllStoragePresentationContexts ,StoragePresentationContexts, VerificationPresentationContexts, \
     QueryRetrievePresentationContexts
@@ -14,9 +14,9 @@ from pynetdicom.sop_class import (
     PatientRootQueryRetrieveInformationModelFind,
     PatientRootQueryRetrieveInformationModelGet,
     StudyRootQueryRetrieveInformationModelFind,
-    StudyRootQueryRetrieveInformationModelGet
+    StudyRootQueryRetrieveInformationModelGet,
 
-    #CTImageStorage,
+    CTImageStorage
     #MRImageStorage,
     #Verification, SOPClass
 )
@@ -223,9 +223,6 @@ def handle_find(event):
     find_id = str(int(time.time() * 1000000))
     detailed_logger.info(f"C-FIND request received: {event.identifier}")
 
-    # Convert PatientName to string for JSON serialization
-    term = None
-
     instances = []
     matching = []
 
@@ -240,33 +237,33 @@ def handle_find(event):
 
 
     #print("INSTANCES.....", instances)
-    if event.identifier.QueryRetrieveLevel == 'PATIENT':
-        if 'PatientName' in event.identifier:
-            if event.identifier.PatientName not in ['*', '', '?']:
+   # if event.identifier.QueryRetrieveLevel == 'PATIENT' :
+    #    if 'PatientName' in event.identifier:
+    #        if event.identifier.PatientName not in ['*', '', '?']:
 
-                matching = [
-                    instance for instance in instances if instance.PatientName == event.identifier.PatientName
-                ]
-        elif 'PatientID' in event.identifier:
-            if event.identifier.PatientID not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if str(instance.PatientID) == str(event.identifier.PatientID).strip()
-                ]
-        elif 'StudyDate' in event.identifier:
-            if event.identifier.StudyDate not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if instance.StudyDate == event.identifier.StudyDate
-                ]
-        elif 'StudyDesctiption' in event.identifier:
-            if event.identifier.PatientName not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if instance.StudyDesctiption == event.identifier.StudyDesctiption
-                ]
-        elif 'AccessionNumber' in event.identifier:
-            if event.identifier.PatientName not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if instance.AccessionNumber == event.identifier.AccessionNumber
-                ]
+    #            matching = [
+    #                instance for instance in instances if instance.PatientName == event.identifier.PatientName
+    #            ]
+    #    elif 'PatientID' in event.identifier:
+    #        if event.identifier.PatientID not in ['*', '', '?']:
+    #            matching = [
+    #                instance for instance in instances if str(instance.PatientID) == str(event.identifier.PatientID).strip()
+    #            ]
+    #    elif 'StudyDate' in event.identifier:
+    #        if event.identifier.StudyDate not in ['*', '', '?']:
+    #            matching = [
+    #                instance for instance in instances if instance.StudyDate == event.identifier.StudyDate
+    #            ]
+    #    elif 'StudyDesctiption' in event.identifier:
+    #        if event.identifier.PatientName not in ['*', '', '?']:
+    #            matching = [
+    #                instance for instance in instances if instance.StudyDesctiption == event.identifier.StudyDesctiption
+    #            ]
+    #    elif 'AccessionNumber' in event.identifier:
+    #        if event.identifier.PatientName not in ['*', '', '?']:
+    #            matching = [
+    #                instance for instance in instances if instance.AccessionNumber == event.identifier.AccessionNumber
+    #            ]
 
 
     #if event.identifier.QueryRetrieveLevel == 'PATIENT':
@@ -297,7 +294,19 @@ def handle_find(event):
         return startdateobject <= datetime.strptime(datestr, '%Y%m%d') <= enddateobject
 
 
-    if event.identifier.QueryRetrieveLevel == 'STUDY':
+    if event.identifier.QueryRetrieveLevel == 'STUDY' or event.identifier.QueryRetrieveLevel == 'PATIENT':
+        if 'PatientName' in event.identifier:
+            print("mr", event.identifier.PatientName)
+            if event.identifier.PatientName not in ['*', '', '?']:
+                for instance in instances:
+                    print("mr2", instance.PatientName)
+                    print("stripped value", event.identifier.PatientName)
+                    if instance.PatientName == event.identifier.PatientName:
+                        print("aaaaaaa", str(instance.PatientName))
+                        matching.append(instance)
+                        print("matchinginstance", instance)
+
+
         #study_date = datetime.strptime(event.identifier.StudyDate, '%Y%m%d').date()
         if 'PatientID' in event.identifier:
             print("mr",event.identifier.PatientID)
@@ -310,73 +319,62 @@ def handle_find(event):
                         matching.append(instance)
                         print("matchinginstance", instance)
 
-        elif 'StudyDate' in event.identifier:
-            if event.identifier.StudyDate not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if date_in_range(instance.StudyDate, event.identifier.StudyDate)
-                ]
-        elif 'StudyDate' in event.identifier:
-            if event.identifier.StudyDate not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if instance.StudyDate == event.identifier.StudyDate
-                ]
-        elif 'StudyDesctiption' in event.identifier:
-            if event.identifier.PatientName not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if instance.StudyDesctiption == event.identifier.StudyDesctiption
-                ]
-        elif 'AccessionNumber' in event.identifier:
-            if event.identifier.PatientName not in ['*', '', '?']:
-                matching = [
-                    instance for instance in instances if instance.AccessionNumber == event.identifier.AccessionNumber
-                ]
 
-   # for m in matching:
-   #     print("MATCHING!", m)
+        elif 'StudyDate' in event.identifier:
+            if 'StudyDate' in event.identifier:
+                if event.identifier.StudyDate not in ['*', '', '?']:
+                    for instance in instances:
+                        print("typeo of instance", type(instance.StudyDate))
+                        print("typeo of event identifier", type(event.identifier.StudyDate))
+                        if instance.StudyDate == event.identifier.StudyDate:
+                            print("work?")
+                            print("matchinginstance", instance)
+                            matching.append(instance)
+
+
+
+        elif 'StudyDesctiption' in event.identifier:
+            if 'StudyDescription' in event.identifier:
+                if event.identifier.StudyDescription not in ['*', '', '?']:
+                    for instance in instances:
+                        print("typeo of instance", type(instance.StudyDescription))
+                        print("typeo of event identifier", type(event.identifier.StudyDescription))
+                        if instance.StudyDescription == event.identifier.StudyDescription:
+                            print("work?")
+                            print("matchinginstance", instance)
+                            matching.append(instance)
+
+
+        elif 'AccessionNumber' in event.identifier:
+            if 'AccessionNumber' in event.identifier:
+                if event.identifier.AccessionNumber not in ['*', '', '?']:
+                    for instance in instances:
+                        print("typeo of instance", type(instance.AccessionNumber))
+                        print("typeo of event identifier", type(event.identifier.AccessionNumber))
+                        if instance.AccessionNumber == event.identifier.AccessionNumber:
+                            print("work?")
+                            print("matchinginstance", instance)
+                            matching.append(instance)
 
     for instance in matching:
+        print("INST", instance)
+
         if event.is_cancelled:
             yield 0xC000, None
             return
 
         identifier = Dataset()
 
-        #print("LASTIDENTIFIER", identifier)
-        #print(instance.get('PatientName'))
-
         identifier.PatientID = instance.get('PatientID')
+        identifier.StudyDate = instance.get('StudyDate')
 
         identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
-        #GET with instance and  
+
+        print("MYIDENTIFIER", identifier)
+        #GET with instance and
         # Pending
         yield (0xFF00, identifier)
 
-
-       # if event.identifier.QueryRetrieveLevel == 'PATIENT':
-       #     print("THEINSTANCE", instance)
-       #     #identifier.PatientName =
-       #     print("INTTTTT",identifier)
-       #     identifier.PatientID = instance['PatientID']
-       #     identifier.StudyDate = instance.StudyDate
-       #     identifier.StudyDesctiption = instance.StudyDesctiption
-       #     identifier.AccessionNumber = instance.AccessionNumber
-       #     identifier.QueryRetrieveLevel == 'PATIENT'
-
-       # elif event.identifier.QueryRetrieveLevel== 'STUDY':
-       #     identifier.StudyDate = instance.StudyDate
-       #     identifier.StudyDesctiption = instance.StudyDesctiption
-       #     identifier.AccessionNumber = instance.AccessionNumber
-       #     identifier.QueryRetrieveLevel == 'STUDY'
-
-
-
-    #return identifier
-
-    #ds = Dataset()
-    #fds = FileDataset()
-
-    #print("DATASET", Dataset)
-    #print("FILEDATASET", FileDataset)
 
 
 
@@ -398,6 +396,7 @@ def handle_store(event):
 
     file_name = f"{store_id}"
     event.dataset.file_meta = event.file_meta
+    #event.file_meta,
     event.dataset.save_as(os.path.join('./dicom_files/received',file_name),write_like_original=False)
     print(f"DICOM file saved as {file_name}")
     #print(event.dataset.file_meta)
@@ -444,8 +443,9 @@ def handle_move(event):
     ds.SOPClassUID = CTImageStorage
     yield 1, ds
 
+
+
 def handle_get(event):
-    print("THISTHIS")
     assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     get_id = str(int(time.time() * 1000000))
    # detailed_logger.info(f"C-GET request received: {event.identifier}")
@@ -464,6 +464,92 @@ def handle_get(event):
     print("REMAINING", remaining_subops)
     print("AAAAAAA",event.identifier)
 
+#________________________________________________________________________________
+    instances = []
+    matching = []
+
+    storagedirectory = './dicom_files/received'
+
+    for path in os.listdir(storagedirectory):
+        instances.append(dcmread(os.path.join(storagedirectory, path)))
+
+    if 'QueryRetrieveLevel' not in event.identifier:
+        yield 0xC000, None
+        return
+
+    if event.identifier.QueryRetrieveLevel == 'STUDY' or event.identifier.QueryRetrieveLevel == 'PATIENT':
+        if 'PatientName' in event.identifier:
+            print("mr", event.identifier.PatientName)
+            if event.identifier.PatientName not in ['*', '', '?']:
+                for instance in instances:
+                    print("mr2", instance.PatientName)
+                    print("stripped value", event.identifier.PatientName)
+                    if instance.PatientName == event.identifier.PatientName:
+                        print("aaaaaaa", str(instance.PatientName))
+                        matching.append(instance)
+                        print("matchinginstance", instance)
+
+        # study_date = datetime.strptime(event.identifier.StudyDate, '%Y%m%d').date()
+        if 'PatientID' in event.identifier:
+            print("mr", event.identifier.PatientID)
+            if event.identifier.PatientID not in ['*', '', '?']:
+                for instance in instances:
+                    print("mr2", instance.PatientID)
+                    print("stripped value", event.identifier.PatientID.strip('*'))
+                    if instance.PatientID == event.identifier.PatientID.strip('*'):
+                        print("aaaaaaa", str(instance.PatientID))
+                        matching.append(instance)
+                        print("matchinginstance", instance)
+
+
+        elif 'StudyDate' in event.identifier:
+            if 'StudyDate' in event.identifier:
+                if event.identifier.StudyDate not in ['*', '', '?']:
+                    for instance in instances:
+                        print("typeo of instance", type(instance.StudyDate))
+                        print("typeo of event identifier", type(event.identifier.StudyDate))
+                        if instance.StudyDate == event.identifier.StudyDate:
+                            print("work?")
+                            print("matchinginstance", instance)
+                            matching.append(instance)
+
+
+
+        elif 'StudyDesctiption' in event.identifier:
+            if 'StudyDescription' in event.identifier:
+                if event.identifier.StudyDescription not in ['*', '', '?']:
+                    for instance in instances:
+                        print("typeo of instance", type(instance.StudyDescription))
+                        print("typeo of event identifier", type(event.identifier.StudyDescription))
+                        if instance.StudyDescription == event.identifier.StudyDescription:
+                            print("work?")
+                            print("matchinginstance", instance)
+                            matching.append(instance)
+
+
+        elif 'AccessionNumber' in event.identifier:
+            if 'AccessionNumber' in event.identifier:
+                if event.identifier.AccessionNumber not in ['*', '', '?']:
+                    for instance in instances:
+                        print("typeo of instance", type(instance.AccessionNumber))
+                        print("typeo of event identifier", type(event.identifier.AccessionNumber))
+                        if instance.AccessionNumber == event.identifier.AccessionNumber:
+                            print("work?")
+                            print("matchinginstance", instance)
+                            matching.append(instance)
+
+        yield len(instances)
+
+    for instance in matching:
+        if event.is_cancelled:
+            yield 0xC000, None
+            return
+
+        # GET with instance and
+        # Pending
+        yield (0xFF00, instance)
+
+    #________________________________________________________________________________
     # Yield the number of remaining sub-operations as the first item
     #with open("DICOMdatasetsEverything", "w") as file:
      #   for key, value in dicom_datasets.items():
@@ -472,32 +558,32 @@ def handle_get(event):
     #if 'QueryRetrieveLevel' not in event.identifier:
     #    yeild (0xC000, None)
 
-    instances = []
-    matching = []
+    #instances = []
+    #matching = []
 
-    storagedirectory = './dicom_files/storage'
-
-
-    for path in os.listdir(storagedirectory):
-        instances.append(dcmread(os.path.join(storagedirectory, path)))
+    #storagedirectory = './dicom_files/storage'
 
 
-    if 'QueryRetrieveLevel' not in event.identifier:
-        yield 0xC000, None
-        return
+    #for path in os.listdir(storagedirectory):
+    #    instances.append(dcmread(os.path.join(storagedirectory, path)))
 
-    if event.identifier.QueryRetrieveLevel == 'PATIENT':
-        found = False
-        if 'PatientID' in event.identifier:
-            print("wokr")
-            for instance in instances:
-                print("INSTANCEIDPATIENT",instance.PatientID)
-                if instance.PatientID == event.identifier.PatientID:
-                    matching = [
-                        instance for instance in instances if instance.PatientID == event.identifier.PatientID
-                    ]
-                    print("There is a match!")
-    yield len(matching)
+
+    #if 'QueryRetrieveLevel' not in event.identifier:
+    #    yield 0xC000, None
+    #    return
+
+    #if event.identifier.QueryRetrieveLevel == 'PATIENT':
+    #    found = False
+    #    if 'PatientID' in event.identifier:
+    #        print("wokr")
+    #        for instance in instances:
+    #            print("INSTANCEIDPATIENT",instance.PatientID)
+    #            if instance.PatientID == event.identifier.PatientID:
+    #                matching = [
+    #                    instance for instance in instances if instance.PatientID == event.identifier.PatientID
+    #                ]
+    #                print("There is a match!")
+
 
 
 
@@ -530,11 +616,18 @@ handlers = [
 ]
 
 ae = AE()
+for cx in ae.supported_contexts:
+    cx.scp_role = True
+    cx.scu_role = False
+ae.supported_contexts = StoragePresentationContexts
+ae.supported_contexts = AllStoragePresentationContexts
+
+
 ae.add_supported_context(PatientRootQueryRetrieveInformationModelFind)
 ae.add_supported_context(PatientRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
-ae.supported_contexts = AllStoragePresentationContexts
+
 
 #for cx in ae.supported_contexts:
 #    cx.scp_role = True
