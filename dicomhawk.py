@@ -1,227 +1,117 @@
-import logging
-import string
 from lib2to3.fixes.fix_input import context
-from logging.handlers import TimedRotatingFileHandler
-from re import match
-from stat import ST_UID
 from datetime import datetime
-from flask import Flask, jsonify, render_template, send_from_directory
-from pynetdicom import AE, evt, debug_logger, AllStoragePresentationContexts ,StoragePresentationContexts, VerificationPresentationContexts, \
-    QueryRetrievePresentationContexts
-
-from pynetdicom.pdu_items import TransferSyntaxSubItem
-from pynetdicom.sop_class import (
-    PatientRootQueryRetrieveInformationModelFind,
-    PatientRootQueryRetrieveInformationModelGet,
-    StudyRootQueryRetrieveInformationModelFind,
-    StudyRootQueryRetrieveInformationModelGet,
-
-    CTImageStorage
-    #MRImageStorage,
-    #Verification, SOPClass
-)
+from pydicom.uid import JPEGLosslessSV1, generate_uid,DigitalXRayImageStorageForPresentation,  JPEGBaseline8Bit, MRImageStorage,SecondaryCaptureImageStorage,ExplicitVRLittleEndian,ImplicitVRLittleEndian,CTImageStorage, PYDICOM_IMPLEMENTATION_UID, OphthalmicPhotography8BitImageStorage, JPEG2000 , AllTransferSyntaxes
+from pynetdicom import AE, evt, debug_logger, AllStoragePresentationContexts ,StoragePresentationContexts, VerificationPresentationContexts,QueryRetrievePresentationContexts,build_context
+from pynetdicom.sop_class import (PatientRootQueryRetrieveInformationModelFind,PatientRootQueryRetrieveInformationModelGet,StudyRootQueryRetrieveInformationModelFind,StudyRootQueryRetrieveInformationModelGet,CTImageStorage)
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.uid import (generate_uid, ExplicitVRLittleEndian, PYDICOM_IMPLEMENTATION_UID, JPEGLosslessSV1,
-                         AllTransferSyntaxes, JPEGLSLossless, PatientRadiationDoseSRStorage)
-import pydicom
-import os
-import socket
+from pydicom.uid import (generate_uid, ExplicitVRLittleEndian, UID,PYDICOM_IMPLEMENTATION_UID, JPEGLosslessSV1, AllTransferSyntaxes, JPEGLSLossless, PatientRadiationDoseSRStorage)
+import socket,time
+import os 
 from datetime import datetime
-import json
-import time
-import random
-
-#import pylibjpeg
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pylibjpeg import decode
-import numpy as np
-from pynetdicom.status import PRINT_JOB_MANAGEMENT_SERVICE_CLASS_STATUS
 
-#pydicom.config.use_gdcm = True
-
-
-
-
-logging.getLogger("pynetdicom").handlers = []
-
-# Set up logging
-log_directory = './logs'
-simplified_log_directory = './simplified_logs'
-
-log_file_path = os.path.join(log_directory, 'dicom_server.log')
-simplified_log_file_path = os.path.join(simplified_log_directory, 'dicom_simplified.log')
-exception_log_file_path = os.path.join(log_directory, 'exception.log')
-
-#data = pydicom.dcmread('./dicom_files/I4')
-#syntax = data.file_meta.TransferSyntaxUID
-
-
-#ds = dcmread(get_testdata_file('./dicom_files/I4'))
-#jpg_arr = data.pixel_array
-#print(jpg_arr)
-
-#replacement_pixels=np.copy(jpg_arr)
-#data.PixelData = replacement_pixels.tobytes()
-#print(data)
-#data.file_meta.TransferSyntaxUID=ExplicitVRLittleEndian
-#print(data.file_meta.TransferSyntaxUID)
-#data.decompress("pylibjpeg")
-
-
-
-# Logger setup function
-def setup_logger(name, log_file, level=logging.INFO, when="midnight", interval=1):
-    handler = TimedRotatingFileHandler(log_file, when=when, interval=interval)
-    handler.suffix = "%Y%m%d"
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    logger.addHandler(handler)
-    logger.addHandler(logging.StreamHandler())
-    return logger
-
-detailed_logger = setup_logger('detailed_logger', log_file_path, logging.DEBUG)
-simplified_logger = setup_logger('simplified_logger', simplified_log_file_path)
-exception_logger = setup_logger('exception_logger', exception_log_file_path, logging.ERROR)
-
-# Configure pynetdicom debug logging to use the detailed logger
+#
 debug_logger()
 
-# Ensure that pynetdicom messages are captured
-pynetdicom_logger = logging.getLogger('pynetdicom')
-pynetdicom_logger.setLevel(logging.DEBUG)
-pynetdicom_logger.addHandler(logging.FileHandler(log_file_path))
+ae = AE()
 
-# Function to log valid JSON messages
-def log_simplified_message(message):
-    try:
-        if message.get("event") == "Created fake DICOM file":
-            return
-        json_message = json.dumps(message)
-        simplified_logger.info(json_message)
-    except (TypeError, ValueError) as e:
-        exception_logger.error(f"Failed to log simplified message: {message} - {e}")
+for context in AllStoragePresentationContexts:
+        context._as_scp=True
+        context._as_scu=True
+        context.scp_role=True
+        context.scu_role=True
+        context.transfer_syntax=[JPEGLosslessSV1] 
+        #print("AllStoragePresentationContexts",context.scp_role)
 
-# Function to generate fake DICOM files with Danish-like names
-def create_fake_dicom_files(directory, num_files=10):
-    os.makedirs(directory, exist_ok=True)
+
+#ae.supported_contexts = StoragePresentationContexts 
+ae.supported_contexts = AllStoragePresentationContexts
+ae.add_supported_context(PatientRootQueryRetrieveInformationModelFind)
+ae.add_supported_context(PatientRootQueryRetrieveInformationModelGet)
+ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
+ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
+
+#ae.add_requested_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] )
+#ae.add_requested_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] )
+#ae.add_requested_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit])
+#ae.add_requested_context(CTImageStorage,[JPEGLosslessSV1])
+#ae.add_supported_context(CTImageStorage,[JPEGLosslessSV1])
+#ae.requested_contexts=AllStoragePresentationContexts
+#ae.add_supported_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] ,True,True)
+#ae.add_supported_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] ,True,True)
+#ae.add_supported_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit],True,True)
+#ae.add_supported_context(CTImageStorage,[JPEG2000],True,True)
+#ae.add_supported_context(MRImageStorage,[JPEGLosslessSV1],True,True)
+
+
+
+
+def handle_get(event):
+    #ae.add_supported_context(MRImageStorage,[JPEGLosslessSV1],True,True)
+
+    assoc = event.assoc
+    instances = []
+    matching = []
+    storagedirectory = './dicom_files/received'
+        #context._as_scu=True
+    for path in os.listdir(storagedirectory):
+        instances.append(dcmread(os.path.join(storagedirectory, path)))
+    if 'QueryRetrieveLevel' not in event.identifier:
+        yield 0xC000, None
+        return
+    if event.identifier.QueryRetrieveLevel == 'STUDY':
+        if 'StudyInstanceUID' in event.identifier:
+            for instance in instances:
+                if instance.StudyInstanceUID == event.identifier.StudyInstanceUID:
+                    matching = [
+                        instance for instance in instances if instance.StudyInstanceUID == event.identifier.StudyInstanceUID
+                    ]
+    print("There is a ",len(matching)," match!", "for study :",)
+    yield len(matching)
     
-    first_names = ["Frederik", "Sofie", "Lukas", "Emma", "William", "Ida", "Noah", "Anna", "Oliver", "Laura"]
-    last_names = ["Jensen", "Nielsen", "Hansen", "Pedersen", "Andersen", "Christensen", "Larsen", "Sørensen", "Rasmussen", "Jørgensen"]
-    
-    for i in range(num_files):
-        filename = os.path.join(directory, f"test_file{i+1}.dcm")
-        file_meta = Dataset()
-        file_meta.MediaStorageSOPClassUID = CTImageStorage
-        file_meta.MediaStorageSOPInstanceUID = generate_uid()
-        file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-        file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
 
-        ds = FileDataset(filename, {}, file_meta=file_meta, preamble=b"\0" * 128)
-        ds.PatientName = f"{random.choice(first_names)}^{random.choice(last_names)}"
-        ds.PatientID = f"{i+1}"
-        ds.StudyInstanceUID = generate_uid()
-        ds.SeriesInstanceUID = generate_uid()
-        ds.SOPInstanceUID = file_meta.MediaStorageSOPInstanceUID
-        ds.Modality = "CT"
-        ds.StudyDate = datetime.now().strftime("%Y%m%d")
-        ds.StudyTime = datetime.now().strftime("%H%M%S")
-        ds.Rows = 512
-        ds.Columns = 512
-        ds.BitsAllocated = 16
-        ds.BitsStored = 12
-        ds.HighBit = 11
-        ds.PixelRepresentation = 0
-        ds.SamplesPerPixel = 1
-        ds.PhotometricInterpretation = "MONOCHROME2"
-        ds.PixelData = b'\x00' * (ds.Rows * ds.Columns * 2)
-
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-
-        pydicom.dcmwrite(filename, ds)
-        detailed_logger.info(f"Created fake DICOM file: {filename}")
-        log_simplified_message({
-            "ID": str(int(time.time() * 1000000)),
-            "event": "Created fake DICOM file",
-            "file": filename,
-            "timestamp": datetime.now().isoformat()
-        })
-
-# Function to scan and load DICOM files
-def load_dicom_files(directory):
-    dicom_files = {}
-    for root, _, files in os.walk(directory):
-        for file in files:
-            path = os.path.join(root, file)
-            try:
-                ds = pydicom.dcmread(path)
-                dicom_files[path] = ds
-            except Exception as e:
-                detailed_logger.error(f"Failed to read DICOM file {path}: {e}")
-                log_simplified_message({
-                    "ID": str(int(time.time() * 1000000)),
-                    "event": "Failed to read DICOM file",
-                    "file": path,
-                    "error": str(e),
-                    "timestamp": datetime.now().isoformat()
-                })
-    return dicom_files
+    for instance in matching:
+        if event.is_cancelled:
+            yield 0xFE00, None
+        abstractSyn= str(instance.SOPClassUID)
+        for context in assoc.accepted_contexts:
+            if context.abstract_syntax == abstractSyn:
+                context._as_scp=True
+                context._as_scu=True
+                context.scu_role=True
+                context.scp_role=True
+                #context.transfer_syntax[0]=ExplicitVRLittleEndian
+                #instance.decompress()
+                #instance.decompress()
+                # Set the transfer syntax to Implicit VR Little Endian
+                #instance.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+                print("AcceptedAfterAssociat",context)
+                yield 0xFF00, instance
+        
+    yield 0x0000, None
 
 
-dicom_directory = 'dicom_files'
-if not os.path.exists(dicom_directory):
-    create_fake_dicom_files(dicom_directory)
-dicom_datasets = load_dicom_files(dicom_directory)
 
-# Dictionary to store association session IDs
-assoc_sessions = {}
+
+
+
 
 def handle_assoc(event):
-    assoc_id = str(int(time.time() * 1000000))
-    assoc_sessions[event.assoc] = assoc_id
-    detailed_logger.info(f"Association requested from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
-    version = event.assoc.requestor.implementation_version_name if event.assoc.requestor.implementation_version_name else "N/A"
+    
+    print(".........................................................................................")
+    time.sleep(2)
+    try:
+        
+    a=9
 
-    #log_simplified_message({
-    #    "session_id": assoc_id,
-    #    "ID": assoc_id,
-    #    "event": "Association requested",
-    #    "IP": event.assoc.requestor.address,
-    #    "Port": event.assoc.requestor.port,
-    #    "level": "warning",
-    #    "msg": "Connection from",
-    #    "timestamp": datetime.now().isoformat()
-    #})
-    #log_simplified_message({
-    #    "session_id": assoc_id,
-    #    "ID": assoc_id,
-    #    "Version": version,
-    #    "level": "info",
-    #    "msg": "Client",
-    #    "timestamp": datetime.now().isoformat()
-    #})
 
 def handle_release(event):
-    assoc_id = assoc_sessions.pop(event.assoc, str(int(time.time() * 1000000)))
-    detailed_logger.info(f"Association released from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
-    #log_simplified_message({
-    #    "session_id": assoc_id,
-    #    "ID": assoc_id,
-    #    "event": "Association released",
-    #    "IP": event.assoc.requestor.address,
-    #    "Port": event.assoc.requestor.port,
-    #    "Status": "Finished",
-    #    "level": "warning",
-    #    "msg": "Connection",
-    #    "timestamp": datetime.now().isoformat()
-    #})
+    e=event
+   
 
 def handle_find(event):
-
-    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
-    find_id = str(int(time.time() * 1000000))
-    detailed_logger.info(f"C-FIND request received: {event.identifier}")
 
     instances = []
     matching = []
@@ -236,54 +126,6 @@ def handle_find(event):
         return
 
 
-    #print("INSTANCES.....", instances)
-   # if event.identifier.QueryRetrieveLevel == 'PATIENT' :
-    #    if 'PatientName' in event.identifier:
-    #        if event.identifier.PatientName not in ['*', '', '?']:
-
-    #            matching = [
-    #                instance for instance in instances if instance.PatientName == event.identifier.PatientName
-    #            ]
-    #    elif 'PatientID' in event.identifier:
-    #        if event.identifier.PatientID not in ['*', '', '?']:
-    #            matching = [
-    #                instance for instance in instances if str(instance.PatientID) == str(event.identifier.PatientID).strip()
-    #            ]
-    #    elif 'StudyDate' in event.identifier:
-    #        if event.identifier.StudyDate not in ['*', '', '?']:
-    #            matching = [
-    #                instance for instance in instances if instance.StudyDate == event.identifier.StudyDate
-    #            ]
-    #    elif 'StudyDesctiption' in event.identifier:
-    #        if event.identifier.PatientName not in ['*', '', '?']:
-    #            matching = [
-    #                instance for instance in instances if instance.StudyDesctiption == event.identifier.StudyDesctiption
-    #            ]
-    #    elif 'AccessionNumber' in event.identifier:
-    #        if event.identifier.PatientName not in ['*', '', '?']:
-    #            matching = [
-    #                instance for instance in instances if instance.AccessionNumber == event.identifier.AccessionNumber
-    #            ]
-
-
-    #if event.identifier.QueryRetrieveLevel == 'PATIENT':
-    #    if 'PatientName' in event.identifier:
-    #        if event.identifier.PatientName not in ['*', '', '?']:
-    #            matching = [
-    #                instance for instance in instances if instance.PatientName == event.identifier.PatientName
-    #            ]
-    #for instance in matching:
-    #    if event.is_cancelled:
-    #        yield 0xC000, None
-    #        return
-
-    #    identifier = Dataset()
-    #    identifier.PatientName = instance.PatientName
-    #    identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
-
-    #    # Pending
-    #    yield (0xFF00, identifier)
-
     def date_in_range(datestr, date_range):
         if '-' in event.identifier.StudyDate:
             startdate, enddate = event.identifier.StudyDate.split('-')
@@ -292,7 +134,7 @@ def handle_find(event):
         else:
             startdate= enddate = date_range
         return startdateobject <= datetime.strptime(datestr, '%Y%m%d') <= enddateobject
-
+    
 
     if event.identifier.QueryRetrieveLevel == 'STUDY' or event.identifier.QueryRetrieveLevel == 'PATIENT':
         if 'PatientName' in event.identifier:
@@ -332,7 +174,6 @@ def handle_find(event):
                             matching.append(instance)
 
 
-
         elif 'StudyDesctiption' in event.identifier:
             if 'StudyDescription' in event.identifier:
                 if event.identifier.StudyDescription not in ['*', '', '?']:
@@ -366,7 +207,10 @@ def handle_find(event):
         identifier = Dataset()
 
         identifier.PatientID = instance.get('PatientID')
-        identifier.StudyDate = instance.get('StudyDate')
+        identifier.StudyInstanceUID = instance.get('StudyInstanceUID')
+        identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
+        identifier.SOPInstanceUID = instance.get('SOPInstanceUID')
+        identifier.SOPClassUID= instance.get('SOPClassUID')
 
         identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
 
@@ -379,22 +223,9 @@ def handle_find(event):
 
 
 def handle_store(event):
-    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
-    store_id = str(int(time.time() * 1000000))
+   
 
-    detailed_logger.info(f"C-STORE request received: {event.dataset}")
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": store_id,
-        "event": "C-STORE request received",
-        "Command": "C-STORE",
-        "dataset": {tag: str(value) for tag, value in event.dataset.items()},
-        "level": "info",
-        "msg": "Received",
-        "timestamp": datetime.now().isoformat()
-    })
-
-    file_name = f"{store_id}"
+    file_name = f"received"
     event.dataset.file_meta = event.file_meta
     #event.file_meta,
     event.dataset.save_as(os.path.join('./dicom_files/received',file_name),write_like_original=False)
@@ -404,36 +235,14 @@ def handle_store(event):
     return 0x0000
 
 
-def handle_echo(event):
-    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
-    echo_id = str(int(time.time() * 1000000))
-    detailed_logger.info(f"C-ECHO request received")
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": echo_id,
-        "event": "C-ECHO request received",
-        "Command": "C-ECHO",
-        "level": "info",
-        "msg": "Received",
-        "timestamp": datetime.now().isoformat()
-    })
 
-    return 0x0000
+
+def handle_echo(event):
+    s=1
 
 def handle_move(event):
-    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     move_id = str(int(time.time() * 1000000))
-    detailed_logger.info(f"C-MOVE request received: {event.identifier}")
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": move_id,
-        "event": "C-MOVE request received",
-        "Command": "C-MOVE",
-        "identifier": {tag: str(value) for tag, value in event.identifier.items()},
-        "level": "info",
-        "msg": "Received",
-        "timestamp": datetime.now().isoformat()
-    })
+   
     ds = Dataset()
     ds.SOPInstanceUID = generate_uid()
     ds.PatientName = "Doe^John"
@@ -444,164 +253,6 @@ def handle_move(event):
     yield 1, ds
 
 
-
-def handle_get(event):
-    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
-    get_id = str(int(time.time() * 1000000))
-   # detailed_logger.info(f"C-GET request received: {event.identifier}")
-    log_simplified_message({
-        "session_id": assoc_id,
-        "ID": get_id,
-        "event": "C-GET request received",
-        "Command": "C-GET",
-        "identifier": {tag: str(value) for tag, value in event.identifier.items()},
-        "level": "info",
-        "msg": "Received",
-        "timestamp": datetime.now().isoformat()
-    })
-    #print("THISPLACE", event.identifier.QueryRetrieveLevel, event.identifier.items, event.identifier.PatientID)
-    remaining_subops = len(dicom_datasets)
-    print("REMAINING", remaining_subops)
-    print("AAAAAAA",event.identifier)
-
-#________________________________________________________________________________
-    instances = []
-    matching = []
-
-    storagedirectory = './dicom_files/received'
-
-    for path in os.listdir(storagedirectory):
-        instances.append(dcmread(os.path.join(storagedirectory, path)))
-
-    if 'QueryRetrieveLevel' not in event.identifier:
-        yield 0xC000, None
-        return
-
-    if event.identifier.QueryRetrieveLevel == 'STUDY' or event.identifier.QueryRetrieveLevel == 'PATIENT':
-        if 'PatientName' in event.identifier:
-            print("mr", event.identifier.PatientName)
-            if event.identifier.PatientName not in ['*', '', '?']:
-                for instance in instances:
-                    print("mr2", instance.PatientName)
-                    print("stripped value", event.identifier.PatientName)
-                    if instance.PatientName == event.identifier.PatientName:
-                        print("aaaaaaa", str(instance.PatientName))
-                        matching.append(instance)
-                        print("matchinginstance", instance)
-
-        # study_date = datetime.strptime(event.identifier.StudyDate, '%Y%m%d').date()
-        if 'PatientID' in event.identifier:
-            print("mr", event.identifier.PatientID)
-            if event.identifier.PatientID not in ['*', '', '?']:
-                for instance in instances:
-                    print("mr2", instance.PatientID)
-                    print("stripped value", event.identifier.PatientID.strip('*'))
-                    if instance.PatientID == event.identifier.PatientID.strip('*'):
-                        print("aaaaaaa", str(instance.PatientID))
-                        matching.append(instance)
-                        print("matchinginstance", instance)
-
-
-        elif 'StudyDate' in event.identifier:
-            if 'StudyDate' in event.identifier:
-                if event.identifier.StudyDate not in ['*', '', '?']:
-                    for instance in instances:
-                        print("typeo of instance", type(instance.StudyDate))
-                        print("typeo of event identifier", type(event.identifier.StudyDate))
-                        if instance.StudyDate == event.identifier.StudyDate:
-                            print("work?")
-                            print("matchinginstance", instance)
-                            matching.append(instance)
-
-
-
-        elif 'StudyDesctiption' in event.identifier:
-            if 'StudyDescription' in event.identifier:
-                if event.identifier.StudyDescription not in ['*', '', '?']:
-                    for instance in instances:
-                        print("typeo of instance", type(instance.StudyDescription))
-                        print("typeo of event identifier", type(event.identifier.StudyDescription))
-                        if instance.StudyDescription == event.identifier.StudyDescription:
-                            print("work?")
-                            print("matchinginstance", instance)
-                            matching.append(instance)
-
-
-        elif 'AccessionNumber' in event.identifier:
-            if 'AccessionNumber' in event.identifier:
-                if event.identifier.AccessionNumber not in ['*', '', '?']:
-                    for instance in instances:
-                        print("typeo of instance", type(instance.AccessionNumber))
-                        print("typeo of event identifier", type(event.identifier.AccessionNumber))
-                        if instance.AccessionNumber == event.identifier.AccessionNumber:
-                            print("work?")
-                            print("matchinginstance", instance)
-                            matching.append(instance)
-
-        yield len(instances)
-
-    for instance in matching:
-        if event.is_cancelled:
-            yield 0xC000, None
-            return
-
-        # GET with instance and
-        # Pending
-        yield (0xFF00, instance)
-
-    #________________________________________________________________________________
-    # Yield the number of remaining sub-operations as the first item
-    #with open("DICOMdatasetsEverything", "w") as file:
-     #   for key, value in dicom_datasets.items():
-      #      file.write(f'{key}:{value}\n')
-
-    #if 'QueryRetrieveLevel' not in event.identifier:
-    #    yeild (0xC000, None)
-
-    #instances = []
-    #matching = []
-
-    #storagedirectory = './dicom_files/storage'
-
-
-    #for path in os.listdir(storagedirectory):
-    #    instances.append(dcmread(os.path.join(storagedirectory, path)))
-
-
-    #if 'QueryRetrieveLevel' not in event.identifier:
-    #    yield 0xC000, None
-    #    return
-
-    #if event.identifier.QueryRetrieveLevel == 'PATIENT':
-    #    found = False
-    #    if 'PatientID' in event.identifier:
-    #        print("wokr")
-    #        for instance in instances:
-    #            print("INSTANCEIDPATIENT",instance.PatientID)
-    #            if instance.PatientID == event.identifier.PatientID:
-    #                matching = [
-    #                    instance for instance in instances if instance.PatientID == event.identifier.PatientID
-    #                ]
-    #                print("There is a match!")
-
-
-
-
-
-    for instance in matching:
-        if event.is_cancelled:
-            yield 0xFE00, None
-            return
-        yield 0xFF00, instance
-    #yield len(instances)
-
-
-
-    #Patient Root:
-        #Patient, Study, Series, composite object instance
-    #Study Root:
-        #Study, Series, composite object instance
-    # Patient/Study is retired
 
 
 
@@ -615,27 +266,6 @@ handlers = [
     (evt.EVT_C_GET, handle_get),
 ]
 
-ae = AE()
-for cx in ae.supported_contexts:
-    cx.scp_role = True
-    cx.scu_role = False
-ae.supported_contexts = StoragePresentationContexts
-ae.supported_contexts = AllStoragePresentationContexts
-
-
-ae.add_supported_context(PatientRootQueryRetrieveInformationModelFind)
-ae.add_supported_context(PatientRootQueryRetrieveInformationModelGet)
-ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
-ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
-
-
-#for cx in ae.supported_contexts:
-#    cx.scp_role = True
-#    cx.scu_role = False
-
-
-for context in StoragePresentationContexts + VerificationPresentationContexts + QueryRetrievePresentationContexts:
-    ae.add_supported_context(context.abstract_syntax,AllTransferSyntaxes)
 
 
 def is_port_in_use(port):
@@ -647,10 +277,42 @@ def start_dicom_server():
     if is_port_in_use(dicom_port):
         print(f"Port {dicom_port} is in use. Please free up the port and try again.")
         return
-    print("erere")
+    print("Server Started")
     ae.start_server(('0.0.0.0', dicom_port), evt_handlers=handlers)
+    
 #'172.29.0.3'
 
 
 start_dicom_server()
 
+def storeToSante():
+
+    #ae.supported_contexts = StoragePresentationContexts
+    #ae.supported_contexts = AllStoragePresentationContexts
+# Load the DICOM file to send
+    dataset = dcmread('./dicom_files/received/test')
+    #ae.add_requested_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] )
+    #ae.add_requested_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] )
+    #ae.add_requested_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit])
+    #ae.add_requested_context(CTImageStorage,[JPEG2000])
+    ae.add_requested_context(MRImageStorage,[JPEGLosslessSV1])
+    # Define the remote DICOM server (host, port)
+    assoc = ae.associate('172.30.160.1', 11113)
+    """ for cx in assoc.accepted_contexts:
+                cx.transfer_syntax[0]=UID("1.2.840.10008.1.2.4.91")
+                cx._as_scu = True
+                cx._as_scp = False """
+    if assoc.is_established:
+        # Send the DICOM file via C-STORE
+        status = assoc.send_c_store(dataset)
+
+        # Check the status of the operation
+        if status:
+            print(f'C-STORE request status: {status.Status}')
+        else:
+            print('C-STORE request failed')
+
+        # Release the association
+        assoc.release()
+
+#storeToSante()
