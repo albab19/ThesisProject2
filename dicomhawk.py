@@ -11,18 +11,20 @@ from datetime import datetime
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pylibjpeg import decode
+from pynetdicom.presentation import PresentationContext
+from pynetdicom import association
+from pydicom.pixel_data_handlers.util import apply_modality_lut
 
-#
 debug_logger()
 
 ae = AE()
 
-for context in AllStoragePresentationContexts:
-        context._as_scp=True
-        context._as_scu=True
-        context.scp_role=True
-        context.scu_role=True
-        context.transfer_syntax=[JPEGLosslessSV1] 
+#for context in AllStoragePresentationContexts:
+        #context._as_scp=True
+        #context._as_scu=True
+        #context.scp_role=True
+        #context.scu_role=True
+        #context.transfer_syntax=[ JPEGBaseline8Bit] 
         #print("AllStoragePresentationContexts",context.scp_role)
 
 
@@ -44,6 +46,23 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
 #ae.add_supported_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit],True,True)
 #ae.add_supported_context(CTImageStorage,[JPEG2000],True,True)
 #ae.add_supported_context(MRImageStorage,[JPEGLosslessSV1],True,True)
+
+
+def custom_get_valid_context(
+        self,
+        ab_syntax: str | UID,
+        tr_syntax: str | UID,
+        role: str | None = None,
+        context_id: int | None = None,
+        allow_conversion: bool = True,
+    ) -> PresentationContext:
+    #context = build_context(CTImageStorage, [JPEGLosslessSV1])
+    #ae.requested_contexts.append(context)
+    time.sleep(20)
+    print("hgggggggggggggggggggggggggggggggggggg")
+    pass
+    return context
+
 
 
 
@@ -82,13 +101,21 @@ def handle_get(event):
                 context._as_scu=True
                 context.scu_role=True
                 context.scp_role=True
-                #context.transfer_syntax[0]=ExplicitVRLittleEndian
+                if instance.file_meta.TransferSyntaxUID.is_compressed:
+                    instance.decompress()
+                apply_modality_lut(instance.pixel_array, instance)
+                instance.save_as('./decompressed_dicom.dcm')
+                send= dcmread('./decompressed_dicom.dcm')
+                #instance.is_implicit_VR = True
+                #instance.is_little_endian = True
+                #context.transfer_syntax[0]=UID(instance.file_meta.TransferSyntaxUID)
                 #instance.decompress()
                 #instance.decompress()
                 # Set the transfer syntax to Implicit VR Little Endian
                 #instance.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
                 print("AcceptedAfterAssociat",context)
-                yield 0xFF00, instance
+                yield 0xFF00, send
+                os.remove("./decompressed_dicom.dcm")
         
     yield 0x0000, None
 
@@ -100,10 +127,8 @@ def handle_get(event):
 
 def handle_assoc(event):
     
+    #event.assoc.ServiceUser.requested_contexts
     print(".........................................................................................")
-    time.sleep(2)
-    try:
-        
     a=9
 
 
@@ -295,7 +320,7 @@ def storeToSante():
     #ae.add_requested_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] )
     #ae.add_requested_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit])
     #ae.add_requested_context(CTImageStorage,[JPEG2000])
-    ae.add_requested_context(MRImageStorage,[JPEGLosslessSV1])
+    ae.add_requested_context(MRImageStorage,[JPEG2000])
     # Define the remote DICOM server (host, port)
     assoc = ae.associate('172.30.160.1', 11113)
     """ for cx in assoc.accepted_contexts:
