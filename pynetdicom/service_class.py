@@ -2040,6 +2040,8 @@ class QueryRetrieveServiceClass(ServiceClass):
         with attempt(rsp, self.dimse, cx_id) as ctx:
             ctx.error_msg = "Exception in handler bound to 'evt.EVT_C_MOVE'"
             ctx.error_status = 0xC511
+            print("reqObject",req)
+
             generator = evt.trigger(
                 self.assoc,
                 evt.EVT_C_MOVE,
@@ -2049,12 +2051,12 @@ class QueryRetrieveServiceClass(ServiceClass):
                     "_is_cancelled": self.is_cancelled,
                 },
             )
-
         # Exception in context or handler aborted/released - before any yields
         if not ctx.success or not self.assoc.is_established:
             return
 
         generator = cast(Iterator[Any], generator)
+        
 
         # Try and get the first yield
         with attempt(rsp, self.dimse, cx_id) as ctx:
@@ -2073,6 +2075,7 @@ class QueryRetrieveServiceClass(ServiceClass):
 
         # Try to check the Move Destination is OK and known
         with attempt(rsp, self.dimse, cx_id) as ctx:
+            print("Hello",rsp)
             ctx.error_msg = (
                 "The handler bound to 'evt.EVT_C_MOVE' yielded an invalid "
                 "destination AE (addr, port) or (addr, port, kwargs) value"

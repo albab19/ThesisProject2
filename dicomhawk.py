@@ -2,7 +2,7 @@ from lib2to3.fixes.fix_input import context
 from datetime import datetime
 from pydicom.uid import JPEGLosslessSV1, generate_uid,DigitalXRayImageStorageForPresentation,  JPEGBaseline8Bit, MRImageStorage,SecondaryCaptureImageStorage,ExplicitVRLittleEndian,ImplicitVRLittleEndian,CTImageStorage, PYDICOM_IMPLEMENTATION_UID, OphthalmicPhotography8BitImageStorage, JPEG2000 , AllTransferSyntaxes
 from pynetdicom import AE, evt, debug_logger, AllStoragePresentationContexts ,StoragePresentationContexts, VerificationPresentationContexts,QueryRetrievePresentationContexts,build_context
-from pynetdicom.sop_class import (PatientRootQueryRetrieveInformationModelFind,PatientRootQueryRetrieveInformationModelGet,StudyRootQueryRetrieveInformationModelFind,StudyRootQueryRetrieveInformationModelGet,CTImageStorage)
+from pynetdicom.sop_class import (PatientRootQueryRetrieveInformationModelFind,Verification,StudyRootQueryRetrieveInformationModelMove,PatientRootQueryRetrieveInformationModelGet,StudyRootQueryRetrieveInformationModelFind,StudyRootQueryRetrieveInformationModelGet,CTImageStorage)
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.uid import (generate_uid, ExplicitVRLittleEndian, UID,PYDICOM_IMPLEMENTATION_UID, JPEGLosslessSV1, AllTransferSyntaxes, JPEGLSLossless, PatientRadiationDoseSRStorage)
 import socket,time
@@ -19,62 +19,32 @@ debug_logger()
 
 ae = AE()
 
-#for context in AllStoragePresentationContexts:
-        #context._as_scp=True
-        #context._as_scu=True
-        #context.scp_role=True
-        #context.scu_role=True
+for context in StoragePresentationContexts:
+        context._as_scp=True
+        context._as_scu=True
+        context.scp_role=True
+        context.scu_role=True
         #context.transfer_syntax=[ JPEGBaseline8Bit] 
         #print("AllStoragePresentationContexts",context.scp_role)
 
 
 #ae.supported_contexts = StoragePresentationContexts 
 ae.supported_contexts = AllStoragePresentationContexts
+ae.requested_contexts = StoragePresentationContexts
 ae.add_supported_context(PatientRootQueryRetrieveInformationModelFind)
 ae.add_supported_context(PatientRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
-
-#ae.add_requested_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] )
-#ae.add_requested_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] )
-#ae.add_requested_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit])
-#ae.add_requested_context(CTImageStorage,[JPEGLosslessSV1])
-#ae.add_supported_context(CTImageStorage,[JPEGLosslessSV1])
-#ae.requested_contexts=AllStoragePresentationContexts
-#ae.add_supported_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] ,True,True)
-#ae.add_supported_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] ,True,True)
-#ae.add_supported_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit],True,True)
-#ae.add_supported_context(CTImageStorage,[JPEG2000],True,True)
-#ae.add_supported_context(MRImageStorage,[JPEGLosslessSV1],True,True)
-
-
-def custom_get_valid_context(
-        self,
-        ab_syntax: str | UID,
-        tr_syntax: str | UID,
-        role: str | None = None,
-        context_id: int | None = None,
-        allow_conversion: bool = True,
-    ) -> PresentationContext:
-    #context = build_context(CTImageStorage, [JPEGLosslessSV1])
-    #ae.requested_contexts.append(context)
-    time.sleep(20)
-    print("hgggggggggggggggggggggggggggggggggggg")
-    pass
-    return context
-
-
+ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
+ae.add_supported_context(Verification)
 
 
 
 def handle_get(event):
-    #ae.add_supported_context(MRImageStorage,[JPEGLosslessSV1],True,True)
-
     assoc = event.assoc
     instances = []
     matching = []
     storagedirectory = './dicom_files/received'
-        #context._as_scu=True
     for path in os.listdir(storagedirectory):
         instances.append(dcmread(os.path.join(storagedirectory, path)))
     if 'QueryRetrieveLevel' not in event.identifier:
@@ -126,7 +96,8 @@ def handle_get(event):
 
 
 def handle_assoc(event):
-    
+    print(event.assoc.requestor.port)
+    time.sleep(10)
     #event.assoc.ServiceUser.requested_contexts
     print(".........................................................................................")
     a=9
@@ -266,16 +237,62 @@ def handle_echo(event):
     s=1
 
 def handle_move(event):
-    move_id = str(int(time.time() * 1000000))
-   
-    ds = Dataset()
-    ds.SOPInstanceUID = generate_uid()
-    ds.PatientName = "Doe^John"
-    ds.PatientID = "12345"
-    ds.StudyInstanceUID = generate_uid()
-    ds.SeriesInstanceUID = generate_uid()
-    ds.SOPClassUID = CTImageStorage
-    yield 1, ds
+    assoc = event.assoc
+    addr= assoc.requestor.address
+    port= assoc.requestor.port
+    print("addr",assoc.requestor.address)
+    print("port",assoc.requestor.port)
+    #time.sleep(10)
+
+    yield(str(addr),port)
+    print("addr yielded")
+    instances = []
+    matching = []
+    storagedirectory = './dicom_files/received'
+        #context._as_scu=True
+    for path in os.listdir(storagedirectory):
+        instances.append(dcmread(os.path.join(storagedirectory, path)))
+    if 'QueryRetrieveLevel' not in event.identifier:
+        yield 0xC000, None
+        return
+    if event.identifier.QueryRetrieveLevel == 'STUDY':
+        if 'StudyInstanceUID' in event.identifier:
+            for instance in instances:
+                if instance.StudyInstanceUID == event.identifier.StudyInstanceUID:
+                    
+                    matching = [
+                        instance for instance in instances if instance.StudyInstanceUID == event.identifier.StudyInstanceUID
+                    ]
+    print("There is a ",len(matching)," match!", "for study :",)
+    yield len(matching)
+    
+    
+    for context in assoc.accepted_contexts:
+                context._as_scp=True
+                context._as_scu=True
+                context.scu_role=True
+                context.scp_role=True
+
+    for instance in matching:
+        if event.is_cancelled:
+            yield 0xFE00, None
+        send=None    
+        if instance.file_meta.TransferSyntaxUID.is_compressed:
+                instance.decompress()
+                apply_modality_lut(instance.pixel_array, instance)
+                instance.save_as('./decompressed_dicom.dcm')
+                send= dcmread('./decompressed_dicom.dcm')
+                print("AcceptedAfterAssociat",context)
+                yield 0xFF00, send
+                os.remove("./decompressed_dicom.dcm")
+        else:
+         yield 0xFF00, instance   
+        
+        
+        
+                
+        
+    yield 0x0000, None
 
 
 
@@ -303,7 +320,7 @@ def start_dicom_server():
         print(f"Port {dicom_port} is in use. Please free up the port and try again.")
         return
     print("Server Started")
-    ae.start_server(('0.0.0.0', dicom_port), evt_handlers=handlers)
+    ae.start_server(('172.30.160.1', dicom_port), evt_handlers=handlers)
     
 #'172.29.0.3'
 

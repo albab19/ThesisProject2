@@ -3509,7 +3509,7 @@ class Association(threading.Thread):
 
     def _serve_request(self, msg: DimseServiceType, context_id: int) -> None:
         
-        #print("_serve_requestAssocClass",msg)
+        print("_serve_requestAssocClass",msg)
         """Handle a DIMSE service request.
 
         Parameters
@@ -3524,7 +3524,6 @@ class Association(threading.Thread):
         if not msg.is_valid_request:
             LOGGER.warning(f"Received unexpected {msg.msg_type} service message")
             return
-        print("tracetrace")
         # Use the Message's Affected SOP Class UID or Requested SOP
         #   Class UID to determine which service to use
         class_uid: str | UID = ""
