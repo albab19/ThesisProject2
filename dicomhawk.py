@@ -1,20 +1,15 @@
 from lib2to3.fixes.fix_input import context
 from datetime import datetime
-from pydicom.uid import JPEGLosslessSV1, generate_uid,DigitalXRayImageStorageForPresentation,  JPEGBaseline8Bit, MRImageStorage,SecondaryCaptureImageStorage,ExplicitVRLittleEndian,ImplicitVRLittleEndian,CTImageStorage, PYDICOM_IMPLEMENTATION_UID, OphthalmicPhotography8BitImageStorage, JPEG2000 , AllTransferSyntaxes
+from pydicom.uid import DigitalXRayImageStorageForPresentation,  JPEGBaseline8Bit, MRImageStorage,SecondaryCaptureImageStorage,ExplicitVRLittleEndian,ImplicitVRLittleEndian,CTImageStorage, PYDICOM_IMPLEMENTATION_UID, OphthalmicPhotography8BitImageStorage, JPEG2000 , AllTransferSyntaxes
 from pynetdicom import AE, evt, debug_logger, AllStoragePresentationContexts ,StoragePresentationContexts, VerificationPresentationContexts,QueryRetrievePresentationContexts,build_context
 from pynetdicom.sop_class import (PatientRootQueryRetrieveInformationModelFind,Verification,StudyRootQueryRetrieveInformationModelMove,PatientRootQueryRetrieveInformationModelGet,StudyRootQueryRetrieveInformationModelFind,StudyRootQueryRetrieveInformationModelGet,CTImageStorage)
-from pydicom.dataset import Dataset, FileDataset
-from pydicom.uid import (generate_uid, ExplicitVRLittleEndian, UID,PYDICOM_IMPLEMENTATION_UID, JPEGLosslessSV1, AllTransferSyntaxes, JPEGLSLossless, PatientRadiationDoseSRStorage)
+from pydicom.dataset import Dataset
 import socket,time
 import os 
 from datetime import datetime
 from pydicom import dcmread
-from pydicom.data import get_testdata_file
-from pylibjpeg import decode
-from pynetdicom.presentation import PresentationContext
-from pynetdicom import association
 from pydicom.pixel_data_handlers.util import apply_modality_lut
-
+import sqlite3
 debug_logger()
 
 ae = AE()
@@ -27,8 +22,6 @@ for context in StoragePresentationContexts:
         #context.transfer_syntax=[ JPEGBaseline8Bit] 
         #print("AllStoragePresentationContexts",context.scp_role)
 
-
-#ae.supported_contexts = StoragePresentationContexts 
 ae.supported_contexts = AllStoragePresentationContexts
 ae.requested_contexts = StoragePresentationContexts
 ae.add_supported_context(PatientRootQueryRetrieveInformationModelFind)
@@ -37,14 +30,14 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
 ae.add_supported_context(Verification)
-
+storagedirectory = './dicom_files/received'
 
 
 def handle_get(event):
     assoc = event.assoc
     instances = []
     matching = []
-    storagedirectory = './dicom_files/received'
+    
     for path in os.listdir(storagedirectory):
         instances.append(dcmread(os.path.join(storagedirectory, path)))
     if 'QueryRetrieveLevel' not in event.identifier:
@@ -90,17 +83,8 @@ def handle_get(event):
     yield 0x0000, None
 
 
-
-
-
-
-
 def handle_assoc(event):
-    print(event.assoc.requestor.port)
-    time.sleep(10)
-    #event.assoc.ServiceUser.requested_contexts
-    print(".........................................................................................")
-    a=9
+    e=event
 
 
 def handle_release(event):
@@ -120,8 +104,6 @@ def handle_find(event):
     if 'QueryRetrieveLevel' not in event.identifier:
         yield 0xC000, None
         return
-
-
     def date_in_range(datestr, date_range):
         if '-' in event.identifier.StudyDate:
             startdate, enddate = event.identifier.StudyDate.split('-')
@@ -219,8 +201,6 @@ def handle_find(event):
 
 
 def handle_store(event):
-   
-
     file_name = f"received"
     event.dataset.file_meta = event.file_meta
     #event.file_meta,
@@ -234,22 +214,16 @@ def handle_store(event):
 
 
 def handle_echo(event):
-    s=1
+    e=event
 
 def handle_move(event):
     assoc = event.assoc
     addr= assoc.requestor.address
     port= assoc.requestor.port
-    print("addr",assoc.requestor.address)
-    print("port",assoc.requestor.port)
-    #time.sleep(10)
-
     yield(str(addr),port)
-    print("addr yielded")
     instances = []
     matching = []
     storagedirectory = './dicom_files/received'
-        #context._as_scu=True
     for path in os.listdir(storagedirectory):
         instances.append(dcmread(os.path.join(storagedirectory, path)))
     if 'QueryRetrieveLevel' not in event.identifier:
@@ -265,14 +239,11 @@ def handle_move(event):
                     ]
     print("There is a ",len(matching)," match!", "for study :",)
     yield len(matching)
-    
-    
     for context in assoc.accepted_contexts:
                 context._as_scp=True
                 context._as_scu=True
                 context.scu_role=True
                 context.scp_role=True
-
     for instance in matching:
         if event.is_cancelled:
             yield 0xFE00, None
@@ -287,10 +258,6 @@ def handle_move(event):
                 os.remove("./decompressed_dicom.dcm")
         else:
          yield 0xFF00, instance   
-        
-        
-        
-                
         
     yield 0x0000, None
 
@@ -309,6 +276,114 @@ handlers = [
 ]
 
 
+def initialize_database():
+    conn = sqlite3.connect('database.db')
+    conn.executescript("BEGIN; " + "".join([f"DELETE FROM {row[0]}; " for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table';")]) + "COMMIT;")
+    cursor = conn.cursor()
+
+    for path in os.listdir(storagedirectory):
+        instance = dcmread(os.path.join(storagedirectory, path))
+        print("instance", instance)
+        patientId = instance.PatientID
+        if instance.get('NumberOfFrames') == None:
+              instance.NumberOfFrames='1'
+        
+        try:
+            patient_attrs = {
+            'PatientID': 'PATIENT_ID',
+            'PatientName': 'PATIENT_NAME',
+            'PatientBirthDate': 'PATIENT_BIRTHDATE',
+            'PatientSex': 'PATIENT_SEX'
+            }
+            available_attrs = {attr: db_column for attr, db_column in patient_attrs.items() if hasattr(instance, attr)}
+            if available_attrs:
+                columns = ', '.join(available_attrs.values())
+                placeholders = ', '.join(['?'] * len(available_attrs))
+                values = tuple(str(getattr(instance, attr)) for attr in available_attrs)
+                #print("columns", columns)
+                #print("values", values)
+                
+                # Insert patient data
+                query = f"INSERT INTO PATIENT ({columns}) VALUES ({placeholders})"
+                cursor.execute(query, values)
+                
+                # Fetch PATIENT_PRKEY
+                PATIENT_PRKEY_query = "SELECT PATIENT_PRKEY FROM PATIENT WHERE PATIENT_ID = ?"
+                cursor.execute(PATIENT_PRKEY_query, (patientId,))
+                PATIENT_PRKEY = cursor.fetchone()[0]
+
+                # Prepare study attributes
+                study_attrs = {
+                    'StudyInstanceUID': 'STUDY_INSTANCE_UID',
+                    'StudyID': 'STUDY_ID',
+                    'StudyDate': 'STUDY_DATE',
+                    'StudyTime': 'STUDY_TIME',
+                    'StudyDescription': 'STUDY_DESCRIPTION',
+                    'AccessionNumber': 'ACCESSION_NUMBER',
+                    'ReferringPhysicianName': 'REFER_PHYSICIAN',
+                    'Modality': 'MODALITIES_IN_STUDY',
+                    'StationName': 'STATION_NAME',
+                    'InstitutionalDepartmentName': 'INSTITUTIONAL_DEPARTMENT_NAME',
+                    'PatientAge': 'PATIENT_AGE',
+                    'PatientWeight': 'PATIENT_WEIGHT',
+                    'InstitutionName': 'INSTITUTION_NAME',
+                    'StudyStatusID': 'STUDY_STATUS',
+                    'SeriesNumber': 'SERIES_COUNT',
+                    'StudyComments': 'STUDY_COMMENTS',
+                    'SpecificCharacterSet': 'CHARACTER_SET'
+                }
+
+                available_study_attrs = {attr: db_column for attr, db_column in study_attrs.items() if hasattr(instance, attr)}
+                if available_study_attrs:
+                    columns = ', '.join(available_study_attrs.values()) + ', PATIENT_PRKEY'
+                    placeholders = ', '.join(['?'] * (len(available_study_attrs) + 1))
+                    values = tuple(str(getattr(instance, attr)) for attr in available_study_attrs) + (PATIENT_PRKEY,)
+                    #print("columns", columns)
+                    #print("values", values)
+                    
+                    # Insert study data
+                    query = f"INSERT INTO STUDY ({columns}) VALUES ({placeholders})"
+                    cursor.execute(query, values)
+                    
+                    # Get StudyInstanceUID for series attributes
+                    studyInstanceUID = instance.get("StudyInstanceUID", None)
+                    serie_attrs = {
+                        'SeriesInstanceUID': 'SERIES_INSTANCE_UID',
+                        'SeriesNumber': 'SERIES_NUMBER',
+                        'SeriesDate': 'SERIES_DATE',
+                        'SeriesTime': 'SERIES_TIME',
+                        'SeriesDescription': 'SERIES_DESCRIPTION',
+                        'Modality': 'MODALITY',
+                        'PatientPosition': 'PATIENT_POSITION',
+                        'ContrastBolusAgent': 'CONTRAST_BOLUS_AGENT',
+                        'Manufacturer': 'MANUFACTURER',
+                        'ModelName': 'MODEL_NAME',
+                        'BodyPartExamined': 'BODY_PART_EXAMINED',
+                        'ProtocolName': 'PROTOCOL_NAME',
+                        'NumberOfFrames': 'IMAGE_COUNT',
+                        'FrameOfReferenceUID': 'FRAME_OF_REFERENCE_UID',
+                        'LocalizerInstanceUID': 'LOCALIZER_INSTANCE_UID'
+                    }
+                    available_serie_attrs = {attr: db_column for attr, db_column in serie_attrs.items() if hasattr(instance, attr)}
+                    if available_serie_attrs:
+                        columns = ', '.join(available_serie_attrs.values()) + ', STUDY_INSTANCE_UID'
+                        placeholders = ', '.join(['?'] * (len(available_serie_attrs) + 1))
+                        values = tuple(str(getattr(instance, attr)) for attr in available_serie_attrs) + (studyInstanceUID,)
+                        print("columns", columns)
+                        print("values", values)
+                        
+                        # Insert series data
+                        query = f"INSERT INTO SERIES ({columns}) VALUES ({placeholders})"
+                        cursor.execute(query, values)
+                    else:
+                        print("No series attributes available to insert")
+                else:
+                    print("No study attributes available to insert")
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
+    conn.commit()
+    conn.close()
 
 def is_port_in_use(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -320,41 +395,8 @@ def start_dicom_server():
         print(f"Port {dicom_port} is in use. Please free up the port and try again.")
         return
     print("Server Started")
+    initialize_database()
     ae.start_server(('172.30.160.1', dicom_port), evt_handlers=handlers)
     
-#'172.29.0.3'
-
 
 start_dicom_server()
-
-def storeToSante():
-
-    #ae.supported_contexts = StoragePresentationContexts
-    #ae.supported_contexts = AllStoragePresentationContexts
-# Load the DICOM file to send
-    dataset = dcmread('./dicom_files/received/test')
-    #ae.add_requested_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] )
-    #ae.add_requested_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] )
-    #ae.add_requested_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit])
-    #ae.add_requested_context(CTImageStorage,[JPEG2000])
-    ae.add_requested_context(MRImageStorage,[JPEG2000])
-    # Define the remote DICOM server (host, port)
-    assoc = ae.associate('172.30.160.1', 11113)
-    """ for cx in assoc.accepted_contexts:
-                cx.transfer_syntax[0]=UID("1.2.840.10008.1.2.4.91")
-                cx._as_scu = True
-                cx._as_scp = False """
-    if assoc.is_established:
-        # Send the DICOM file via C-STORE
-        status = assoc.send_c_store(dataset)
-
-        # Check the status of the operation
-        if status:
-            print(f'C-STORE request status: {status.Status}')
-        else:
-            print('C-STORE request failed')
-
-        # Release the association
-        assoc.release()
-
-#storeToSante()
