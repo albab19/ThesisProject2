@@ -4,14 +4,32 @@ from pydicom.uid import DigitalXRayImageStorageForPresentation,  JPEGBaseline8Bi
 from pynetdicom import AE, evt, debug_logger, AllStoragePresentationContexts ,StoragePresentationContexts, VerificationPresentationContexts,QueryRetrievePresentationContexts,build_context
 from pynetdicom.sop_class import (PatientRootQueryRetrieveInformationModelFind,Verification,StudyRootQueryRetrieveInformationModelMove,PatientRootQueryRetrieveInformationModelGet,StudyRootQueryRetrieveInformationModelFind,StudyRootQueryRetrieveInformationModelGet,CTImageStorage)
 from pydicom.dataset import Dataset
-import socket,time
+import socket,time,traceback
 import os 
+from pynetdicom.apps.qrscp import handlers
+import dicomdb
+from sqlalchemy import cast, String
+
 from datetime import datetime
 from pydicom import dcmread
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 import sqlite3
 debug_logger()
-
+dicom_to_db_mapping = {
+    'SOPInstanceUID': 'sop_instance_uid',
+    'TransferSyntaxUID': 'transfer_syntax_uid',
+    'SOPClassUID': 'sop_class_uid',
+    'PatientID': 'patient_id',
+    'PatientName': 'patient_name',
+    'StudyInstanceUID': 'study_instance_uid',
+    'StudyDate': 'study_date',
+    'StudyTime': 'study_time',
+    'AccessionNumber': 'accession_number',
+    'StudyID': 'study_id',
+    'SeriesInstanceUID': 'series_instance_uid',
+    'Modality': 'modality',
+    'SeriesNumber': 'series_number',
+    'InstanceNumber': 'instance_number'}
 ae = AE()
 
 for context in StoragePresentationContexts:
@@ -49,6 +67,13 @@ def handle_get(event):
                 if instance.StudyInstanceUID == event.identifier.StudyInstanceUID:
                     matching = [
                         instance for instance in instances if instance.StudyInstanceUID == event.identifier.StudyInstanceUID
+                    ]
+    elif event.identifier.QueryRetrieveLevel == 'SERIES':
+        if 'SeriesInstanceUID' in event.identifier:
+            for instance in instances:
+                if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID:
+                    matching = [
+                        instance for instance in instances if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID
                     ]
     print("There is a ",len(matching)," match!", "for study :",)
     yield len(matching)
@@ -92,125 +117,172 @@ def handle_release(event):
    
 
 def handle_find(event):
+    requestor = event.assoc.requestor
+    timestamp = event.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+    addr, port = requestor.address, requestor.port
 
-    instances = []
-    matching = []
+    model = event.request.AffectedSOPClassUID
+    identifier = event.identifier
+    if identifier.QueryRetrieveLevel=="STUDY":
+         attr = dicomdb.db._STUDY_ROOT_ATTRIBUTES
+         for raw in identifier:
+             print("Hello",identifier[raw.keyword].value)
+             if raw.keyword in attr["SERIES"] or raw.keyword in attr["IMAGE"] or not identifier[raw.keyword].value:
+                 delattr(identifier, raw.keyword)
+    elif identifier.QueryRetrieveLevel=="SERIES":
+         attr = dicomdb.db._STUDY_ROOT_ATTRIBUTES
+         for raw in identifier:
+             print("Hello",identifier[raw.keyword].value)
+             if  raw.keyword in attr["IMAGE"] or not identifier[raw.keyword].value:
+                 delattr(identifier, raw.keyword)
+    elif identifier.QueryRetrieveLevel=="PATIENT":
+         attr = dicomdb.db._PATIENT_ROOT_ATTRIBUTES
+         for raw in identifier:
+             if raw.keyword in attr["SERIES"] or raw.keyword in attr["IMAGE"] or raw.keyword in attr["STUDY"] or not identifier[raw.keyword].value:
+                 delattr(identifier, raw.keyword)
+                 
+            
+    if model.keyword in (
+        "UnifiedProcedureStepPull",
+        "ModalityWorklistInformationModelFind",
+    ):
+        yield 0x0000, None
+    else:
+        engine = dicomdb.engine
+        matches=[]
+        Session = dicomdb.sessionmaker(bind=engine)
+        session = Session()
+        try:
+            """ query= session.query(dicomdb.db.Instance)
+            for kw in identifier :
+                if kw.keyword in dicom_to_db_mapping:
+                    print(kw.keyword)
+                    query.filter(getattr(dicomdb.db.Instance,dicom_to_db_mapping.get(kw.keyword)) == getattr(identifier,kw.keyword)) """
+            if identifier.QueryRetrieveLevel=="STUDY":
+                matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
+                uniqueStudies= get_uniqueStudies(matchedInstances)
+                studyQuery= session.query(dicomdb.db.Study)
+                studyQuery = studyQuery.filter(dicomdb.db.Study.study_instance_uid.in_(uniqueStudies))
+                matches=studyQuery.all()
+            elif identifier.QueryRetrieveLevel=="SERIES":
+                matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
+                print("MatchedInstancesFirst",matchedInstances)
+                #session.flush()
+                #print("SerieQuery",identifier.SeriesInstanceUID)
+                uniqueSeries= get_uniqueSeries(matchedInstances,identifier)
+                seriesQuery= session.query(dicomdb.db.Series)
+                seriesQuery= seriesQuery.filter(dicomdb.db.Series.series_instance_uid.in_(uniqueSeries))
+                matches=seriesQuery.all()
+            elif identifier.QueryRetrieveLevel=="PATIENT":
+                matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
+                uniquePatients= get_unique_patients(matchedInstances)
+                patientQuery= session.query(dicomdb.db.Patient)
+                patientQuery= patientQuery.filter(dicomdb.db.Patient.patient_id.in_(uniquePatients))
+                matches=patientQuery.all()
+                
+            print("Matchessss",matches)
+        except Exception as exc:
+            traceback.print_exc() 
+            session.rollback()
+            yield 0xC320, None
+            return
+        finally:
+            for instance in matches:
+                response_dataset = Dataset()
+                try:
+                    if identifier.QueryRetrieveLevel=="STUDY":
+                        response_dataset.StudyInstanceUID = getattr(instance,"study_instance_uid")
+                        response_dataset.StudyDate = getattr(instance,"study_date")
+                        response_dataset.StudyTime = getattr(instance,"study_time")
+                        response_dataset.AccessionNumber = getattr(instance,"accession_number")
+                        response_dataset.StudyID = getattr(instance,"study_id")
+                        response_dataset.PatientName = get_other_levels_tags("STUDY","patient_name",getattr(instance,"study_instance_uid"))
+                        response_dataset.PatientID = get_other_levels_tags("STUDY","patient_id",getattr(instance,"study_instance_uid"))
+                        response_dataset.NumberOfStudyRelatedInstances= get_other_levels_tags("STUDY","NumberOfStudyRelatedInstances",getattr(instance,"study_instance_uid"))
+                    elif identifier.QueryRetrieveLevel=="SERIES":
+                        response_dataset.Modality = getattr(instance,"modality")
+                        response_dataset.SeriesInstanceUID = getattr(instance,"series_instance_uid")
+                        response_dataset.SeriesNumber = getattr(instance,"series_number")
+                        response_dataset.PatientName = get_other_levels_tags("SERIES","patient_name",getattr(instance,"series_instance_uid"))
+                        response_dataset.PatientID = get_other_levels_tags("SERIES","patient_id",getattr(instance,"series_instance_uid"))
 
-    storagedirectory = './dicom_files/received'
+                    elif identifier.QueryRetrieveLevel=="PATIENT":
+                        response_dataset.PatientID = getattr(instance,"patient_id")
+                        response_dataset.PatientName = getattr(instance,"patient_name")
+                except Exception as e :
+                    traceback.print_exc() 
+                    pass
+                yield (0xFF00, response_dataset)
+                    
+                session.close()
 
-    for path in os.listdir(storagedirectory):
-        instances.append(dcmread(os.path.join(storagedirectory, path)))
-
-    if 'QueryRetrieveLevel' not in event.identifier:
-        yield 0xC000, None
-        return
-    def date_in_range(datestr, date_range):
-        if '-' in event.identifier.StudyDate:
-            startdate, enddate = event.identifier.StudyDate.split('-')
-            startdateobject = datetime.strptime(startdate, '%Y%m%d')
-            enddateobject = datetime.strptime(enddate, '%Y%m%d')
-        else:
-            startdate= enddate = date_range
-        return startdateobject <= datetime.strptime(datestr, '%Y%m%d') <= enddateobject
+def get_other_levels_tags(level,required_tag,query_identifier):
+    query = dicomdb.session.query(dicomdb.db.Instance)
+    
+    if level=="STUDY":
+        query= query.filter(dicomdb.db.Instance.study_instance_uid == cast(query_identifier,String))
+        if required_tag == 'NumberOfStudyRelatedInstances':
+            return len(query.all())
+            
+        else:    
+            result= query.all()[0]
+            dicomdb.session.commit()
+            if result:
+                return getattr(result,required_tag)
+    elif level=="SERIES":
+        print("hhhhhhhhhhhhhhhhhhhhhh")
+        query= query.filter(dicomdb.db.Instance.series_instance_uid == cast(query_identifier,String))
+        result= query.all()[0]
+        if result:
+            return getattr(result,required_tag)
+    elif level=="PATIENT":
+        query= query.filter(dicomdb.db.Instance.patient_id == cast(query_identifier,String))
+        result= query.all()[0]
+        if result:
+            return getattr(result,required_tag)
+    return None
     
 
-    if event.identifier.QueryRetrieveLevel == 'STUDY' or event.identifier.QueryRetrieveLevel == 'PATIENT':
-        if 'PatientName' in event.identifier:
-            print("mr", event.identifier.PatientName)
-            if event.identifier.PatientName not in ['*', '', '?']:
-                for instance in instances:
-                    print("mr2", instance.PatientName)
-                    print("stripped value", event.identifier.PatientName)
-                    if instance.PatientName == event.identifier.PatientName:
-                        print("aaaaaaa", str(instance.PatientName))
-                        matching.append(instance)
-                        print("matchinginstance", instance)
+def get_uniqueStudies(li):
+    uniqueSt=[]
+    for a in li:
+        sUID=getattr(a,"study_instance_uid")
+        if sUID not in uniqueSt:
+            uniqueSt.append(sUID)
+    #print("MatchedInstancesStudie",uniqueSt)
 
+    return uniqueSt
 
-        #study_date = datetime.strptime(event.identifier.StudyDate, '%Y%m%d').date()
-        if 'PatientID' in event.identifier:
-            print("mr",event.identifier.PatientID)
-            if event.identifier.PatientID not in ['*', '', '?']:
-                for instance in instances:
-                    print("mr2", instance.PatientID)
-                    print("stripped value", event.identifier.PatientID.strip('*'))
-                    if  instance.PatientID == event.identifier.PatientID.strip('*'):
-                        print("aaaaaaa",str(instance.PatientID))
-                        matching.append(instance)
-                        print("matchinginstance", instance)
+def get_uniqueSeries(li,identifier):
+    uniqueSt=[]
+    for a in li:
+        serieUID=getattr(a,"series_instance_uid")
+        studyUID=getattr(a,"study_instance_uid")
+        if serieUID not in uniqueSt and studyUID==identifier.StudyInstanceUID:
+            uniqueSt.append(serieUID)
+    print("MatchedInstancesSerie",uniqueSt)
 
+    return uniqueSt
 
-        elif 'StudyDate' in event.identifier:
-            if 'StudyDate' in event.identifier:
-                if event.identifier.StudyDate not in ['*', '', '?']:
-                    for instance in instances:
-                        print("typeo of instance", type(instance.StudyDate))
-                        print("typeo of event identifier", type(event.identifier.StudyDate))
-                        if instance.StudyDate == event.identifier.StudyDate:
-                            print("work?")
-                            print("matchinginstance", instance)
-                            matching.append(instance)
+def get_unique_patients(li):
+    uniqueSt=[]
+    for a in li:
+        sUID=getattr(a,"patient_id")
+        if sUID not in uniqueSt:
+            uniqueSt.append(sUID)
+    #print("MatchedInstancesPatient",uniqueSt)
 
-
-        elif 'StudyDesctiption' in event.identifier:
-            if 'StudyDescription' in event.identifier:
-                if event.identifier.StudyDescription not in ['*', '', '?']:
-                    for instance in instances:
-                        print("typeo of instance", type(instance.StudyDescription))
-                        print("typeo of event identifier", type(event.identifier.StudyDescription))
-                        if instance.StudyDescription == event.identifier.StudyDescription:
-                            print("work?")
-                            print("matchinginstance", instance)
-                            matching.append(instance)
-
-
-        elif 'AccessionNumber' in event.identifier:
-            if 'AccessionNumber' in event.identifier:
-                if event.identifier.AccessionNumber not in ['*', '', '?']:
-                    for instance in instances:
-                        print("typeo of instance", type(instance.AccessionNumber))
-                        print("typeo of event identifier", type(event.identifier.AccessionNumber))
-                        if instance.AccessionNumber == event.identifier.AccessionNumber:
-                            print("work?")
-                            print("matchinginstance", instance)
-                            matching.append(instance)
-
-    for instance in matching:
-        print("INST", instance)
-
-        if event.is_cancelled:
-            yield 0xC000, None
-            return
-
-        identifier = Dataset()
-
-        identifier.PatientID = instance.get('PatientID')
-        identifier.StudyInstanceUID = instance.get('StudyInstanceUID')
-        identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
-        identifier.SOPInstanceUID = instance.get('SOPInstanceUID')
-        identifier.SOPClassUID= instance.get('SOPClassUID')
-
-        identifier.QueryRetrieveLevel = event.identifier.QueryRetrieveLevel
-
-        print("MYIDENTIFIER", identifier)
-        #GET with instance and
-        # Pending
-        yield (0xFF00, identifier)
-
-
-
+    return uniqueSt
 
 def handle_store(event):
     file_name = f"received"
     event.dataset.file_meta = event.file_meta
     #event.file_meta,
     event.dataset.save_as(os.path.join('./dicom_files/received',file_name),write_like_original=False)
-    print(f"DICOM file saved as {file_name}")
+    #print(f"DICOM file saved as {file_name}")
     #print(event.dataset.file_meta)
 
     return 0x0000
-
-
 
 
 def handle_echo(event):
@@ -220,6 +292,7 @@ def handle_move(event):
     assoc = event.assoc
     addr= assoc.requestor.address
     port= assoc.requestor.port
+    # In local host the port has been forwarded which makes the connection not possible
     yield(str(addr),port)
     instances = []
     matching = []
@@ -237,6 +310,14 @@ def handle_move(event):
                     matching = [
                         instance for instance in instances if instance.StudyInstanceUID == event.identifier.StudyInstanceUID
                     ]
+    elif event.identifier.QueryRetrieveLevel == 'SERIES':
+        if 'SeriesInstanceUID' in event.identifier:
+            for instance in instances:
+                if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID:
+                    matching = [
+                        instance for instance in instances if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID
+                    ]
+                    
     print("There is a ",len(matching)," match!", "for study :",)
     yield len(matching)
     for context in assoc.accepted_contexts:
@@ -262,9 +343,6 @@ def handle_move(event):
     yield 0x0000, None
 
 
-
-
-
 handlers = [
     (evt.EVT_ACSE_RECV, handle_assoc),
     (evt.EVT_RELEASED, handle_release),
@@ -276,115 +354,6 @@ handlers = [
 ]
 
 
-def initialize_database():
-    conn = sqlite3.connect('database.db')
-    conn.executescript("BEGIN; " + "".join([f"DELETE FROM {row[0]}; " for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table';")]) + "COMMIT;")
-    cursor = conn.cursor()
-
-    for path in os.listdir(storagedirectory):
-        instance = dcmread(os.path.join(storagedirectory, path))
-        print("instance", instance)
-        patientId = instance.PatientID
-        if instance.get('NumberOfFrames') == None:
-              instance.NumberOfFrames='1'
-        
-        try:
-            patient_attrs = {
-            'PatientID': 'PATIENT_ID',
-            'PatientName': 'PATIENT_NAME',
-            'PatientBirthDate': 'PATIENT_BIRTHDATE',
-            'PatientSex': 'PATIENT_SEX'
-            }
-            available_attrs = {attr: db_column for attr, db_column in patient_attrs.items() if hasattr(instance, attr)}
-            if available_attrs:
-                columns = ', '.join(available_attrs.values())
-                placeholders = ', '.join(['?'] * len(available_attrs))
-                values = tuple(str(getattr(instance, attr)) for attr in available_attrs)
-                #print("columns", columns)
-                #print("values", values)
-                
-                # Insert patient data
-                query = f"INSERT INTO PATIENT ({columns}) VALUES ({placeholders})"
-                cursor.execute(query, values)
-                
-                # Fetch PATIENT_PRKEY
-                PATIENT_PRKEY_query = "SELECT PATIENT_PRKEY FROM PATIENT WHERE PATIENT_ID = ?"
-                cursor.execute(PATIENT_PRKEY_query, (patientId,))
-                PATIENT_PRKEY = cursor.fetchone()[0]
-
-                # Prepare study attributes
-                study_attrs = {
-                    'StudyInstanceUID': 'STUDY_INSTANCE_UID',
-                    'StudyID': 'STUDY_ID',
-                    'StudyDate': 'STUDY_DATE',
-                    'StudyTime': 'STUDY_TIME',
-                    'StudyDescription': 'STUDY_DESCRIPTION',
-                    'AccessionNumber': 'ACCESSION_NUMBER',
-                    'ReferringPhysicianName': 'REFER_PHYSICIAN',
-                    'Modality': 'MODALITIES_IN_STUDY',
-                    'StationName': 'STATION_NAME',
-                    'InstitutionalDepartmentName': 'INSTITUTIONAL_DEPARTMENT_NAME',
-                    'PatientAge': 'PATIENT_AGE',
-                    'PatientWeight': 'PATIENT_WEIGHT',
-                    'InstitutionName': 'INSTITUTION_NAME',
-                    'StudyStatusID': 'STUDY_STATUS',
-                    'SeriesNumber': 'SERIES_COUNT',
-                    'StudyComments': 'STUDY_COMMENTS',
-                    'SpecificCharacterSet': 'CHARACTER_SET'
-                }
-
-                available_study_attrs = {attr: db_column for attr, db_column in study_attrs.items() if hasattr(instance, attr)}
-                if available_study_attrs:
-                    columns = ', '.join(available_study_attrs.values()) + ', PATIENT_PRKEY'
-                    placeholders = ', '.join(['?'] * (len(available_study_attrs) + 1))
-                    values = tuple(str(getattr(instance, attr)) for attr in available_study_attrs) + (PATIENT_PRKEY,)
-                    #print("columns", columns)
-                    #print("values", values)
-                    
-                    # Insert study data
-                    query = f"INSERT INTO STUDY ({columns}) VALUES ({placeholders})"
-                    cursor.execute(query, values)
-                    
-                    # Get StudyInstanceUID for series attributes
-                    studyInstanceUID = instance.get("StudyInstanceUID", None)
-                    serie_attrs = {
-                        'SeriesInstanceUID': 'SERIES_INSTANCE_UID',
-                        'SeriesNumber': 'SERIES_NUMBER',
-                        'SeriesDate': 'SERIES_DATE',
-                        'SeriesTime': 'SERIES_TIME',
-                        'SeriesDescription': 'SERIES_DESCRIPTION',
-                        'Modality': 'MODALITY',
-                        'PatientPosition': 'PATIENT_POSITION',
-                        'ContrastBolusAgent': 'CONTRAST_BOLUS_AGENT',
-                        'Manufacturer': 'MANUFACTURER',
-                        'ModelName': 'MODEL_NAME',
-                        'BodyPartExamined': 'BODY_PART_EXAMINED',
-                        'ProtocolName': 'PROTOCOL_NAME',
-                        'NumberOfFrames': 'IMAGE_COUNT',
-                        'FrameOfReferenceUID': 'FRAME_OF_REFERENCE_UID',
-                        'LocalizerInstanceUID': 'LOCALIZER_INSTANCE_UID'
-                    }
-                    available_serie_attrs = {attr: db_column for attr, db_column in serie_attrs.items() if hasattr(instance, attr)}
-                    if available_serie_attrs:
-                        columns = ', '.join(available_serie_attrs.values()) + ', STUDY_INSTANCE_UID'
-                        placeholders = ', '.join(['?'] * (len(available_serie_attrs) + 1))
-                        values = tuple(str(getattr(instance, attr)) for attr in available_serie_attrs) + (studyInstanceUID,)
-                        print("columns", columns)
-                        print("values", values)
-                        
-                        # Insert series data
-                        query = f"INSERT INTO SERIES ({columns}) VALUES ({placeholders})"
-                        cursor.execute(query, values)
-                    else:
-                        print("No series attributes available to insert")
-                else:
-                    print("No study attributes available to insert")
-        except Exception as e:
-            print(f"Error occurred: {e}")
-
-    conn.commit()
-    conn.close()
-
 def is_port_in_use(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('0.0.0.0', port)) == 0
@@ -395,7 +364,7 @@ def start_dicom_server():
         print(f"Port {dicom_port} is in use. Please free up the port and try again.")
         return
     print("Server Started")
-    initialize_database()
+    dicomdb.initialize_database()
     ae.start_server(('172.30.160.1', dicom_port), evt_handlers=handlers)
     
 

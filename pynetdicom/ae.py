@@ -1424,7 +1424,6 @@ class ApplicationEntity:
         thread.start()
 
         self._servers.append(server)
-
         return server
 
     def __str__(self) -> str:

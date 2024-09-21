@@ -234,6 +234,7 @@ def add_instance(ds, session, fpath=None):
 
 
 def build_query(identifier, session, query=None):
+    
     """Perform a query against the database.
 
     Parameters
@@ -267,25 +268,25 @@ def build_query(identifier, session, query=None):
             elif vr in ["DA", "TM", "DT"] and "-" in val:
                 pass
             else:
-                # print('Performing single value matching...')
+                print('Performing single value matching...')
                 query = _search_single_value(elem, session, query)
                 continue
 
         # Part 4, C.2.2.2.3 Universal Matching
         if val is None:
-            # print('Performing universal matching...')
+            print('Performing universal matching...')
             query = _search_universal(elem, session, query)
             continue
 
         # Part 4, C.2.2.2.2 List of UID Matching
         if vr == "UI":
-            # print('Performing list of UID matching...')
+            print('Performing list of UID matching...')
             query = _search_uid_list(elem, session, query)
             continue
 
         # Part 4, C.2.2.2.4 Wild Card Matching
         if vr in _text_vr and ("*" in val or "?" in val):
-            # print('Performing wildcard matching...')
+            print('Performing wildcard matching...')
             query = _search_wildcard(elem, session, query)
             continue
 
@@ -339,12 +340,16 @@ def _check_identifier(identifier, model):
     for ii, level in enumerate(levels):
         if level == identifier.QueryRetrieveLevel:
             # Check if identifier has elements below current level
+            print("Identifier aftr filter from db class",identifier)
             for sublevel in levels[ii + 1 :]:
+                #print("SubLevel",sublevel,attr[sublevel])
                 if any([kw in identifier for kw in attr[sublevel]]):
+
                     raise InvalidIdentifier(
                         "The Identifier contains keys below the level "
                         "specified by the Query Retrieve Level"
                     )
+                    
 
             # The level is the same as that in the identifier so we're OK
             return
@@ -439,13 +444,12 @@ def search(model, identifier, session):
     """
     if model not in _STUDY_ROOT and model not in _PATIENT_ROOT:
         raise ValueError(f"Unknown information model '{model.name}'")
-
+#################Remember to remove Modality check 
     # Remove all optional keys, after this only unique/required will remain
     for elem in identifier:
         kw = elem.keyword
         if kw != "QueryRetrieveLevel" and kw not in _ATTRIBUTES:
             delattr(identifier, kw)
-
     if model in _C_GET or model in _C_MOVE:
         # Part 4, C.2.2.1.2: remove required keys from C-GET/C-MOVE
         for kw, value in _ATTRIBUTES.items():
@@ -474,7 +478,9 @@ def _search_qr(model, identifier, session):
         The Instances that match the query.
     """
     # Will raise InvalidIdentifier if check failed
+
     _check_identifier(identifier, model)
+
 
     if model in _PATIENT_ROOT:
         attr = _PATIENT_ROOT[model]
@@ -490,7 +496,8 @@ def _search_qr(model, identifier, session):
         ds = Dataset()
         [setattr(ds, kw, getattr(identifier, kw)) for kw in keywords]
         query = build_query(ds, session, query)
-
+        #print("QuyreyFromdb.py",query.all())
+        
         if level == identifier.QueryRetrieveLevel:
             break
 
@@ -565,15 +572,19 @@ def _search_single_value(elem, session, query=None):
     sqlalchemy.orm.query.Query
         The resulting query.
     """
+    
     attr = getattr(Instance, _TRANSLATION[elem.keyword])
+    #print("AttrFromdb.py",attr)
     if elem.VR == "PN":
         value = str(elem.value)
     else:
         value = elem.value
 
     if not query:
+        #print("jjjjjjjjjjjjjjjjjjjjjjjjjj")
         query = session.query(Instance)
-
+    
+    #print("valueFromdb.py",value)
     return query.filter(attr == value)
 
 

@@ -285,7 +285,6 @@ class DIMSEServiceProvider:
         primitive : pdu_primitives.P_DATA
             A P-DATA primitive received from the peer to be processed.
         """
-        print("tracetrace")
         if self.message is None:
             self.message = DIMSEMessage()
 
