@@ -33,7 +33,7 @@ debug_logger()
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 # Load the DICOM file
-ds = pydicom.dcmread('./dicom_files/received/I4')
+ds = pydicom.dcmread('./dicom_files/received/OPT_S1')
 
 # Decompress the pixel data
 if ds.file_meta.TransferSyntaxUID.is_compressed:
@@ -64,13 +64,13 @@ def storeToSante():
     #ae.supported_contexts = StoragePresentationContexts
     #ae.supported_contexts = AllStoragePresentationContexts
 # Load the DICOM file to send
-    dataset = dcmread('./Desktop/MR/ThesisProject2/dicom_files/received/CtJpeg')
-    ae.add_requested_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] )
-    ae.add_requested_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] )
-    ae.add_requested_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit])
-    ae.add_requested_context(CTImageStorage,[JPEGLosslessSV1, JPEG2000])
-    ae.add_requested_context(MRImageStorage,[JPEGLosslessSV1])
-    ae.add_supported_context(MRImageStorage,[JPEGLosslessSV1],True,True)
+    dataset = dcmread('./dicom_files/received/decompressed_dicom.dcm')
+    #ae.add_requested_context( OphthalmicPhotography8BitImageStorage, [JPEG2000] )
+    #ae.add_requested_context( DigitalXRayImageStorageForPresentation, [ImplicitVRLittleEndian] )
+    #ae.add_requested_context(SecondaryCaptureImageStorage,[ImplicitVRLittleEndian,JPEGBaseline8Bit])
+    #ae.add_requested_context(CTImageStorage,[JPEGLosslessSV1, JPEG2000])
+    #ae.add_requested_context(MRImageStorage,[JPEGLosslessSV1])
+    #ae.add_supported_context(MRImageStorage,[JPEGLosslessSV1],True,True)
     assoc = ae.associate('172.30.160.1', 11113)
 
     for context in assoc.accepted_contexts:
@@ -96,7 +96,7 @@ def storeToSante():
         # Release the association
         assoc.release()
 
-#storeToSante()
+storeToSante()
 """ abstractSyn= str(instance.SOPClassUID)
     for cx in assoc.accepted_contexts:
         if cx.abstract_syntax == abstractSyn:

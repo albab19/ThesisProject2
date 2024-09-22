@@ -11,28 +11,6 @@ storagedirectory= './dicom_files/received/'
 db_file = './db.db'
 
 
-
-
-
-def get_table_schema(db_file):
-    conn = sqlite3.connect(db_file)
-    cursor = conn.cursor()
-
-    # Query to get the schema of all tables
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tables = cursor.fetchall()
-
-    schema = {}
-    for table_name in tables:
-        table_name = table_name[0]
-        cursor.execute(f"PRAGMA table_info({table_name});")
-        columns = cursor.fetchall()
-        schema[table_name] = columns
-
-    conn.close()
-    return schema
-
-
 #engine=db.create("sqlite:///db.db")
 engine = create_engine(f'sqlite:///{db_file}')
 Base.metadata.create_all(engine)
@@ -52,6 +30,9 @@ def initialize_database():
     
     for path in os.listdir(storagedirectory):
         instance = dcmread(os.path.join(storagedirectory, path))
+        for raw in instance:
+            if raw.keyword=="PatientName" or raw.keyword=="PatientID":
+                raw.value = str(raw.value).casefold()              
         db.add_instance(instance,session,path)
         #db.remove_instance("1.2.826.0.1.3680043.8.1055.1.20111102150758591.03296050.69180943",session)
         session.commit()

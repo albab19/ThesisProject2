@@ -1,6 +1,6 @@
 from lib2to3.fixes.fix_input import context
 from datetime import datetime
-from pydicom.uid import DigitalXRayImageStorageForPresentation,  JPEGBaseline8Bit, MRImageStorage,SecondaryCaptureImageStorage,ExplicitVRLittleEndian,ImplicitVRLittleEndian,CTImageStorage, PYDICOM_IMPLEMENTATION_UID, OphthalmicPhotography8BitImageStorage, JPEG2000 , AllTransferSyntaxes
+from pydicom.uid import DigitalXRayImageStorageForPresentation, OphthalmicTomographyImageStorage,  JPEGBaseline8Bit, MRImageStorage,SecondaryCaptureImageStorage,ExplicitVRLittleEndian,ImplicitVRLittleEndian,CTImageStorage, PYDICOM_IMPLEMENTATION_UID, OphthalmicPhotography8BitImageStorage, JPEG2000 , AllTransferSyntaxes
 from pynetdicom import AE, evt, debug_logger, AllStoragePresentationContexts ,StoragePresentationContexts, VerificationPresentationContexts,QueryRetrievePresentationContexts,build_context
 from pynetdicom.sop_class import (PatientRootQueryRetrieveInformationModelFind,Verification,StudyRootQueryRetrieveInformationModelMove,PatientRootQueryRetrieveInformationModelGet,StudyRootQueryRetrieveInformationModelFind,StudyRootQueryRetrieveInformationModelGet,CTImageStorage)
 from pydicom.dataset import Dataset
@@ -48,6 +48,7 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
 ae.add_supported_context(Verification)
+#ae.add_requested_context(OphthalmicTomographyImageStorage,[ExplicitVRLittleEndian])
 storagedirectory = './dicom_files/received'
 
 
@@ -55,7 +56,6 @@ def handle_get(event):
     assoc = event.assoc
     instances = []
     matching = []
-    
     for path in os.listdir(storagedirectory):
         instances.append(dcmread(os.path.join(storagedirectory, path)))
     if 'QueryRetrieveLevel' not in event.identifier:
@@ -78,33 +78,24 @@ def handle_get(event):
     print("There is a ",len(matching)," match!", "for study :",)
     yield len(matching)
     
-
     for instance in matching:
         if event.is_cancelled:
             yield 0xFE00, None
         abstractSyn= str(instance.SOPClassUID)
+        send=None
         for context in assoc.accepted_contexts:
             if context.abstract_syntax == abstractSyn:
                 context._as_scp=True
                 context._as_scu=True
                 context.scu_role=True
                 context.scp_role=True
-                if instance.file_meta.TransferSyntaxUID.is_compressed:
-                    instance.decompress()
-                apply_modality_lut(instance.pixel_array, instance)
-                instance.save_as('./decompressed_dicom.dcm')
-                send= dcmread('./decompressed_dicom.dcm')
-                #instance.is_implicit_VR = True
-                #instance.is_little_endian = True
-                #context.transfer_syntax[0]=UID(instance.file_meta.TransferSyntaxUID)
-                #instance.decompress()
-                #instance.decompress()
-                # Set the transfer syntax to Implicit VR Little Endian
-                #instance.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-                print("AcceptedAfterAssociat",context)
-                yield 0xFF00, send
-                os.remove("./decompressed_dicom.dcm")
-        
+        if instance.file_meta.TransferSyntaxUID.is_compressed:
+            instance.decompress()
+        apply_modality_lut(instance.pixel_array, instance)
+        instance.save_as('./decompressed_dicom.dcm')
+        send= dcmread('./decompressed_dicom.dcm')
+        yield 0xFF00, send
+        os.remove("./decompressed_dicom.dcm")
     yield 0x0000, None
 
 
@@ -153,34 +144,35 @@ def handle_find(event):
         Session = dicomdb.sessionmaker(bind=engine)
         session = Session()
         try:
-            """ query= session.query(dicomdb.db.Instance)
-            for kw in identifier :
-                if kw.keyword in dicom_to_db_mapping:
-                    print(kw.keyword)
-                    query.filter(getattr(dicomdb.db.Instance,dicom_to_db_mapping.get(kw.keyword)) == getattr(identifier,kw.keyword)) """
-            if identifier.QueryRetrieveLevel=="STUDY":
-                matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
-                uniqueStudies= get_uniqueStudies(matchedInstances)
+            for raw in identifier:
+                if raw.keyword=="PatientName" or raw.keyword=="PatientID":
+                    raw.value = str(raw.value).casefold() 
+            if len(identifier)==1:
                 studyQuery= session.query(dicomdb.db.Study)
-                studyQuery = studyQuery.filter(dicomdb.db.Study.study_instance_uid.in_(uniqueStudies))
                 matches=studyQuery.all()
-            elif identifier.QueryRetrieveLevel=="SERIES":
-                matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
-                print("MatchedInstancesFirst",matchedInstances)
-                #session.flush()
-                #print("SerieQuery",identifier.SeriesInstanceUID)
-                uniqueSeries= get_uniqueSeries(matchedInstances,identifier)
-                seriesQuery= session.query(dicomdb.db.Series)
-                seriesQuery= seriesQuery.filter(dicomdb.db.Series.series_instance_uid.in_(uniqueSeries))
-                matches=seriesQuery.all()
-            elif identifier.QueryRetrieveLevel=="PATIENT":
-                matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
-                uniquePatients= get_unique_patients(matchedInstances)
-                patientQuery= session.query(dicomdb.db.Patient)
-                patientQuery= patientQuery.filter(dicomdb.db.Patient.patient_id.in_(uniquePatients))
-                matches=patientQuery.all()
-                
-            print("Matchessss",matches)
+            else:    
+                if identifier.QueryRetrieveLevel=="STUDY":                    
+                    matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
+                    uniqueStudies= get_uniqueStudies(matchedInstances)
+                    studyQuery= session.query(dicomdb.db.Study)
+                    studyQuery = studyQuery.filter(dicomdb.db.Study.study_instance_uid.in_(uniqueStudies))
+                    matches=studyQuery.all()
+                elif identifier.QueryRetrieveLevel=="SERIES":
+                    matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
+                    #print("MatchedInstancesFirst",matchedInstances)
+                    #session.flush()
+                    #print("SerieQuery",identifier.SeriesInstanceUID)
+                    uniqueSeries= get_uniqueSeries(matchedInstances,identifier)
+                    seriesQuery= session.query(dicomdb.db.Series)
+                    seriesQuery= seriesQuery.filter(dicomdb.db.Series.series_instance_uid.in_(uniqueSeries))
+                    matches=seriesQuery.all()
+                elif identifier.QueryRetrieveLevel=="PATIENT":
+                    matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.1.1",identifier,session)
+                    uniquePatients= get_unique_patients(matchedInstances)
+                    patientQuery= session.query(dicomdb.db.Patient)
+                    patientQuery= patientQuery.filter(dicomdb.db.Patient.patient_id.in_(uniquePatients))
+                    matches=patientQuery.all()
+            #print("Matchessss",matches)
         except Exception as exc:
             traceback.print_exc() 
             session.rollback()
@@ -199,13 +191,14 @@ def handle_find(event):
                         response_dataset.PatientName = get_other_levels_tags("STUDY","patient_name",getattr(instance,"study_instance_uid"))
                         response_dataset.PatientID = get_other_levels_tags("STUDY","patient_id",getattr(instance,"study_instance_uid"))
                         response_dataset.NumberOfStudyRelatedInstances= get_other_levels_tags("STUDY","NumberOfStudyRelatedInstances",getattr(instance,"study_instance_uid"))
+
                     elif identifier.QueryRetrieveLevel=="SERIES":
                         response_dataset.Modality = getattr(instance,"modality")
                         response_dataset.SeriesInstanceUID = getattr(instance,"series_instance_uid")
                         response_dataset.SeriesNumber = getattr(instance,"series_number")
                         response_dataset.PatientName = get_other_levels_tags("SERIES","patient_name",getattr(instance,"series_instance_uid"))
                         response_dataset.PatientID = get_other_levels_tags("SERIES","patient_id",getattr(instance,"series_instance_uid"))
-
+                        response_dataset.NumberOfSeriesRelatedInstances= get_other_levels_tags("SERIES","NumberOfSeriesRelatedInstances",getattr(instance,"series_instance_uid"))
                     elif identifier.QueryRetrieveLevel=="PATIENT":
                         response_dataset.PatientID = getattr(instance,"patient_id")
                         response_dataset.PatientName = getattr(instance,"patient_name")
@@ -232,6 +225,8 @@ def get_other_levels_tags(level,required_tag,query_identifier):
     elif level=="SERIES":
         print("hhhhhhhhhhhhhhhhhhhhhh")
         query= query.filter(dicomdb.db.Instance.series_instance_uid == cast(query_identifier,String))
+        if required_tag == 'NumberOfSeriesRelatedInstances':
+            return len(query.all())
         result= query.all()[0]
         if result:
             return getattr(result,required_tag)

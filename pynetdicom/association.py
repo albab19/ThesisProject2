@@ -430,6 +430,7 @@ class Association(threading.Thread):
         possible_contexts = [
             cx for cx in possible_contexts if ab_syntax == cx.abstract_syntax
         ]
+        print("PossibleContextsFromAssociation",ab_syntax,",,,,,,,", tr_syntax)
 
         # For UPS we can also match UPS Push to Pull/Watch/Event/Query
         if ab_syntax == UnifiedProcedureStepPush and not possible_contexts:

@@ -711,7 +711,7 @@ class Instance(Base):
 
     patient_id = Column(String, ForeignKey("patient.patient_id"))
     patient_name = Column(String, ForeignKey("patient.patient_name"))
-
+    
     study_instance_uid = Column(String, ForeignKey("study.study_instance_uid"))
     study_date = Column(String, ForeignKey("study.study_date"))
     study_time = Column(String, ForeignKey("study.study_time"))
