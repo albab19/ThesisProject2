@@ -1,13 +1,12 @@
 
 FROM python
 
-
-
 # Copy the current directory contents into the container at /app
-COPY . ./app
+COPY . .
+
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /.
 
 RUN pip install flask
 
@@ -15,5 +14,5 @@ RUN pip install flask
 EXPOSE 5000
 
 # Run the app
-CMD ["python", "flask_logging_server/logserver.py"]
+CMD ["python","-u", "logserver.py"]
 

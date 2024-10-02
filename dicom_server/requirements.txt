@@ -1,0 +1,8 @@
+Flask==2.3.2
+pydicom==2.4.4
+pynetdicom==2.0.1
+numpy==1.23.5
+pylibjpeg
+pylibjpeg-libjpeg
+pylibjpeg-openjpeg
+sqlalchemy

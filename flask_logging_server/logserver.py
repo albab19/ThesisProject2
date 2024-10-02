@@ -8,8 +8,8 @@ import json
 
 
 # Set paths for log files
-log_directory = '/app/logs'
-simplified_log_directory = '/app/simplified_logs'
+log_directory = './app/'
+simplified_log_directory = './app/'
 
 # Set logging files
 log_file_path = os.path.join(log_directory, 'dicom_server.log')
@@ -82,6 +82,8 @@ def all_logs():
 
 @app.route('/logs/simplified')
 def simplified_logs():
+
+
     try:
         if not os.path.exists(simplified_log_file_path):
             return jsonify([])  # Return an empty list if the log file does not exist
@@ -96,12 +98,14 @@ def simplified_logs():
                         exception_logger.error(f"Invalid JSON in log file: {line} - {e}")
                         continue
         return jsonify(log_entries)
+    
     except Exception as e:
         exception_logger.error(f"Error reading simplified log file: {e}")
         return jsonify([])  # Return an empty list in case of error
 
 @app.route('/logs/simplified_page')
 def simplified_logs_page():
+    
     return render_template('simplified_logs.html')
 
 @app.route('/favicon.ico')
