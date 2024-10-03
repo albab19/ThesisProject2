@@ -18,7 +18,7 @@ services:
     volumes:
       - shared_data:/app
     ports:
-      - "11112:11112"
+      - "104:104"
     networks:
       host:
         ipv4_address: 172.29.0.3

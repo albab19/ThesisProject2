@@ -21,7 +21,7 @@ COPY ./service_class.py   ./usr/local/lib/python3.9/site-packages/pynetdicom/ser
 COPY ./db.py ./usr/local/lib/python3.9/site-packages/pynetdicom/apps/qrscp/db.py
 
 # Expose the DICOM
-EXPOSE 11112
+EXPOSE 104
 
 
 # Run the app

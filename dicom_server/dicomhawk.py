@@ -197,7 +197,9 @@ def handle_find(event):
     requestor = event.assoc.requestor
     timestamp = event.timestamp.strftime("%Y-%m-%d %H:%M:%S")
     addr, port = requestor.address, requestor.port
-
+    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
+    find_id = str(int(time.time() * 1000000))
+    detailed_logger.info(f"C-FIND request received: {event.identifier}")
     model = event.request.AffectedSOPClassUID
     identifier = event.identifier
     if identifier.QueryRetrieveLevel=="STUDY":
@@ -213,6 +215,7 @@ def handle_find(event):
              if  raw.keyword in attr["IMAGE"] or not identifier[raw.keyword].value:
                  delattr(identifier, raw.keyword)
     elif identifier.QueryRetrieveLevel=="PATIENT":
+        
          attr = dicomdb.db._PATIENT_ROOT_ATTRIBUTES
          for raw in identifier:
              if raw.keyword in attr["SERIES"] or raw.keyword in attr["IMAGE"] or raw.keyword in attr["STUDY"] or not identifier[raw.keyword].value:
