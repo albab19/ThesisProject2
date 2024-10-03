@@ -450,7 +450,7 @@ def start_dicom_server():
         return
     print("Server Started")
     dicomdb.initialize_database()
-    ae.start_server(('localhost', dicom_port), evt_handlers=handlers)
+    ae.start_server(('172.29.0.3',dicom_port), evt_handlers=handlers)
     
 
 start_dicom_server()
