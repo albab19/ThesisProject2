@@ -17,7 +17,7 @@ from pydicom import dcmread
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 import sqlite3
 debug_logger()
-env = os.getenv('Docker_ENV', 'false').lower() == 'true'
+dock_env = os.getenv('Docker_ENV', 'false')
 
 # dicom_to_db_mapping = {
 #     'SOPInstanceUID': 'sop_instance_uid',
@@ -60,7 +60,7 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
 ae.add_supported_context(Verification)
 #ae.add_requested_context(OphthalmicTomographyImageStorage,[ExplicitVRLittleEndian])
 storagedirectory = './dicom_files/received'
-if env:
+if dock_env == "true":
     storagedirectory = './dicom_files/received2'
 
     
@@ -78,7 +78,7 @@ def handle_get(event):
         return
     if event.identifier.QueryRetrieveLevel == 'STUDY':
         lg.detailed_logger.info
-        lg.log_simplified_message(assoc_id,"C_GET","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","")
+        lg.log_simplified_message(assoc_id,"C_GET","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","")
         
         if 'StudyInstanceUID' in event.identifier:
             for instance in instances:
@@ -414,7 +414,8 @@ def is_port_in_use(port):
 
 def start_dicom_server():
     ip='0.0.0.0'
-    if env:
+    print("aaaaaaaaaaa",dock_env)
+    if dock_env =="true":
         ip= '172.29.0.3'
     dicom_port = 11112
     if is_port_in_use(dicom_port):
