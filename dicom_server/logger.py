@@ -49,7 +49,7 @@ def setup_logger(name, log_file, level=logging.INFO, when="midnight", interval=1
     logger.addHandler(logging.StreamHandler())
     return logger
         
-def log_simplified_message(assoc_id,request_type,query_level,term,identifier,level,version,ip,port):
+def log_simplified_message(assoc_id,request_type,query_level,term,identifier,level,version,ip,port,matches):
     message= {
                 "session_id": assoc_id,
                 "Term": term,
@@ -57,7 +57,8 @@ def log_simplified_message(assoc_id,request_type,query_level,term,identifier,lev
                 "level": level,
                 "QueryRetrieveLevel": query_level,
                 "identifier": identifier,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
+                "Matches":matches
                 }
     if request_type=="Association Requested" or request_type == "Association Released":
         message["Version"]=version

@@ -77,18 +77,17 @@ def handle_get(event):
         yield 0xC000, None
         return
     if event.identifier.QueryRetrieveLevel == 'STUDY':
-        lg.detailed_logger.info
-        lg.log_simplified_message(assoc_id,"C_GET","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","")
-        
+        lg.detailed_logger.info        
         if 'StudyInstanceUID' in event.identifier:
             for instance in instances:
                 if instance.StudyInstanceUID == event.identifier.StudyInstanceUID:
                     matching = [
                         instance for instance in instances if instance.StudyInstanceUID == event.identifier.StudyInstanceUID
                     ]
+            lg.log_simplified_message(assoc_id,"C_GET","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
+
     elif event.identifier.QueryRetrieveLevel == 'SERIES':
         lg.detailed_logger.info    
-        lg.log_simplified_message(assoc_id,"C_GET","SERIES",event.identifier.SeriesInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","")
         
         if 'SeriesInstanceUID' in event.identifier:
             for instance in instances:
@@ -96,7 +95,8 @@ def handle_get(event):
                     matching = [
                         instance for instance in instances if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID
                     ]
-      
+            lg.log_simplified_message(assoc_id,"C_GET","SERIES",event.identifier.SeriesInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
+
     print("There is a ",len(matching)," match!", "for study :",)
     yield len(matching)
     #yield 1
@@ -135,14 +135,14 @@ def handle_assoc(event):
     assoc_sessions[event.assoc] = assoc_id
     version = event.assoc.requestor.implementation_version_name if event.assoc.requestor.implementation_version_name else "N/A"
     lg.detailed_logger.info    
-    lg.log_simplified_message(assoc_id,"Association Requested","","","","Warning",version,event.assoc.requestor.address,event.assoc.requestor.port)
+    lg.log_simplified_message(assoc_id,"Association Requested","","","","Warning",version,event.assoc.requestor.address,event.assoc.requestor.port,"")
          
 
 
 def handle_release(event):
     assoc_id = assoc_sessions.pop(event.assoc, str(int(time.time() * 1000000)))
     lg.detailed_logger.info(f"Association released from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
-    lg.log_simplified_message(assoc_id,"Association released","","","","Warning","",event.assoc.requestor.address,event.assoc.requestor.port)
+    lg.log_simplified_message(assoc_id,"Association released","","","","Warning","",event.assoc.requestor.address,event.assoc.requestor.port,"")
      
    
 
@@ -200,7 +200,7 @@ def handle_find(event):
                     studyQuery= session.query(dicomdb.db.Study)
                     studyQuery = studyQuery.filter(dicomdb.db.Study.study_instance_uid.in_(uniqueStudies))
                     matches=studyQuery.all()
-                    lg.log_simplified_message(assoc_id,"C_FIND","STUDY","",{tag: str(value) for tag, value in event.identifier.items()},"Info",len(matches),"","")
+                    lg.log_simplified_message(assoc_id,"C_FIND","STUDY","",{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matches))
 
                 elif identifier.QueryRetrieveLevel=="SERIES":
                     matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
@@ -211,14 +211,14 @@ def handle_find(event):
                     seriesQuery= session.query(dicomdb.db.Series)
                     seriesQuery= seriesQuery.filter(dicomdb.db.Series.series_instance_uid.in_(uniqueSeries))
                     matches=seriesQuery.all()
-                    lg.log_simplified_message(assoc_id,"C_FIND","SERIES","",{tag: str(value) for tag, value in event.identifier.items()},"Info",len(matches),"","")
+                    lg.log_simplified_message(assoc_id,"C_FIND","SERIES","",{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matches))
                 elif identifier.QueryRetrieveLevel=="PATIENT":
                     matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.1.1",identifier,session)
                     uniquePatients= get_unique_patients(matchedInstances)
                     patientQuery= session.query(dicomdb.db.Patient)
                     patientQuery= patientQuery.filter(dicomdb.db.Patient.patient_id.in_(uniquePatients))
                     matches=patientQuery.all()
-                    lg.log_simplified_message(assoc_id,"C_FIND","PATIENT","",{tag: str(value) for tag, value in event.identifier.items()},"Info",len(matches),"","")
+                    lg.log_simplified_message(assoc_id,"C_FIND","PATIENT","",{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matches))
 
             #print("Matchessss",matches)
         except Exception as exc:
@@ -352,7 +352,7 @@ def handle_move(event):
         yield 0xC000, None
         return
     if event.identifier.QueryRetrieveLevel == 'STUDY':
-        lg.log_simplified_message(assoc_id,"C_Move","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","")
+        lg.log_simplified_message(assoc_id,"C_Move","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
 
         if 'StudyInstanceUID' in event.identifier:
             for instance in instances:
@@ -363,7 +363,7 @@ def handle_move(event):
                     ]
        
     elif event.identifier.QueryRetrieveLevel == 'SERIES':
-        lg.log_simplified_message(assoc_id,"C_Move","SERIES",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","")
+        lg.log_simplified_message(assoc_id,"C_Move","SERIES",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
         if 'SeriesInstanceUID' in event.identifier:
             for instance in instances:
                 if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID:
