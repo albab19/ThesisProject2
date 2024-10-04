@@ -23,11 +23,13 @@ session = Session()
 
 
 def initialize_database():
-    
-    delete_statement = delete(db.Instance)
-    session.execute(delete_statement)
-    session.commit()
-    
+    try:
+        delete_statement = delete(db.Instance)
+        session.execute(delete_statement)
+        session.commit()
+    except: 
+        pass
+    print("hhhhh",os.listdir("./"))
     for path in os.listdir(storagedirectory):
         instance = dcmread(os.path.join(storagedirectory, path))
         for raw in instance:

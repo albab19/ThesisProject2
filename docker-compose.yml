@@ -14,11 +14,14 @@ services:
       - dicomhawk
 
   dicomhawk:
+    environment:
+      - ENABLE_LOGGING=true
+      - Docker_ENV=true
     build: ./dicom_server/.
     volumes:
       - shared_data:/app
     ports:
-      - "11112:11112"
+      - "104:11112"
     networks:
       host:
         ipv4_address: 172.29.0.3
