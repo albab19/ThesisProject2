@@ -60,7 +60,10 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
 ae.add_supported_context(Verification)
 #ae.add_requested_context(OphthalmicTomographyImageStorage,[ExplicitVRLittleEndian])
 storagedirectory = './dicom_files/received'
+if env:
+    storagedirectory = './dicom_files/received2'
 
+    
 
 def handle_get(event):
     assoc = event.assoc
