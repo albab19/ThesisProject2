@@ -59,7 +59,7 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
 ae.add_supported_context(Verification)
 #ae.add_requested_context(OphthalmicTomographyImageStorage,[ExplicitVRLittleEndian])
-storagedirectory = './dicom_files/received'
+storagedirectory = './dicom_files/received/received'
 
 
     
@@ -330,7 +330,7 @@ def handle_store(event):
 
 
 def handle_echo(event):
-    e=event
+     return 0x0000
 
 def handle_move(event):
     assoc = event.assoc
@@ -416,7 +416,7 @@ def start_dicom_server():
     print("aaaaaaaaaaa",dock_env)
     if dock_env =="true":
         ip= '172.29.0.3'
-    dicom_port = 11112
+    dicom_port = 104
     if is_port_in_use(dicom_port):
         print(f"Port {dicom_port} is in use. Please free up the port and try again.")
         return

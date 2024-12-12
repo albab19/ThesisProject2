@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pynetdicom.apps.qrscp import db
 Base = declarative_base()
-storagedirectory= './dicom_files/received/'
+storagedirectory= './dicom_files/received/received/'
 db_file = './db.db'
 
 

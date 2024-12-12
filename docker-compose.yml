@@ -6,7 +6,7 @@ services:
     volumes:
       - shared_data:/app
     networks:
-      host:
+      ThesisProjectNetwork:
         ipv4_address: 172.29.0.2
     ports:
       - "5000:5000"
@@ -21,9 +21,9 @@ services:
     volumes:
       - shared_data:/app
     ports:
-      - "104:11112"
+      - "104:104"
     networks:
-      host:
+      ThesisProjectNetwork:
         ipv4_address: 172.29.0.3
 volumes:
   shared_data:
@@ -31,8 +31,5 @@ volumes:
 
 
 networks:
-  host:
-    ipam:
-      config:
-        - subnet: 172.29.0.0/16
-          gateway: 172.29.0.1
+  ThesisProjectNetwork:
+    external: true
