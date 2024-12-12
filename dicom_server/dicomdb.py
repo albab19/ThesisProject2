@@ -8,8 +8,9 @@ from sqlalchemy.orm import sessionmaker
 from pynetdicom.apps.qrscp import db
 Base = declarative_base()
 storagedirectory= './dicom_files/received/'
-db_file = './db.db'
-
+db_file = './../db.db'
+if os.getenv('Docker_ENV', 'false')=="true":
+    db_file = '/app/db.db'
 
 #engine=db.create("sqlite:///db.db")
 engine = create_engine(f'sqlite:///{db_file}')
@@ -29,12 +30,12 @@ def initialize_database():
         session.commit()
     except: 
         pass
-    print("hhhhh",os.listdir("./"))
+    #print("hhhhh",os.listdir("./"))
     for path in os.listdir(storagedirectory):
         instance = dcmread(os.path.join(storagedirectory, path))
         for raw in instance:
             if raw.keyword=="PatientName" or raw.keyword=="PatientID":
-                raw.value = str(raw.value).casefold()              
+                raw.value = str(raw.value).capitalize()              
         db.add_instance(instance,session,path)
         session.commit()
     print("Database initialized from DICOM storage")

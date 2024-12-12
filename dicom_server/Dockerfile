@@ -1,28 +1,20 @@
-
 FROM python:3.9-slim
+USER root
 
 # Set the working directory in the container
 
+COPY ./../db.db app/
 
-# Copy the current directory contents into the container at /app
 COPY . .
-#Patched file
 
-#COPY simplified_logs ./app/
-#COPY logs ./app/
+
 
 WORKDIR /.
+RUN pip install --upgrade pip  && pip install -r requirements.txt && apt-get update &&  apt-get -qq install iptables ipset
 
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-COPY ./service_class.py   ./usr/local/lib/python3.9/site-packages/pynetdicom/service_class.py
+COPY ./service_class.py   /usr/local/lib/python3.9/site-packages/pynetdicom/service_class.py
 COPY ./db.py ./usr/local/lib/python3.9/site-packages/pynetdicom/apps/qrscp/db.py
-
-# Expose the DICOM
+COPY ./valuerep.py /usr/local/lib/python3.9/site-packages/pydicom/valuerep.py
 EXPOSE 11112
-
-
-# Run the app
 CMD ["python","-u" ,"dicomhawk.py"]

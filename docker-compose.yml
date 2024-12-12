@@ -1,22 +1,36 @@
 version: '3.8'  # Use the latest version of Compose
 
 services:
-  logserver:
-    build: ./flask_logging_server/.
+  # logserver:
+  #   build: ./flask_logging_server/.
+  #   volumes:
+  #     - shared_data:/app
+  #   networks:
+  #     host:
+  #       ipv4_address: 172.29.0.2
+  #   ports:
+  #     - "5000:5000"
+  #   depends_on:
+  #     - dicomhawk
+  api:
+    build: ./API/.
     volumes:
       - shared_data:/app
     networks:
       host:
         ipv4_address: 172.29.0.2
     ports:
-      - "5000:5000"
-    depends_on:
-      - dicomhawk
+      - "3000:3000"
+    environment:
+      - Docker_ENV=True
+    # depends_on:
+    #   - dicomhawk
 
   dicomhawk:
     environment:
-      - ENABLE_LOGGING=true
-      - Docker_ENV=true
+      - ENABLE_LOGGING=false
+      - blackhole=True
+      - Docker_ENV=True
     build: ./dicom_server/.
     volumes:
       - shared_data:/app
@@ -25,9 +39,18 @@ services:
     networks:
       host:
         ipv4_address: 172.29.0.3
+  redis:
+      image: redis
+      ports:
+        - "6379:6379"
+      networks:
+          host:
+            ipv4_address: 172.29.0.4
+
 volumes:
   shared_data:
     driver: local
+  
 
 
 networks:
