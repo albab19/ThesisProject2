@@ -1,7 +1,18 @@
 const redis = require('redis');
-
+host="localhost"
+if (process.env.Docker_ENV=="True"){
+host="172.29.0.4"
+}
 // Create a client instance (default connects to localhost:6379)
-const redisClient = redis.createClient();
+const redisClient = redis.createClient({
+    socket: {
+      host: 'localhost', // Replace with your Redis server's IP address
+      port: 6379  // Default Redis port; change if different
+    }
+  });
+
+
+
 redisClient.on('error', function(error) {
   console.error(error);
 });
@@ -10,4 +21,4 @@ redisClient.on('error', function(error) {
 redisClient.connect();
 
 
-module.exports = redisClient
+module.exports = redisClient    
