@@ -6,6 +6,7 @@ const path = require('path');
 
 const jwtUtils = require("./../authentication/jwtUtils");
 
+const redisLogger= require("./../redisLogger")
 
 const robotsTxtContent = `
 User-agent: MJ12bot
@@ -18,6 +19,7 @@ User-agent: *
 Disallow: /admin/
 Disallow: /admin-config/
 Disallow: /secure/
+Disallow: /ensurance_data/
 
 
 # Sitemap location (optional but recommended)
@@ -34,13 +36,35 @@ const routes = ['/admin', '/admin-config','/secure'];
 routes.forEach((route)=>{
     router.get(route, (req,res)=>{
         console.log(`New entry: ${req.ip} accessed ${route}`);
+        if(route=="/admin"){
 
+            
+            try {
+
+                const jsonObject = {
+                    ip: req.ip,
+                    timestamp: new Date().toISOString()  // Current time in ISO format
+                  };
+              
+                  // Convert JSON object to a string
+                  const jsonString = JSON.stringify(jsonObject);
+
+                // Adding elements to the list "mylist"
+                const result =  redisLogger.rPush('mylist',jsonString);
+                console.log('Number of elements in the list:', result);
+              } catch (error) {
+                console.error('Error:', error);
+              } finally {
+                // Don't forget to close the connection
+                redisLogger.quit();
+              }
+        }
         //sign the token
         const adminAccessToken = jwtUtils.generateAdminAccessToken({username: 'admin' });
         //console.log("here", adminAccessToken({username: admin}));
         
         const  adminRefreshToken = jwtUtils.generateAdminRefreshToken({username: 'admin'});
-
+        
         //for local testing secure should be put to false
         //put it into the cookie
        res.cookie("adminAccessToken", adminAccessToken, {httpOnly:true, secure:false, sameSite:"Strict"});
