@@ -143,14 +143,16 @@ def handle_assoc(event):
     global  log_data
     rep_dat={}
     ip= str(event.assoc.requestor.address)
-    current_time = datetime.utcnow()
-    formatted_time = current_time.strftime('%Y-%m-%dT%H:%M:%S')
+    current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
     ipscanned= ip.encode() in redis_client.lrange("scannedIPs", 0, -1)
 
     global lock
     if lock == 0:
-        log_data["timestamp"]=  formatted_time
-        log_data["id"]= str(hash(event.assoc))
+        log_data["Request_parameters"]="N/A"
+        log_data["QueryRetrieveLevel"] = "N/A"
+        log_data["Known_scanner"]= network_handler.is_known_scanner(ip)
+        log_data["timestamp"]=  str(current_time)
+        log_data["id"]= str(hash(current_time))[1:-1]
         log_data["ip"]= ip
         log_data["port"]=str(event.assoc.requestor.port)
         log_data["Request_Type"]= "Association_request"
@@ -160,7 +162,7 @@ def handle_assoc(event):
             ipqualityScore = network_handler.getIpqualityScore(ip) if not ipscanned else ["", "", "", "","","",""]
             virusTotal=network_handler.getVirusTotalScore(ip) if not ipscanned else {}
 
-            rep_dat["timestamp"]=formatted_time 
+            rep_dat["timestamp"]= str(current_time) 
             rep_dat["virus_total_results"] = virusTotal
             rep_dat["ip"]= ip
             rep_dat["ip_quality_score"] = ipqualityScore[0]
@@ -187,9 +189,9 @@ def handle_assoc(event):
 
 def handle_release(event):
     global log_data
-    log_data["Request_Type"]+=" / Finished"
+    log_data["status"]="Finished"
     global lock
-    lock= 2
+    lock= 0
     redis_client.rpush("requests", json.dumps(log_data))
     print("AssocID3",hash(event.assoc))
     assoc_id = assoc_sessions.pop(event.assoc, str(int(time.time() * 1000000)))
@@ -463,9 +465,9 @@ def handle_move(event):
 
 def handle_abort(event):
     global log_data
-    log_data["Request_Type"]+=" / Aborted"
+    log_data["status"]="Aborted"
     global lock
-    lock= 3
+    lock= 0
     redis_client.rpush("requests", json.dumps(log_data))
     print("Abooort")
     
@@ -505,8 +507,8 @@ def start_dicom_server():
     except Exception as e:
         #print(e)
         pass    
-    #ip='172.18.204.133'
-    ip="localhost"
+    ip='172.18.204.133'
+    #ip="localhost"
     print("aaaaaaaaaaa",dock_env)
     if dock_env =="True":
         ip= '172.29.0.3'

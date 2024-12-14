@@ -9,7 +9,7 @@ from pynetdicom.apps.qrscp import db
 Base = declarative_base()
 storagedirectory= './dicom_files/received/'
 db_file = './../db.db'
-if os.getenv('Docker_ENV', 'false')=="true":
+if os.getenv('Docker_ENV', 'False')=="True":
     db_file = '/app/db.db'
 
 #engine=db.create("sqlite:///db.db")

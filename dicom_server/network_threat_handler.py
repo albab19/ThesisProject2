@@ -115,3 +115,11 @@ def getVirusTotalScore(ip):
             result_counts[result] = result_counts.get(result, 0) + 1
         print(result_counts)
         return result_counts
+
+def is_known_scanner(ip):
+    with open("./blackhole_list.txt", "r") as file:
+        for line in file:
+            if ip in line:
+                return "True"
+
+    return "False"    
