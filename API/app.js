@@ -1,21 +1,8 @@
-
-
-
-
 //expressjs lib
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
-const redis = require('redis');
 
-// Create a client instance (default connects to localhost:6379)
-const redisClient = redis.createClient();
-redisClient.on('error', function(error) {
-  console.error(error);
-});
-
-// Connect to Redis
-redisClient.connect();
 //uploading 
 const multer = require('multer');
 
