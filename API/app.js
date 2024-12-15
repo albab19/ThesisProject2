@@ -5,7 +5,7 @@ const favicon = require('serve-favicon');
 
 //uploading 
 const multer = require('multer');
-
+const redisClient= require("./redisLogger");
 //require('dotenv').config();
 //expressjs app
 const app = express();
@@ -84,7 +84,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 
 app.post('/upload',  (req,res)=>{
-  upload.array('dicomFiles[]', 10)(req,res, function(err){
+  upload.array('dicomFiles[]', 1)(req,res, function(err){
       if(err){
         if(err.code === 'LIMIT_UNEXPECTED_FILE'){
           return res.status(400).json({message: 'Cannot upload more than 10 files at once.'});
@@ -93,7 +93,7 @@ app.post('/upload',  (req,res)=>{
       }
 
       res.json({
-        message: '10 first files uploaded successfully',
+        message: 'file uploaded successfully',
         files: req.files.map(file=>({
           filename:file.filename,
           path:file.path
@@ -106,6 +106,8 @@ app.post('/upload',  (req,res)=>{
 
 
 app.post('/login',async(req,res) => {
+  
+
   try{
     
     if (!req.body.username || !req.body.password){
@@ -113,11 +115,21 @@ app.post('/login',async(req,res) => {
     }
 
    
-    if(req.body.username === "oolnie" && req.body.password === "iamtcte4*"){
-      res.sendFile(path.join(__dirname, './static', 'underDevelopment.html'));
+    else if(req.body.username === "oolnie" && req.body.password === "iamtcte4*"){
+      req.session.user ={username: req.body.username};
+
+      const accessToken = jwtUtils.generateAccessToken({username: req.body.username});
+      const  refreshToken = jwtUtils.generateRefreshToken({username: req.body.username});
+      res.cookie("accessToken", accessToken, {httpOnly:true, secure:false, sameSite:"Strict"});
+      res.cookie("refreshToken", refreshToken, {httpOnly:true, secure:false, sameSite:"Strict"});
+      logEvent("Hidden credintials accessed",req)
+      res.status(200).json({message: 'Login dev'});
+      // Convert JSON object to a string
+        
     }
 
-    if(req.body.username === USERS.username && req.body.password === USERS.password){
+    else if(req.body.username === USERS.username && req.body.password === USERS.password){
+      logEvent(`Successful login User(${req.body.username}) and password(${req.body.password})`,req)
       req.session.user ={username: req.body.username};
       console.log('User ','"',req.body.username,'"',' logged in. Session ID:', req.sessionID); // Log the session ID
 
@@ -132,15 +144,19 @@ app.post('/login',async(req,res) => {
       console.log("cookie", res.cookie);
       //onsole.log("CSRF token:::", csrfToken);
       
+
       return res.status(200).json({message: 'Login successful!'});
 
     }else{
       //it has been "invalid credentials before"
+      logEvent(`Fail login User(${req.body.username}) and password(${req.body.password})`,req)
+      
       return res.status(401).json({message: 'Invalid username or password!'});
     }
   }catch(error){
     res.status(500).json({ message: error.message });
   }
+
 });
 
 app.post('/logout', (req,res)=>{
@@ -188,7 +204,15 @@ app.get('/refresh', (req,res)=>{
 });
 
 app.get('/', async(req, res) => {
-  res.sendFile((path.join(__dirname, 'static', 'login.html')));
+  if(req.session.user){
+    res.sendFile((path.join(__dirname, 'static', 'main.html')));
+  }else{
+    res.sendFile((path.join(__dirname, 'static', 'login.html')));
+  }
+
+
+
+  
 });
 
 //check-admin-token is called loginAdmin to avoid fingerprinting
@@ -232,7 +256,32 @@ try{
   console.error("Error. Server did not start", error);
 }
 
+function logEvent(e,req,parameter=""){
+  let ip = req.socket.remoteAddress
+  if (ip.substr(0, 7) === "::ffff:") {
+  ip = ip.split(':').pop();
+  }        
+  const r_port= req.connection.remotePort
+  try {
 
+      const jsonObject = {
+          ip: ip,
+          timestamp: new Date().toISOString().slice(0, 19) ,
+          event:e,
+          sessionId: process.env.SESSION_SECRET,
+          port: r_port,
+          report: "N/A"
+        };
+  
+        const jsonString = JSON.stringify(jsonObject);
+
+        redisClient.rPush('mylist',jsonString);
+        return;
+    } catch (error) {
+      console.error('Error:', error);
+    } 
+    console.log("")
+  }
 
 
 /*

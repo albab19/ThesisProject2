@@ -30,6 +30,9 @@
             border-radius: 5px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/form-data@4.0.1/lib/browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fs-js@1.0.6/index.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -97,11 +100,10 @@
                 }
                 formData.append('dicomFiles[]', file);
 
-                
+               
             });
             
-            
-
+        
             
             fetch('/upload', {
                 method: 'POST',
@@ -110,7 +112,28 @@
             .then(response => response.json())
             .then(data => {
                 alert('Files uploaded successfully!');                
-                console.log(data);
+                const filename=data.files[0].filename;
+                console.log(filename)
+                fetch('/main/scan', {
+                    method: 'POST',
+                    headers: {
+                       'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ filename: data.files[0].filename                       
+                    }) 
+                })
+                .then(response => response.json())
+                .then(data => {
+                  fileInput.value='';
+                  fileList.innerHTML = '';
+                   
+                })
+                .catch(error => {
+                    console.error('Error uploading files:', error);
+                });
+            });  
+
+
 
                 fileInput.value='';
                 fileList.innerHTML = '';
@@ -119,7 +142,11 @@
             .catch(error => {
                 console.error('Error uploading files:', error);
             });
-        });
+        
+
+
+
+        
     </script>
 </body>
 </html>

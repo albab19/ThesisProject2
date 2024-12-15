@@ -1,12 +1,11 @@
 //db
 const sqlite3 = require('sqlite3').verbose();
-var databasePath= "./../../db.db"
-var env  = process.env.Docker_ENV;
-console.log("Hellooo",env)
-if (env =="True"){
+var databasePath= "./../db.db"
+if (process.env.Docker_ENV ==="True"){
     databasePath = '/app/db.db'
 
 }
+console.log(databasePath)
 // Connect to the SQLite database
 function connectToDB() {
     const db = new sqlite3.Database(databasePath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
@@ -16,6 +15,18 @@ function connectToDB() {
         console.log('Connected to the SQLite database.');
     }
 });
+
+db.serialize(() => {
+    console.log("ser")
+    db.each("SELECT name FROM sqlite_master WHERE type='table'", (err, table) => {
+        if (err) {
+            console.error('Error running query', err.message);
+            return;
+        }
+        console.log(table.name);
+    });
+});
+
 
 return db;
 }

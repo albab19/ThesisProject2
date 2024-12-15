@@ -14,7 +14,7 @@ const authenticate = (req, res, next)=>{
         const decoded = jwtUtils.verifyAccessToken(token);
 
         req.username = decoded;
-        console.log(req.username)
+        console.log("Hello",req.username)
         next();
 
     }catch(error){
