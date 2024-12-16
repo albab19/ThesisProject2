@@ -251,7 +251,7 @@ async function checkAnalysis(analysisId, APIKey,req,ip,port) {
 
     if(parameter==="" || e==="Search by id" || e==="Search by name"){     
     try {
-      const ip= req.socket.remoteAddress
+      let ip= req.socket.remoteAddress
       if (ip.substr(0, 7) === "::ffff:") {
         ip = ip.split(':').pop();
         }        

@@ -4,50 +4,23 @@ from flask import Flask, jsonify, render_template, send_from_directory
 import os
 import json
 
+Docker_ENV = os.getenv('Docker_ENV', 'false')
 
 
-
-# Set paths for log files
-log_directory = './app/'
-simplified_log_directory = './app/'
+if Docker_ENV == "true":
+    log_directory = './app/'
+    simplified_log_directory = './app/'
+    host='172.29.0.2'
+else:
+    log_directory = './'
+    simplified_log_directory = './'
+    host='localhost'
 
 # Set logging files
 log_file_path = os.path.join(log_directory, 'dicom_server.log')
 simplified_log_file_path = os.path.join(simplified_log_directory, 'dicom_simplified.log')
 exception_log_file_path = os.path.join(log_directory, 'exception.log')
 
-# Logger setup function
-def setup_logger(name, log_file, level=logging.INFO, when="midnight", interval=1):
-    handler = TimedRotatingFileHandler(log_file, when=when, interval=interval)
-    handler.suffix = "%Y%m%d"
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    logger.addHandler(handler)
-    logger.addHandler(logging.StreamHandler())
-    return logger
-
-
-detailed_logger = setup_logger('detailed_logger', log_file_path, logging.DEBUG)
-simplified_logger = setup_logger('simplified_logger', simplified_log_file_path)
-exception_logger = setup_logger('exception_logger', exception_log_file_path, logging.ERROR)
-
-
-
-# Ensure that pynetdicom messages are captured
-pynetdicom_logger = logging.getLogger('pynetdicom')
-pynetdicom_logger.setLevel(logging.DEBUG)
-pynetdicom_logger.addHandler(logging.FileHandler(log_file_path))
-
-
-# Function to log valid JSON messages
-def log_simplified_message(message):
-    try:
-        if message.get("event") == "Created fake DICOM file":
-            return
-        json_message = json.dumps(message)
-        simplified_logger.info(json_message)
-    except (TypeError, ValueError) as e:
-        exception_logger.error(f"Failed to log simplified message: {message} - {e}")
 
 
 app = Flask(__name__)
@@ -77,7 +50,6 @@ def all_logs():
             log_content = f.read().replace('\n', '<br>')
         return f"<pre>{log_content}</pre>"
     except Exception as e:
-        exception_logger.error(f"Error reading log file: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/logs/simplified')
@@ -95,12 +67,10 @@ def simplified_logs():
                     try:
                         log_entries.append(json.loads(line))
                     except json.JSONDecodeError as e:
-                        exception_logger.error(f"Invalid JSON in log file: {line} - {e}")
                         continue
         return jsonify(log_entries)
     
     except Exception as e:
-        exception_logger.error(f"Error reading simplified log file: {e}")
         return jsonify([])  # Return an empty list in case of error
 
 @app.route('/logs/simplified_page')
@@ -119,7 +89,8 @@ def not_found(e):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    exception_logger.error(f"Unhandled exception: {e}")
     return jsonify({"error": "Internal Server Error"}), 500
 
-app.run(host='172.29.0.2',debug=True,port=5000)
+
+
+app.run(host,debug=True,port=5000)

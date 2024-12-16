@@ -41,6 +41,7 @@ const generateAdminRefreshToken = (payload)=>{
 // Verify Access Token
 const verifyAccessToken = (token) => {
     //if the curiousadmin token does not match CURIOUS_ADMIN_SECRET
+    
     return jwt.verify(token, ACCESS_TOKEN_SECRET);
 };
 

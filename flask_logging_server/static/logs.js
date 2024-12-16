@@ -50,6 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         commandCell.textContent = log.Command || "N/A";
                         row.appendChild(commandCell);
 
+                        
+
                         const termCell = document.createElement("td");
                         termCell.textContent = log.Term || "N/A";
                         row.appendChild(termCell);
@@ -65,10 +67,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         const levelCell = document.createElement("td");
                         levelCell.textContent = log.level || "N/A";
                         row.appendChild(levelCell);
+                        
+                       
 
-                        const msgCell = document.createElement("td");
-                        msgCell.textContent = log.QueryRetrieveLevel || "N/A";
-                        row.appendChild(msgCell);
+                        const queryCell = document.createElement("td");
+                        queryCell.textContent = log.QueryRetrieveLevel || "N/A";
+                        row.appendChild(queryCell);
 
                         const timeCell = document.createElement("td");
                         timeCell.textContent = log.timestamp || "N/A";
