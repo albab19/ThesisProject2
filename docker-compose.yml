@@ -7,7 +7,7 @@ services:
       - shared_data:/app
     networks:
       host:
-        ipv4_address: 172.29.0.2
+        ipv4_address: 172.29.0.5
     ports:
       - "5000:5000"
 

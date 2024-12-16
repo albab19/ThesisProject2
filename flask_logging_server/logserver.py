@@ -10,7 +10,7 @@ Docker_ENV = os.getenv('Docker_ENV', 'false')
 if Docker_ENV == "true":
     log_directory = './app/'
     simplified_log_directory = './app/'
-    host='172.29.0.2'
+    host='172.29.0.5'
 else:
     log_directory = './'
     simplified_log_directory = './'
