@@ -7,7 +7,7 @@ import json
 Docker_ENV = os.getenv('Docker_ENV', 'false')
 
 
-if Docker_ENV == "true":
+if Docker_ENV == "True":
     log_directory = './app/'
     simplified_log_directory = './app/'
     host='172.29.0.5'

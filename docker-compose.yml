@@ -5,6 +5,8 @@ services:
     build: ./flask_logging_server/.
     volumes:
       - shared_data:/app
+    environment:
+      - Docker_ENV=True
     networks:
       host:
         ipv4_address: 172.29.0.5
@@ -49,7 +51,6 @@ services:
 volumes:
   shared_data:
     driver: local
-  
 
 
 networks:
