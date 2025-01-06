@@ -36,6 +36,8 @@ except Exception as e:
   
         
 def log_simplified_message(assoc_id,request_type,query_level,term,identifier,level,version,ip,port,matches):
+    print("version",version," and ", "request_type",request_type)
+
     message= {
                 "ID": assoc_id,
                 "Term": term,
@@ -46,8 +48,8 @@ def log_simplified_message(assoc_id,request_type,query_level,term,identifier,lev
                 "timestamp": datetime.now().isoformat(),
                 "Matches":matches
                 }
-    if request_type=="Association Requested" or request_type == "Association Released":
-        message["Version"]=version
+    if request_type=="Association Requested" or request_type == "Association released" or request_type=="Association aborted":
+        message["Version"]= str(version)
         message["IP"]=ip
         message["Port"]=port
     try:

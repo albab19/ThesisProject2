@@ -5,8 +5,9 @@ from pynetdicom import _config ,AE, evt,  debug_logger, AllStoragePresentationCo
 from pynetdicom.sop_class import (PatientRootQueryRetrieveInformationModelFind,Verification,StudyRootQueryRetrieveInformationModelMove,PatientRootQueryRetrieveInformationModelGet,StudyRootQueryRetrieveInformationModelFind,StudyRootQueryRetrieveInformationModelGet,CTImageStorage)
 from pydicom.dataset import Dataset
 import socket,time,traceback
-import os , json
+import os , json, threading
 import logger as lg
+from integrity_checker import hash_checker 
 from pynetdicom.apps.qrscp import handlers
 import dicomdb
 from sqlalchemy import cast, String
@@ -19,32 +20,21 @@ from pydicom.pixel_data_handlers.util import apply_modality_lut
 import sqlite3
 log_data={}
 lock=0
-
+versionName=""
+sessionId=0
 dock_env = os.getenv('Docker_ENV', 'False')
-# handler = logging.FileHandler(lg.log_file_path)
-# handler.setLevel(logging.DEBUG)
-# formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-# handler.setFormatter(formatter)
-# pynetdicom_logger = logging.getLogger('pynetdicom')
-# pynetdicom_logger.handlers = []
-
-# pynetdicom_logger.setLevel(logging.DEBUG)
-# pynetdicom_logger.addHandler(handler)
-
-# _config.LOG_HANDLER_LEVEL = logging.DEBUG
 
 debug_logger() 
+
+
 pynetdicom_logger = logging.getLogger('pynetdicom')
-#pynetdicom_logger.handlers = []
 handler = logging.FileHandler(lg.log_file_path)
-# handler.setLevel(logging.DEBUG)
 pynetdicom_logger.setLevel(logging.DEBUG)
 pynetdicom_logger.addHandler(handler)
-
 redis_client = redis.Redis("localhost",6379)
 if dock_env=="True":
    redis_client = redis.Redis("172.29.0.4",6379)
- 
+   
 ae = AE()
 
 for context in StoragePresentationContexts:
@@ -61,19 +51,15 @@ ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
 ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
 ae.add_supported_context(Verification)
-#ae.add_requested_context(OphthalmicTomographyImageStorage,[ExplicitVRLittleEndian])
 storagedirectory = './dicom_files/received'
 
 
-    
 
 def handle_get(event):
+    global sessionId
     global log_data
     log_data["Request_Type"]="C-GET"
-    print("AssocID2",event.assoc)
     assoc = event.assoc
-    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
-    get_id = str(int(time.time() * 1000000))
     instances = []
     matching = []
     for path in os.listdir(storagedirectory):
@@ -81,7 +67,6 @@ def handle_get(event):
     if 'QueryRetrieveLevel' not in event.identifier:
         yield 0xC000, None
         return
-    # lg.detailed_logger.info(f"C-GET request received: {event.identifier}")     
 
     if event.identifier.QueryRetrieveLevel == 'STUDY':
         log_data["QueryRetrieveLevel"]="STUDY"
@@ -92,7 +77,8 @@ def handle_get(event):
                     matching = [
                         instance for instance in instances if instance.StudyInstanceUID == event.identifier.StudyInstanceUID
                     ]
-            lg.log_simplified_message(assoc_id,"C_GET","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
+            lg.log_simplified_message(sessionId,"C_GET","STUDY",event.identifier.StudyInstanceUID,str([f"{raw.keyword}: {raw.value}" for raw in event.identifier if raw.keyword != "QueryRetrieveLevel"]),"Info","","","",len(matching))
+        
 
     elif event.identifier.QueryRetrieveLevel == 'SERIES':
         log_data["QueryRetrieveLevel"]="SERIES"
@@ -105,7 +91,8 @@ def handle_get(event):
                     matching = [
                         instance for instance in instances if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID
                     ]
-            lg.log_simplified_message(assoc_id,"C_GET","SERIES",event.identifier.SeriesInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
+            lg.log_simplified_message(sessionId,"C_GET","SERIES",str([f"{raw.keyword}: {raw.value}" for raw in event.identifier if raw.keyword != "QueryRetrieveLevel"]),"Info","","","",len(matching))
+        
 
     print("There is a ",len(matching)," match!", "for study :",)
     yield len(matching)
@@ -123,38 +110,29 @@ def handle_get(event):
                 context.scp_role=True
         if instance.file_meta.TransferSyntaxUID.is_compressed:
             instance.decompress()
-        apply_modality_lut(instance.pixel_array, instance)
+            apply_modality_lut(instance.pixel_array, instance)
         instance.save_as('./decompressed_dicom.dcm')
         send= dcmread('./decompressed_dicom.dcm')
         yield 0xFF00, send
         os.remove("./decompressed_dicom.dcm")
-    # zip= dcmread("test.bat")
-    # shellcode = b"\x31\xc0\x50\x68\x63\x61\x6c\x63\x54\x5f\xb8\xc7\x93\xc2\x77\xff\xd0"
-    
-    # # Open an existing DICOM file
-    # # Add the shellcode as raw byte data in a Private Tag (0x9999, 0x0010) or some other metadata field
-    # # Here we convert the shellcode to a hexadecimal string representation
-    # zip.add_new((0x9999, 0x0010), 'OB', shellcode)
-    # yield 0xFF00, zip
 
     yield 0x0000, None
 assoc_sessions = {}
 
 def handle_assoc(event):
-    assoc_id = str(int(time.time() * 1000000))
-    assoc_sessions[event.assoc] = assoc_id
-    version = event.assoc.requestor.implementation_version_name if event.assoc.requestor.implementation_version_name else "N/A"
-
+    global lock
+    global versionName
+    global sessionId
     global  log_data
     rep_dat={}
     ip= str(event.assoc.requestor.address)
     current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
     ipscanned= ip.encode() in redis_client.lrange("scannedIPs", 0, -1)
-
-    global lock
+    
     if lock == 0:
-        lg.log_simplified_message(assoc_id,"Association Requested","N/A","N/A","N/A","Warning",version,event.assoc.requestor.address,event.assoc.requestor.port,"N/A")
-
+        sessionId=str(int(time.time() * 1000000))
+        lg.log_simplified_message(sessionId,"Association Requested","N/A","N/A","N/A","Warning","",event.assoc.requestor.address,event.assoc.requestor.port,"N/A")
+        log_data["matches"]="N/A"
         log_data["Request_parameters"]="N/A"
         log_data["QueryRetrieveLevel"] = "N/A"
         log_data["Known_scanner"]= network_handler.is_known_scanner(ip)
@@ -183,12 +161,17 @@ def handle_assoc(event):
         
         
         lock =1
+    else:
+         versionName= str(event.assoc.requestor.implementation_version_name) if event.assoc.requestor.implementation_version_name else "N/A"
+
     
     
          
 
 
 def handle_release(event):
+    global versionName
+    global sessionId
     global log_data
     log_data["status"]="Finished"
     global lock
@@ -197,32 +180,27 @@ def handle_release(event):
     print("AssocID3",hash(event.assoc))
     assoc_id = assoc_sessions.pop(event.assoc, str(int(time.time() * 1000000)))
     # lg.detailed_logger.info(f"Association released from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
-    lg.log_simplified_message(assoc_id,"Association released","","","","Warning","",event.assoc.requestor.address,event.assoc.requestor.port,"")
-     
+    lg.log_simplified_message(sessionId,"Association released","","","","Warning",versionName,event.assoc.requestor.address,event.assoc.requestor.port,"")
+    print("Realeaseeed")
+    sessionId=0
+    #versionName=""
    
 
 def handle_find(event):
     global log_data
     log_data["Request_Type"]="C-FIND"
-    requestor = event.assoc.requestor
-    timestamp = event.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-    addr, port = requestor.address, requestor.port
-    assoc_id = str(hash(event.assoc))
-
     model = event.request.AffectedSOPClassUID
     identifier = event.identifier
     if identifier.QueryRetrieveLevel=="STUDY":
          log_data["QueryRetrieveLevel"]="STUDY"
          attr = dicomdb.db._STUDY_ROOT_ATTRIBUTES
          for raw in identifier:
-             #print("Hello",identifier[raw.keyword].value)
              if raw.keyword in attr["SERIES"] or raw.keyword in attr["IMAGE"] or not identifier[raw.keyword].value:
                  delattr(identifier, raw.keyword)
     elif identifier.QueryRetrieveLevel=="SERIES":
          log_data["QueryRetrieveLevel"]="SERIES"
          attr = dicomdb.db._STUDY_ROOT_ATTRIBUTES
          for raw in identifier:
-             #print("Hello",identifier[raw.keyword].value)
              if  raw.keyword in attr["IMAGE"] or not identifier[raw.keyword].value:
                  delattr(identifier, raw.keyword)
     elif identifier.QueryRetrieveLevel=="PATIENT":
@@ -231,8 +209,6 @@ def handle_find(event):
          for raw in identifier:
              if raw.keyword in attr["SERIES"] or raw.keyword in attr["IMAGE"] or raw.keyword in attr["STUDY"] or not identifier[raw.keyword].value:
                  delattr(identifier, raw.keyword)
-                 
-            
     if model.keyword in (
         "UnifiedProcedureStepPull",
         "ModalityWorklistInformationModelFind",
@@ -243,44 +219,38 @@ def handle_find(event):
         matches=[]
         Session = dicomdb.sessionmaker(bind=engine)
         session = Session()
-        #print("IdenAfterFilter",identifier)
         try:
             for raw in identifier:
                 if raw.keyword=="PatientName" or raw.keyword=="PatientID":
                     raw.value = str(raw.value).capitalize() 
             if len(identifier)==1:
                 log_data["Request_parameters"]="all_studies"
+                lg.log_simplified_message(sessionId,"C_FIND","STUDY","All studies","All studies requested","info","","","","All")
                 studyQuery= session.query(dicomdb.db.Study)
                 matches=studyQuery.all()
             else:
                 log_data["Request_parameters"] = [f"{raw.keyword}: {raw.value}" for raw in identifier if raw.keyword != "QueryRetrieveLevel"]
-                if identifier.QueryRetrieveLevel=="STUDY":                    
+                if identifier.QueryRetrieveLevel=="STUDY":
                     matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
                     uniqueStudies= get_uniqueStudies(matchedInstances)
                     studyQuery= session.query(dicomdb.db.Study)
                     studyQuery = studyQuery.filter(dicomdb.db.Study.study_instance_uid.in_(uniqueStudies))
-                    matches=studyQuery.all()                    
-                    lg.log_simplified_message(assoc_id,"C_FIND","STUDY","",{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matches))
-
+                    matches=studyQuery.all()
+                    lg.log_simplified_message(sessionId,"C_FIND","STUDY","",str([f"{raw.keyword}: {raw.value}" for raw in identifier if raw.keyword != "QueryRetrieveLevel"]),"Info","","","",len(matches))
                 elif identifier.QueryRetrieveLevel=="SERIES":
                     matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.2.1",identifier,session)
-                    #print("MatchedInstancesFirst",matchedInstances)
-                    #session.flush()
-                    #print("SerieQuery",identifier.SeriesInstanceUID)
                     uniqueSeries= get_uniqueSeries(matchedInstances,identifier)
                     seriesQuery= session.query(dicomdb.db.Series)
                     seriesQuery= seriesQuery.filter(dicomdb.db.Series.series_instance_uid.in_(uniqueSeries))
                     matches=seriesQuery.all()
-                    lg.log_simplified_message(assoc_id,"C_FIND","SERIES","",{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matches))
+                    lg.log_simplified_message(sessionId,"C_FIND","SERIES","",str([f"{raw.keyword}: {raw.value}" for raw in identifier if raw.keyword != "QueryRetrieveLevel"]),"Info","","","",len(matches))
                 elif identifier.QueryRetrieveLevel=="PATIENT":
                     matchedInstances=dicomdb.db.search("1.2.840.10008.5.1.4.1.2.1.1",identifier,session)
                     uniquePatients= get_unique_patients(matchedInstances)
                     patientQuery= session.query(dicomdb.db.Patient)
                     patientQuery= patientQuery.filter(dicomdb.db.Patient.patient_id.in_(uniquePatients))
                     matches=patientQuery.all()
-                    lg.log_simplified_message(assoc_id,"C_FIND","PATIENT","",{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matches))
-
-            #print("Matchessss",matches)
+                    lg.log_simplified_message(sessionId,"C_FIND","PATIENT","",str([f"{raw.keyword}: {raw.value}" for raw in identifier if raw.keyword != "QueryRetrieveLevel"]),"Info","","","",len(matches))
             log_data["matches"]= len(matches)
         except Exception as exc:
             traceback.print_exc() 
@@ -315,7 +285,6 @@ def handle_find(event):
                     traceback.print_exc() 
                     pass
                 yield (0xFF00, response_dataset)
-                    
                 session.close()
 
 def get_other_levels_tags(level,required_tag,query_identifier):
@@ -393,7 +362,7 @@ def handle_store(event):
 def handle_echo(event):
     assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
    
-    lg.log_simplified_message(assoc_id,"C_ECHO","","","","Info","","","","")
+    lg.log_simplified_message(sessionId,"C_ECHO","","","","Info","","","","")
     global log_data
     log_data["Request_Type"]="C-ECHO"
     print("Loggg",log_data)
@@ -420,7 +389,7 @@ def handle_move(event):
         yield 0xC000, None
         return
     if event.identifier.QueryRetrieveLevel == 'STUDY':
-        lg.log_simplified_message(assoc_id,"C_Move","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
+        lg.log_simplified_message(sessionId,"C_Move","STUDY",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
 
         if 'StudyInstanceUID' in event.identifier:
             for instance in instances:
@@ -431,7 +400,7 @@ def handle_move(event):
                     ]
        
     elif event.identifier.QueryRetrieveLevel == 'SERIES':
-        lg.log_simplified_message(assoc_id,"C_Move","SERIES",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
+        lg.log_simplified_message(sessionId,"C_Move","SERIES",event.identifier.StudyInstanceUID,{tag: str(value) for tag, value in event.identifier.items()},"Info","","","",len(matching))
         if 'SeriesInstanceUID' in event.identifier:
             for instance in instances:
                 if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID:
@@ -466,10 +435,13 @@ def handle_move(event):
 
 def handle_abort(event):
     global log_data
+    global sessionId
     log_data["status"]="Aborted"
     global lock
     lock= 0
     redis_client.rpush("requests", json.dumps(log_data))
+    lg.log_simplified_message(sessionId,"Association aborted","","","","Warning",versionName,event.assoc.requestor.address,event.assoc.requestor.port,"")
+    sessionId=0
     print("Abooort")
     
 
@@ -522,8 +494,14 @@ def start_dicom_server():
     ae.start_server((ip,dicom_port), evt_handlers=handlers,)
     
 
+def check_hashes(storage_directory, redis_client):
+    hash_c = hash_checker(storage_directory, redis_client,"hash_store.json")
+    print("ddddddddddd")
 
+
+hs = hash_checker(storagedirectory, redis_client,"hash_store.json")
+hs.start()
+print("hhhhhhhhhhhhhhhh")
+
+#check_hashes(storagedirectory,redis_client)
 start_dicom_server()
-#getIPSecurityScore("206.168.34.197")
-#getIpqualityScore("206.168.34.197")
-#getVirusTotalScore("172.18.192.1")
