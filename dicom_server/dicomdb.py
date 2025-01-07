@@ -28,17 +28,19 @@ def initialize_database():
         delete_statement = delete(db.Instance)
         session.execute(delete_statement)
         session.commit()
-    except: 
+    
+        #print("hhhhh",os.listdir("./"))
+        for path in os.listdir(storagedirectory):
+            instance = dcmread(os.path.join(storagedirectory, path))
+            # for raw in instance:
+            #     if raw.keyword=="PatientName" or raw.keyword=="PatientID":
+            #         raw.value = str(raw.value).capitalize()              
+            db.add_instance(instance,session,path)
+            session.commit()
+        print("Database initialized from DICOM storage")
+    except Exception as e:
+        print(e) 
         pass
-    #print("hhhhh",os.listdir("./"))
-    for path in os.listdir(storagedirectory):
-        instance = dcmread(os.path.join(storagedirectory, path))
-        for raw in instance:
-            if raw.keyword=="PatientName" or raw.keyword=="PatientID":
-                raw.value = str(raw.value).capitalize()              
-        db.add_instance(instance,session,path)
-        session.commit()
-    print("Database initialized from DICOM storage")
 
 """ query = Dataset()
 query.QueryRetrieveLevel = "PATIENT"

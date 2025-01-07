@@ -8,6 +8,7 @@ import socket,time,traceback
 import os , json, threading
 import logger as lg
 from integrity_checker import hash_checker 
+from tcia_management import tcia_management
 from pynetdicom.apps.qrscp import handlers
 import dicomdb
 from sqlalchemy import cast, String
@@ -91,7 +92,7 @@ def handle_get(event):
                     matching = [
                         instance for instance in instances if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID
                     ]
-            lg.log_simplified_message(sessionId,"C_GET","SERIES",str([f"{raw.keyword}: {raw.value}" for raw in event.identifier if raw.keyword != "QueryRetrieveLevel"]),"Info","","","",len(matching))
+            lg.log_simplified_message(sessionId,"C_GET","SERIES",str([f"{raw.keyword}: {raw.value}" for raw in event.identifier if raw.keyword != "QueryRetrieveLevel"]),"Info","","","","",len(matching))
         
 
     print("There is a ",len(matching)," match!", "for study :",)
@@ -220,9 +221,9 @@ def handle_find(event):
         Session = dicomdb.sessionmaker(bind=engine)
         session = Session()
         try:
-            for raw in identifier:
-                if raw.keyword=="PatientName" or raw.keyword=="PatientID":
-                    raw.value = str(raw.value).capitalize() 
+            # for raw in identifier:
+                # if raw.keyword=="PatientName" or raw.keyword=="PatientID":
+                #     raw.value = str(raw.value).capitalize() 
             if len(identifier)==1:
                 log_data["Request_parameters"]="all_studies"
                 lg.log_simplified_message(sessionId,"C_FIND","STUDY","All studies","All studies requested","info","","","","All")
@@ -267,6 +268,9 @@ def handle_find(event):
                         response_dataset.StudyTime = getattr(instance,"study_time")
                         response_dataset.AccessionNumber = getattr(instance,"accession_number")
                         response_dataset.StudyID = getattr(instance,"study_id")
+                        response_dataset.InstitutionName = get_other_levels_tags("STUDY","institution_name",getattr(instance,"study_instance_uid"))
+                        response_dataset.PatientBirthDate = get_other_levels_tags("STUDY","birth_date",getattr(instance,"study_instance_uid"))
+                        response_dataset.PatientSex = get_other_levels_tags("STUDY","patient_sex",getattr(instance,"study_instance_uid"))
                         response_dataset.PatientName = get_other_levels_tags("STUDY","patient_name",getattr(instance,"study_instance_uid"))
                         response_dataset.PatientID = get_other_levels_tags("STUDY","patient_id",getattr(instance,"study_instance_uid"))
                         response_dataset.NumberOfStudyRelatedInstances= get_other_levels_tags("STUDY","NumberOfStudyRelatedInstances",getattr(instance,"study_instance_uid"))
@@ -470,19 +474,19 @@ def is_port_in_use(port):
 
 def start_dicom_server():
     block_scanners=os.getenv('blackhole', "False")
-    print("ABC",block_scanners)
+    #print("ABC",block_scanners)
     try:
         if block_scanners=="True":
             network_handler.block_known_scanners("bl.txt","known_scanners")
         else:
             a=0
-            network_handler.allow_scanners("known_scanners")
+            #network_handler.allow_scanners("known_scanners")
     except Exception as e:
         #print(e)
         pass    
     #ip='172.18.204.133'
     ip="localhost"
-    print("aaaaaaaaaaa",dock_env)
+    #print("aaaaaaaaaaa",dock_env)
     if dock_env =="True":
         ip= '172.29.0.3'
     dicom_port = 11112
@@ -493,15 +497,10 @@ def start_dicom_server():
     dicomdb.initialize_database()
     ae.start_server((ip,dicom_port), evt_handlers=handlers,)
     
-
-def check_hashes(storage_directory, redis_client):
-    hash_c = hash_checker(storage_directory, redis_client,"hash_store.json")
-    print("ddddddddddd")
-
-
+tci = tcia_management(storagedirectory,redis_client,1,dicomdb)
+tci.start()
 hs = hash_checker(storagedirectory, redis_client,"hash_store.json")
 hs.start()
-print("hhhhhhhhhhhhhhhh")
 
-#check_hashes(storagedirectory,redis_client)
+
 start_dicom_server()

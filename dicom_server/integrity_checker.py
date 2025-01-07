@@ -8,12 +8,20 @@ class hash_checker(threading.Thread):
             self.storage_directory = storage_directory
             self.redis_client = redis_client
             self.hash_store_path= hash_store_path
+            #self.event= event
             print("Checking files integrity each 6 hours")
-            
+
+      
     def run(self):
+        
+        #self.event.wait()
+        #schedule.every(3).seconds.do(self.check_hashes)
+        schedule.every(6).hours.do(self.check_hashes)
+        #self.event.clear()
         while True:
-            self.check_hashes()
-            time.sleep(21600)  
+            # if not self.event.is_set():  
+            schedule.run_pending()
+            time.sleep(10300)
 
         
 
@@ -28,7 +36,8 @@ class hash_checker(threading.Thread):
         return hash_sha256.hexdigest()
 
     def check_hashes(self):
-        print("Triggered")
+        
+        print("Checking files integrity")
         new_hashes = {}
         changed_files = []
         try:
@@ -48,6 +57,7 @@ class hash_checker(threading.Thread):
         
             except Exception as e:
                 print(f"Error processing {path}: {e}")
+                pass
         
         
         with open(self.hash_store_path, 'w') as f:
@@ -55,8 +65,10 @@ class hash_checker(threading.Thread):
 
         if changed_files:
             self.redis_client.rpush("fileChange", json.dumps(changed_files))
+            
             print("Changed files:", changed_files)
         else:
+            
             print("No changes detected.")
 
 

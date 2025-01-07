@@ -7,3 +7,6 @@ pylibjpeg-openjpeg
 sqlalchemy
 requests
 redis
+schedule
+aiohttp
+faker

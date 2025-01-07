@@ -62,6 +62,9 @@ class InvalidIdentifier(Exception):
 # Translate from the element keyword to the db attribute
 _TRANSLATION = {
     "PatientID": "patient_id",  # PATIENT | Unique | VM 1 | LO
+    "PatientSex":"patient_sex",
+    "InstitutionName":"institution_name",
+    "PatientBirthDate":"birth_date",
     "PatientName": "patient_name",  # PATIENT | Required | VM 1 | PN
     "StudyInstanceUID": "study_instance_uid",  # STUDY | Unique | VM 1 | UI
     "StudyDate": "study_date",  # STUDY | Required | VM 1 | DA
@@ -115,6 +118,9 @@ _STUDY_ROOT_ATTRIBUTES = OrderedDict(
             "StudyID",
             "PatientID",
             "PatientName",
+            "PatientSex",
+            "PatientBirthDate",
+            "InstitutionName",
         ],
         "SERIES": ["SeriesInstanceUID", "Modality", "SeriesNumber"],
         "IMAGE": ["SOPInstanceUID", "InstanceNumber"],
@@ -186,11 +192,15 @@ def add_instance(ds, session, fpath=None):
         ("series_number", "SeriesNumber", None, False),
         ("sop_instance_uid", "SOPInstanceUID", 64, True),
         ("instance_number", "InstanceNumber", None, False),
+        ("patient_sex", "PatientSex", 64, False),
+        ("institution_name", "InstitutionName", 64, False),
+        ("birth_date", "PatientBirthDate", 64, False),
     ]
 
     # Unique and Required attributes
     for attr, keyword, max_len, unique in required:
         if not unique and keyword not in ds:
+            print("atttr",attr)
             value = None
         else:
             elem = ds[keyword]
@@ -202,6 +212,7 @@ def add_instance(ds, session, fpath=None):
             if max_len:
                 if elem.VR == "PN":
                     value = str(value)
+
                 assert len(value) <= max_len
             else:
                 assert -(2**31) <= value <= 2**31 - 1
@@ -696,7 +707,9 @@ class Instance(Base):
     # Transfer Syntax UID of the SOP Instance
     transfer_syntax_uid = Column(String(64))
     sop_class_uid = Column(String(64))
-
+    patient_sex = Column(String(64))
+    institution_name=Column(String(64))
+    birth_date = Column(String(64))
     patient_id = Column(String, ForeignKey("patient.patient_id"))
     patient_name = Column(String, ForeignKey("patient.patient_name"))
 
