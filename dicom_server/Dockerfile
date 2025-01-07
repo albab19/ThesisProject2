@@ -3,7 +3,7 @@ USER root
 
 # Set the working directory in the container
 
-COPY ./../db.db app/
+COPY ./db.db app/
 
 COPY . .
 
