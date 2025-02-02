@@ -1,12 +1,11 @@
-import os, hashlib, threading, json, schedule, time
+import os, hashlib, threading, json, schedule, time,redis_handler
 
 
 class hash_checker(threading.Thread):
 
-    def __init__(self, storage_directory, redis_client,hash_store_path):
+    def __init__(self, storage_directory,hash_store_path):
             super().__init__(daemon=True)
             self.storage_directory = storage_directory
-            self.redis_client = redis_client
             self.hash_store_path= hash_store_path
             #self.event= event
             print("Checking files integrity each 6 hours")
@@ -64,7 +63,7 @@ class hash_checker(threading.Thread):
             json.dump(new_hashes, f)
 
         if changed_files:
-            self.redis_client.rpush("fileChange", json.dumps(changed_files))
+            redis_handler.update_files_integrity_state(changed_files)
             
             print("Changed files:", changed_files)
         else:

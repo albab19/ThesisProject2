@@ -1,5 +1,6 @@
 import subprocess, requests
 
+from datetime import datetime
 
 def get_known_scanners(scanners_file):
     knownScanners = []
@@ -123,3 +124,22 @@ def is_known_scanner(ip):
                 return "True"
 
     return "False"    
+
+
+
+
+def get_reputation_data(rep_dat, ip, ip_scanned):
+    current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+    abusedb_report=  getIPSecurityScore(ip) if not ip_scanned else ["", "", ""]
+    ip_quality_score = getIpqualityScore(ip) if not ip_scanned else ["", "", "", "","","",""]
+    virus_total=getVirusTotalScore(ip) if not ip_scanned else {}
+    rep_dat["timestamp"]= str(current_time) 
+    rep_dat["virus_total_results"] = virus_total
+    rep_dat["ip"]= ip
+    rep_dat["ip_quality_score"] = ip_quality_score[0]
+    rep_dat["proxy"] = ip_quality_score[1]
+    rep_dat["region"] = ip_quality_score[2]
+    rep_dat["vpn"] = ip_quality_score[4]
+    rep_dat["country"] = abusedb_report[2]
+    rep_dat["ISP"] = abusedb_report[0]
+    rep_dat["AbuseDBScore"] = abusedb_report[1]
