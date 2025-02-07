@@ -10,3 +10,7 @@ redis
 schedule
 aiohttp
 faker
+jwt
+pyjwt
+dependency-injector
+aenum

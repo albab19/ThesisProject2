@@ -1,249 +1,258 @@
-import os, traceback, config, dicom_sets_parser, dicomdb
-from pydicom import dcmread
-from logger import DicomLogger
+import traceback, utilities.dicom_util as dicom_util
+from dependency_injector.wiring import inject
+from services.dicom_session_service import ISessionCollector
+from services.dicom_database_service import IDicomDatabase
 from pydicom.dataset import Dataset
 import traceback
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 from typing import Generator, Tuple, Optional
-
-logger = DicomLogger()
-
-
-def handle_assoc(event):
-    version_name = (
-        str(event.assoc.requestor.implementation_version_name)
-        if event.assoc.requestor.implementation_version_name
-        else "N/A"
-    )
-    ip = str(event.assoc.requestor.address)
-    port = event.assoc.requestor.port
-    logger.start_log_session(ip, port, version_name)
+from enums.dicom_session_keys import Sessionkeys as sk
 
 
-def handle_echo(event):
-    try:
-        logger.set_log_info({"level": "info", "Request_Type": "C_ECHO"})
-        logger.log_simplified_message()
-        return 0x0000
-    except Exception as e:
-        print("Exception in handling ECHO operation", e)
-        return 0xC000
+class DICOMHandlers:
+    @inject
+    def __init__(
+        self,
+        exceptions_logger,
+        event_collector: ISessionCollector = None,
+        dicomdb: IDicomDatabase = None,
+    ):
+        self.event_collector = event_collector or ISessionCollector()
+        self.dicomdb = dicomdb or IDicomDatabase()
+        self.exceptions_logger = exceptions_logger
 
+    def handle_assoc(self, event):
+        version_name = (
+            str(event.assoc.requestor.implementation_version_name)
+            if event.assoc.requestor.implementation_version_name
+            else "N/A"
+        )
+        ip = str(event.assoc.requestor.address)
+        port = event.assoc.requestor.port
+        self.event_collector.session_started(ip, port, version_name)
 
-def handle_find(event) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
-    matches = []
+    def handle_echo(self, event):
+        try:
+            self.event_collector.collect_session_info(
+                {
+                    sk.LOG_LEVEL.key: "Info",
+                    sk.REQUEST_TYPE.key: "C_ECHO",
+                    sk.SESSION_MAIN_OPERATION.key: "C_ECHO",
+                },
+                True,
+            )
+            return 0x0000
+        except Exception as e:
+            print("Exception in handling ECHO operation", e)
+            return 0xC000
 
-    try:
-        logger.set_log_info({"level": "Info", "Request_Type": "C_FIND"})
-        model = event.request.AffectedSOPClassUID
+    def handle_find(
+        self, event
+    ) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
+        matches = []
+
+        try:
+            self.event_collector.collect_session_info(
+                {
+                    sk.LOG_LEVEL.key: "Info",
+                    sk.REQUEST_TYPE.key: "C_FIND",
+                    sk.SESSION_MAIN_OPERATION.key: "C_FIND",
+                }
+            )
+            model = event.request.AffectedSOPClassUID
+            identifier = event.identifier
+
+            # Validate Model
+            if dicom_util.model_invalid(model):
+                print("Request dataset has invaild model")
+                yield (0xA900, None)  # Identifier does not match SOP Class
+                return
+
+            # Validate Identifier
+            if dicom_util.identifier_invalid(identifier):
+                print("Request dataset has invaild identifier")
+                yield (0xC006, None)  # Invalid attribute value
+                return
+
+            dicom_util.filter_identifier_tags(identifier)
+            query_level = dicom_util.get_query_level(identifier)
+            self.event_collector.collect_session_info({sk.QUERY_LEVEL.key: query_level})
+
+            # Determine if it's a "all" request at the correct level
+            if dicom_util.all_requested(identifier):
+                if query_level == "STUDY":
+                    matches = self.dicomdb.query_all_studies()
+                elif query_level == "SERIES":
+                    """The pynetdicom ORM lacks for query/retreive model on SERIES level, that is why we filter here based on studies and not on series
+                    which add limitition in quering all series otherwise, we used the studyinstanceuid (STUDY model) as an identifier to retreive a specific serie
+                    """
+                    matches = self.dicomdb.query_all_studies()
+                elif query_level == "PATIENT":
+                    matches = self.dicomdb.query_all_patients()
+                self.event_collector.collect_session_info(
+                    {
+                        sk.SESSION_PARAMETERS.key: "ALL " + query_level,
+                        sk.MATCHES.key: len(matches),
+                    },
+                    True,
+                )
+            else:
+                query_parameters = dicom_util.get_query_parameters(identifier)
+                self.event_collector.collect_session_info(
+                    {sk.SESSION_PARAMETERS.key: query_parameters}
+                )
+                # Hierarchical query level determination
+                if dicom_util.is_patient_level(identifier):
+                    matches = self.dicomdb.query_patient_level(identifier)
+                elif dicom_util.is_study_level(identifier):
+                    matches = self.dicomdb.query_study_level(identifier)
+                elif dicom_util.is_series_level(identifier):
+                    matches = self.dicomdb.query_series_level(identifier)
+
+                self.event_collector.collect_session_info(
+                    {sk.MATCHES.key: len(matches)}, True
+                )
+
+            # Send Matching Results
+            for instance in matches:
+                response_dataset = Dataset()
+                try:
+                    self.dicomdb.get_response_data(
+                        identifier, instance, response_dataset
+                    )
+                    yield (0xFF00, response_dataset)  # Pending response
+                except Exception as e:
+                    print("Exception in building response set", e)
+                    yield (0xC001, None)
+
+            # Final success response
+            yield (0x0000, None)
+
+        except Exception as e:
+            print("Exception in handling C-find operation", e)
+            traceback.print_exc()
+            yield (0xC001, None)  # Unable to process
+
+    def handle_get(self, event) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
+        assoc = event.assoc
         identifier = event.identifier
 
-        # Validate Model
-        if dicom_sets_parser.model_invalid(model):
-            print("Query dataset has invaild model")
-            yield (0xA900, None)  # Identifier does not match SOP Class
+        if dicom_util.identifier_invalid(identifier):
+            yield 0xC000, None
             return
+        instances = dicom_util.get_instances()
+        matching = []
+        query_level = dicom_util.get_query_level(identifier)
+        matching = self.get_matching_instances(event, instances)
+        self.event_collector.collect_session_info(
+            {
+                sk.QUERY_LEVEL.key: query_level,
+                sk.LOG_LEVEL.key: "Info",
+                sk.REQUEST_TYPE.key: "C_GET",
+                sk.MATCHES.key: len(matching),
+            },
+            True,
+        )
+        print("There is a ", len(matching), " match!")
+        yield len(matching)
+        for instance in matching:
+            if event.is_cancelled:
+                yield 0xFE00, None
+            # Ensure the accepted contexts act as a SCP
+            dicom_util.assign_runtime_contexts_support(assoc)
+            if dicom_util.file_compressed(instance):
+                instance.decompress()
+                apply_modality_lut(instance.pixel_array, instance)
+            yield 0xFF00, instance
 
-        # Validate Identifier
-        if dicom_sets_parser.identifier_invalid(identifier):
-            print("Query dataset has invaild identifier")
-            yield (0xC006, None)  # Invalid attribute value
+        yield 0x0000, None
+
+    def handle_store(self, event):
+        self.event_collector.collect_session_info(
+            {sk.LOG_LEVEL.key: "Info", sk.REQUEST_TYPE.key: "C_STORE"}, True
+        )
+        dicom_util.store_received_file(event)
+        return 0x0000
+
+    def handle_move(
+        self, event
+    ) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
+
+        addr = assoc.requestor.address
+        port = assoc.requestor.port
+        yield (str(addr), port)
+        assoc = event.assoc
+        identifier = event.identifier
+
+        if dicom_util.identifier_invalid(identifier):
+            yield 0xC000, None
             return
+        instances = dicom_util.get_instances()
+        matching = []
+        query_level = dicom_util.get_query_level(identifier)
+        matching = self.get_matching_instances(event, instances)
+        self.event_collector.collect_session_info(
+            {
+                sk.QUERY_LEVEL.key: query_level,
+                sk.LOG_LEVEL.key: "Info",
+                sk.REQUEST_TYPE.key: "C_MOVE",
+                sk.MATCHES.key: len(matching),
+            },
+            True,
+        )
+        print("There is a ", len(matching), " match!")
+        yield len(matching)
+        for instance in matching:
+            if event.is_cancelled:
+                yield 0xFE00, None
+            dicom_util.assign_runtime_contexts_support(assoc)
+            if dicom_util.file_compressed(instance):
+                instance.decompress()
+                apply_modality_lut(instance.pixel_array, instance)
+            yield 0xFF00, instance
 
-        dicom_sets_parser.filter_identifier_tags(identifier)
-        query_level = dicom_sets_parser.get_query_level(identifier)
-        logger.set_log_info({"query_level": query_level})
+        yield 0x0000, None
 
-        # Determine if it's a "all studies" request at the correct level
-        if dicom_sets_parser.all_requested(identifier):
-            if query_level == "STUDY":
-                matches = dicomdb.query_all_studies()
-            elif query_level == "SERIES":
-                """The pynetdicom ORM lacks for query/retreive model on SERIES level, that is why we filter here based on studies and not on series
-                which add limitition in quering all series otherwise, we used the studyinstanceuid (STUDY model) as an identifier to retreive a specific serie
-                """
-                matches = dicomdb.query_all_studies()
-            elif query_level == "PATIENT":
-                matches = dicomdb.query_all_patients()
-            logger.set_log_info({"term": "all", "matches": len(matches)})
-        else:
-            query_parameters = dicom_sets_parser.get_query_parameters(identifier)
-            logger.set_log_info({"term": str(query_parameters)})
+    def handle_release(self, event):
+        self.event_collector.collect_session_info(
+            {sk.LOG_LEVEL.key: "Warning", sk.REQUEST_TYPE.key: "Association Released"},
+            True,
+        )
+        self.event_collector.session_ended()
 
-            # Hierarchical query level determination
-            if dicom_sets_parser.is_patient_level(identifier):
-                matches = dicomdb.query_patient_level(identifier)
-            elif dicom_sets_parser.is_study_level(identifier):
-                matches = dicomdb.query_study_level(identifier)
-            elif dicom_sets_parser.is_series_level(identifier):
-                matches = dicomdb.query_series_level(identifier)
+    def handle_abort(self, event):
+        self.event_collector.collect_session_info(
+            {sk.LOG_LEVEL.key: "Warning", sk.REQUEST_TYPE.key: "Association Aborted"},
+            True,
+        )
+        self.event_collector.session_ended()
 
-            logger.set_log_info({"matches": len(matches)})
-        logger.log_simplified_message()
+    def get_matching_instances(self, event, instances):
+        matching = []
 
-        # Send Matching Results
-        for instance in matches:
-            response_dataset = Dataset()
-            try:
-                dicomdb.get_response_data(identifier, instance, response_dataset)
-                yield (0xFF00, response_dataset)  # Pending response
-            except Exception as e:
-                print("Exception in building response set", e)
-                yield (0xC001, None)
+        if dicom_util.is_study_level(event.identifier):
+            if hasattr(event.identifier, "StudyInstanceUID"):
+                study_uid = event.identifier.StudyInstanceUID
+                self.event_collector.collect_session_info(
+                    {sk.SESSION_PARAMETERS.key: "StudyInstanceUID: " + str(study_uid)}
+                )
+                matching = [
+                    instance
+                    for instance in instances
+                    if instance.StudyInstanceUID == study_uid
+                ]
 
-        # Final success response
-        yield (0x0000, None)
+        elif dicom_util.is_series_level(event.identifier):
+            if hasattr(event.identifier, "SeriesInstanceUID"):
+                series_uid = event.identifier.SeriesInstanceUID
+                self.event_collector.collect_session_info(
+                    {sk.SESSION_PARAMETERS.key: "SeriesInstanceUID: " + str(series_uid)}
+                )
 
-    except Exception as e:
-        print("Exception in handling C-find operation", e)
-        traceback.print_exc()
-        yield (0xC001, None)  # Unable to process
+                matching = [
+                    instance
+                    for instance in instances
+                    if instance.SeriesInstanceUID == series_uid
+                ]
 
-
-def handle_get(event) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
-    assoc = event.assoc
-    identifier = event.identifier
-    instances = dicom_sets_parser.get_instances()
-    matching = []
-
-    if dicom_sets_parser.identifier_invalid(identifier):
-        yield 0xC000, None
-        return
-
-    query_level = dicom_sets_parser.get_query_level(identifier)
-    matching = get_matching_instances(event, instances)
-    logger.set_log_info(
-        {
-            "query_level": query_level,
-            "level": "Info",
-            "term": "C_GET",
-            "matches": len(matching),
-        }
-    )
-    logger.log_simplified_message()
-    print("There is a ", len(matching), " match!")
-    yield len(matching)
-    for instance in matching:
-        if event.is_cancelled:
-            yield 0xFE00, None
-        config.assign_runtime_contexts_support(assoc)
-        if dicom_sets_parser.file_compressed(instance):
-            instance.decompress()
-            apply_modality_lut(instance.pixel_array, instance)
-        yield 0xFF00, instance
-
-    yield 0x0000, None
-
-
-def get_matching_instances(event, instances):
-    if dicom_sets_parser.is_study_level(event.identifier):
-        if "StudyInstanceUID" in event.identifier:
-            logger.set_log_info({"term": str(event.identifier.StudyInstanceUID)})
-            for instance in instances:
-                if instance.StudyInstanceUID == event.identifier.StudyInstanceUID:
-                    matching = [
-                        instance
-                        for instance in instances
-                        if instance.StudyInstanceUID
-                        == event.identifier.StudyInstanceUID
-                    ]
-
-    elif dicom_sets_parser.is_series_level(event.identifier):
-        if "SeriesInstanceUID" in event.identifier:
-            logger.set_log_info({"term": str(event.identifier.SeriesInstanceUID)})
-            for instance in instances:
-                if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID:
-                    matching = [
-                        instance
-                        for instance in instances
-                        if instance.SeriesInstanceUID
-                        == event.identifier.SeriesInstanceUID
-                    ]
-
-    return matching
-
-
-def handle_store(event) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
-    logger.set_log_info({"level": "INFO", "Request_Type": "C_STORE"})
-    logger.log_simplified_message()
-    dicom_sets_parser.store_received_file(event)
-    return 0x0000
-
-
-def handle_move(event) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
-
-    addr = assoc.requestor.address
-    port = assoc.requestor.port
-    yield (str(addr), port)
-    assoc = event.assoc
-    identifier = event.identifier
-    instances = dicom_sets_parser.get_instances(instances)
-    matching = []
-
-    if dicom_sets_parser.identifier_invalid(identifier):
-        yield 0xC000, None
-        return
-    query_level = dicom_sets_parser.get_query_level(identifier)
-    logger.set_log_info(
-        {"query_level": query_level, "level": "Info", "Request_type": "C_GET"}
-    )
-    if dicom_sets_parser.is_study_level(event.identifier):
-
-        if "StudyInstanceUID" in event.identifier:
-            logger.set_log_info({"term": str(event.identifier.StudyInstanceUID)})
-            for instance in instances:
-                if instance.StudyInstanceUID == event.identifier.StudyInstanceUID:
-                    matching = [
-                        instance
-                        for instance in instances
-                        if instance.StudyInstanceUID
-                        == event.identifier.StudyInstanceUID
-                    ]
-
-    elif dicom_sets_parser.is_series_level(event.identifier):
-
-        if "SeriesInstanceUID" in event.identifier:
-            logger.set_log_info({"identifier": str(event.identifier.SeriesInstanceUID)})
-            for instance in instances:
-                if instance.SeriesInstanceUID == event.identifier.SeriesInstanceUID:
-                    matching = [
-                        instance
-                        for instance in instances
-                        if instance.SeriesInstanceUID
-                        == event.identifier.SeriesInstanceUID
-                    ]
-
-    logger.set_log_info({"matches": len(matching)})
-    logger.log_simplified_message()
-    print(
-        "There is a ",
-        len(matching),
-        " match!",
-        "for study :",
-    )
-    yield len(matching)
-    # yield 1
-    for instance in matching:
-        if event.is_cancelled:
-            yield 0xFE00, None
-        decompressed = None
-        config.assign_runtime_contexts_permission(assoc)
-        if dicom_sets_parser.file_compressed(instance):
-            instance.decompress()
-            apply_modality_lut(instance.pixel_array, instance)
-        instance.save_as("./decompressed_dicom.dcm")
-        decompressed = dcmread("./decompressed_dicom.dcm")
-        yield 0xFF00, decompressed
-        os.remove("./decompressed_dicom.dcm")
-
-    yield 0x0000, None
-
-
-def handle_release(event):
-    logger.set_log_info({"level": "Warning", "status": "Finished"})
-    logger.log_release_or_abort()
-
-
-def handle_abort(event):
-    logger.set_log_info({"level": "Warning", "status": "Aborted"})
-    logger.log_release_or_abort()
+        return matching

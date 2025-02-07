@@ -1,3 +1,12 @@
+""" This module validates the functionality of the dicom_handlers handle_get() function for retrieving both uncompressed and compressed DICOM files.
+Asseretations: 
+
+- The correct number of datasets is returned.
+
+- The returned files contain the expected patient names.
+
+- The transfer syntax is correctly handled (compressed or uncompressed)"""
+
 import global_patcher
 import pytest
 from pydicom import Dataset
@@ -6,6 +15,8 @@ from unittest.mock import Mock
 import dicom_handlers
 from pynetdicom.events import Event
 from pynetdicom.sop_class import CTImageStorage
+
+global_patcher.initialize_tests()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -49,7 +60,10 @@ def event_compress_retrieve():
     return event
 
 
-def test_get_uncompressed_file_using_little_indian(event_uncompress_retrieve: Mock):
+"""Tests the retrieval of an uncompressed DICOM file using Little Endian transfer syntax"""
+
+
+def test_get_uncompressed_file_using_little_Endian(event_uncompress_retrieve: Mock):
 
     gen = dicom_handlers.handle_get(event_uncompress_retrieve)
     result = list(gen)
@@ -66,6 +80,9 @@ def test_get_uncompressed_file_using_little_indian(event_uncompress_retrieve: Mo
     assert RETURNED_FILE.PatientName == EXCPECTED_PATIONT_NAME_FOR_THIS_STUDY
     # Assert the file is not commpressed
     assert not RETURNED_FILE.file_meta.TransferSyntaxUID.is_compressed
+
+
+"""Tests the retrieval of a compressed DICOM file using JPEG 2000 transfer syntax"""
 
 
 def test_get_compressed_file_using_JPEG2000(event_compress_retrieve: Mock):

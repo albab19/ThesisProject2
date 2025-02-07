@@ -62,9 +62,9 @@ class InvalidIdentifier(Exception):
 # Translate from the element keyword to the db attribute
 _TRANSLATION = {
     "PatientID": "patient_id",  # PATIENT | Unique | VM 1 | LO
-    "PatientSex":"patient_sex",
-    "InstitutionName":"institution_name",
-    "PatientBirthDate":"birth_date",
+    "PatientSex": "patient_sex",
+    "InstitutionName": "institution_name",
+    "PatientBirthDate": "birth_date",
     "PatientName": "patient_name",  # PATIENT | Required | VM 1 | PN
     "StudyInstanceUID": "study_instance_uid",  # STUDY | Unique | VM 1 | UI
     "StudyDate": "study_date",  # STUDY | Required | VM 1 | DA
@@ -83,7 +83,10 @@ _TRANSLATION = {
 _ATTRIBUTES = {
     "PatientID": ("PATIENT", "U", "LO", 1),
     "PatientName": ("PATIENT", "R", "PN", 1),
+    "InstitutionName": ("STUDY", "R", "DA", 1),
+    "PatientBirthDate": ("STUDY", "R", "DA", 1),
     "StudyInstanceUID": ("STUDY", "U", "UI", 1),
+    "PatientSex": ("PATIENT", "R", "PN", 1),
     "StudyDate": ("STUDY", "R", "DA", 1),
     "StudyTime": ("STUDY", "R", "TM", 1),
     "AccessionNumber": ("STUDY", "R", "SH", 1),
@@ -200,7 +203,6 @@ def add_instance(ds, session, fpath=None):
     # Unique and Required attributes
     for attr, keyword, max_len, unique in required:
         if not unique and keyword not in ds:
-            print("atttr",attr)
             value = None
         else:
             elem = ds[keyword]
@@ -708,7 +710,7 @@ class Instance(Base):
     transfer_syntax_uid = Column(String(64))
     sop_class_uid = Column(String(64))
     patient_sex = Column(String(64))
-    institution_name=Column(String(64))
+    institution_name = Column(String(64))
     birth_date = Column(String(64))
     patient_id = Column(String, ForeignKey("patient.patient_id"))
     patient_name = Column(String, ForeignKey("patient.patient_name"))

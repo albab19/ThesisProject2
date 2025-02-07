@@ -32,16 +32,14 @@ were used:
 """
 
 # Note: "The actual implementation of the handle_echo method is provided by the pynetdicom library and is handled by the SCP (Service Class Provider) when a DICOM C-ECHO request is received."
+import sys
+import os
 
-
+sys.path.append(os.path.abspath(".."))
 import pytest
 from unittest.mock import Mock, patch
 from pydicom import Dataset
-import sys
 import global_patcher as global_patcher
-import os
-
-sys.path.append(os.path.abspath(".."))  # Add the parent directory to sys.path
 import dicom_handlers
 
 
@@ -112,27 +110,19 @@ def mock_dicomdb():
     return Mock()
 
 
-@pytest.fixture
-def mock_logger():
-    return Mock()
-
-
 """
 Before all tests we patch the real database by initialize mock one with four studies for four different patients from a mock dicom files storage
 (Oliver Møller, Amanda Larsen, Agnete Østergaard, Ronnie Nikolajsen and Jarl Frederiksen)
 We choose this approach to This approach to follow the development process as realistically as possible.
 """
 
-
-@pytest.fixture(scope="session", autouse=True)
-def pre_tests():
-    global_patcher.setup_mock_db()
+global_patcher.initialize_tests()
 
 
 def test_invalid_sop_class(event_retrieve_specific_study):
     "" " Test handling of invalid  SOP Class UID" ""
     with patch.multiple(
-        "dicom_sets_parser",
+        "dicom_utils",
         model_invalid=Mock(return_value=True),
         identifier_invalid=Mock(return_value=False),
     ):
@@ -146,7 +136,7 @@ def test_invalid_sop_class(event_retrieve_specific_study):
 def test_invalid_identifier(event_retrieve_specific_study):
     """handling of invalid identifier attributes"""
     with patch.multiple(
-        "dicom_sets_parser",
+        "dicom_utils",
         model_invalid=Mock(return_value=False),
         identifier_invalid=Mock(return_value=True),
     ):
@@ -237,15 +227,13 @@ def test_find_specific_serie(event_retrieve_series_for_specific_study):
     assert results[-1][0] == 0x0000
 
 
-def test_response_generation_failure(
-    event_retreive_all_patients, mock_logger, mock_dicomdb
-):
+def test_response_generation_failure(event_retreive_all_patients, mock_dicomdb):
     # Here we build two empty datasets simulating the files in the storage are corrupted
     test_matches = [Dataset(), Dataset()]
     mock_dicomdb.get_response_data.side_effect = Exception("Test error")
 
     with patch.multiple(
-        "dicom_sets_parser",
+        "dicom_utils",
         model_invalid=Mock(return_value=False),
         identifier_invalid=Mock(return_value=False),
         all_requested=Mock(return_value=True),

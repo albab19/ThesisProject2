@@ -1,9 +1,7 @@
 FROM python:3.9-slim
 USER root
 
-# Set the working directory in the container
-
-COPY ./db.db app/
+COPY ./storage/db.db app/
 
 COPY . .
 
@@ -17,4 +15,4 @@ COPY ./service_class.py   /usr/local/lib/python3.9/site-packages/pynetdicom/serv
 COPY ./db.py ./usr/local/lib/python3.9/site-packages/pynetdicom/apps/qrscp/db.py
 COPY ./valuerep.py /usr/local/lib/python3.9/site-packages/pydicom/valuerep.py
 EXPOSE 11112
-CMD ["python","-u" ,"dicomhawk.py"]
+CMD ["python","-u" ,"main.py"]

@@ -1,119 +1,244 @@
-import threading, pydicom
+import threading
+from pydicom import uid
 import schedule, requests
-import os
 import json
-import zipfile
-import io
-from pydicom import dcmread
-from faker import Faker
-import random, shutil
-from datetime import datetime
-from datetime import datetime, timedelta
-import redis_handler
+import utilities.tcia_util as tcia_util
+from services.redis_service import IRedisService
+from services.dicom_database_service import IDicomDatabase
+from services.tci_services import ITCIAAPI
+from services.tci_services import ITCIAScheduler
+from services.tci_services import ITCIAManager
+from dependency_injector.wiring import inject
 
 
-class tcia_management(threading.Thread):
+class TCIAScheduler(threading.Thread, ITCIAScheduler):
 
-    def __init__(self, storage_directory, week, dicomdb):
+    @inject
+    def __init__(
+        self, exceptions_logger, period, period_unit, tcia_manager: ITCIAManager = None
+    ):
         super().__init__(daemon=True)
-        self.username = os.getenv("tcia_username", "Nawras")
-        self.password = os.getenv("tcia_password", "mrmr@gmail.com")
-        self.week = week
-        self.fake = Faker("da_DK")
-        self.dicomdb = dicomdb
+        self.period = period
+        self.period_unit = period_unit
+        self.exceptions_logger = exceptions_logger
+        self.tcia_manager = tcia_manager or ITCIAManager()
+        self.start()
+
+    def run(self):
+        self.schedule_files_retrieval()
+        print(
+            "TCIA retrieving schedule is started, DICOM files storage and database will be directly updated from The Cancer Imaging Archeive each",
+            self.period,
+            self.period_unit,
+        )
+
+    def schedule_files_retrieval(self):
+        try:
+            schedule_unit = getattr(schedule.every(self.period), self.period_unit)
+            schedule_unit.do(self.tcia_manager.change_dicom_files)
+        except Exception:
+            self.exceptions_logger.exception(
+                "Exception while running TCIA files retriev schedular"
+            )
+
+
+class TCIAManager(ITCIAManager):
+    def __init__(
+        self,
+        exceptions_logger,
+        storage_directory,
+        tcia_dir,
+        pdf_canary_path,
+        dicomdb: IDicomDatabase = None,
+        redis_handler: IRedisService = None,
+        tcia_api: ITCIAAPI = None,
+    ):
+        self.tcia_dir = tcia_dir
         self.storage_directory = storage_directory
-        self.tcia_dir = "./tcia_data"
-        print("TCIA retrieving schedule is started")
-
-    def get_access_token(self):
-        try:
-            res = requests.post(
-                "https://services.cancerimagingarchive.net/nbia-api/oauth/token",
-                data={
-                    "username": self.username,
-                    "password": self.password,
-                    "client_id": "NBIA",
-                    "grant_type": "password",
-                },
-            )
-            json_object = json.loads(res.content)
-            return [json_object["access_token"], json_object["refresh_token"]]
-        except Exception as e:
-            print("Access token retrieval failed:", e)
-
-    def refresh_access_token(self):
-        try:
-            requests.post(
-                "https://services.cancerimagingarchive.net/nbia-api/oauth/token",
-                data={
-                    "refresh_token": self.refresh_token,
-                    "client_id": "nbia",
-                    "grant_type": "refresh_token",
-                },
-            )
-        except Exception as e:
-            print("Token refresh failed:", e)
-
-    def delete_old_files(self):
-        try:
-            for file in os.listdir(self.storage_directory):
-                os.remove(os.path.join(self.storage_directory, file))
-        except Exception as e:
-            print("Old files deletion failed:", e)
+        self.dicomdb = dicomdb or IDicomDatabase()
+        self.redis_handler = redis_handler or IRedisService()
+        self.exceptions_logger = exceptions_logger
+        self.tcia_api = tcia_api
+        self.pdf_canary_path = pdf_canary_path
 
     def change_dicom_files(self):
+        # to be used in unit testing
+        self.schedule_starded = True
         print("Scheduled change of dicom files started")
         try:
-            self.access_token = self.get_access_token()[0]
-            self.delete_old_files()
-            self.delete_temps()
-            self.get_new_files()
+            tcia_util.delete_old_files(self.storage_directory)
+            tcia_util.delete_temps(self.tcia_dir)
+            self.tcia_api.get_access_token()
+            self.tcia_api.get_new_files(
+                self.redis_handler.get_TCI_existing_studies(), self.tcia_dir
+            )
             self.organize_downloaded_files()
             self.dicomdb.initialize_database()
-        except Exception as e:
-            print("Dicom files scheduled retrieve failed:", e)
+        except Exception:
+            self.exceptions_logger.exception(
+                "Changing Dicom files with TCIA files failed:"
+            )
 
-    def get_new_files(self):
-        try:
-            existing_studies = redis_handler.get_TCI_existing_studies()
-            modalities = ["CT", "MR", "US", "DX"]
-            _json = {}
-            for mod in modalities:
-                metadata = {}
+    def organize_downloaded_files(self):
+        directory = tcia_util.initialize_dicom_directory_if_not_exist(
+            self.storage_directory
+        )
+        series_files_counter = 0
+        for modality in tcia_util.get_downloaded_modalitis(self.tcia_dir):
+            for study_uid in tcia_util.get_studies_from_modality(
+                modality, self.tcia_dir
+            ):
                 try:
-                    res = requests.get(
-                        "https://services.cancerimagingarchive.net/nbia-api/services/v1/getSeries",
-                        params={f"Modality": {mod}},
-                    )
-                    _json = json.loads(res.content)
-                except Exception as e:
-                    print("Series retrieval failed:", e)
-                    pass
-                if _json:
-                    a = 0
-                    for entry in _json:
-                        modality = entry["Modality"]
-                        study_uid = entry["StudyInstanceUID"]
-                        series_uid = entry["SeriesInstanceUID"]
-                        image_count = int(entry["ImageCount"])
+                    self.redis_handler.add_TCI_study(study_uid)
+                except Exception:
+                    self.exceptions_logger.exception("Study addition failed:")
 
-                        if (
-                            os.getenv("minimum_file_por_serie", 1)
-                            <= image_count
-                            <= os.getenv("maximum_file_serie", 3)
-                        ):
-                            if (
-                                study_uid.encode() not in existing_studies
-                                and a <= os.getenv("Number_studies_modality", 9)
-                            ):
-                                if study_uid not in metadata:
-                                    a += 1
-                                    metadata[study_uid] = []
-                                metadata[study_uid].append(
-                                    {"se_uid": series_uid, "modality": modality}
-                                )
-                            else:
-                                pass
+                study_files_counter = 0
+                (
+                    patient_name,
+                    patient_id,
+                    patient_sex,
+                    birth_date,
+                    study_id,
+                    study_date,
+                    accession_number,
+                ) = tcia_util.generate_patient_info()
+                institution = tcia_util.get_random_institution()
+                for se_uid in tcia_util.get_downloaded_studies_per_modality(
+                    modality, study_uid, self.tcia_dir
+                ):
+                    for file in tcia_util.get_series_per_study(
+                        modality, study_uid, se_uid, self.tcia_dir
+                    ):
+                        self.process_serie_file(
+                            directory,
+                            series_files_counter,
+                            modality,
+                            study_uid,
+                            study_files_counter,
+                            patient_name,
+                            patient_id,
+                            patient_sex,
+                            birth_date,
+                            study_id,
+                            study_date,
+                            accession_number,
+                            institution,
+                            se_uid,
+                            file,
+                        )
+
+    def process_serie_file(
+        self,
+        directory,
+        series_files_counter,
+        modality,
+        study_uid,
+        study_files_counter,
+        patient_name,
+        patient_id,
+        patient_sex,
+        birth_date,
+        study_id,
+        study_date,
+        accession_number,
+        institution,
+        se_uid,
+        file,
+    ):
+        if not tcia_util.is_licience_file(file):
+            study_files_counter += 1
+            series_files_counter += 1
+            dataset = tcia_util.build_file_dataset(
+                modality,
+                study_uid,
+                patient_name,
+                patient_id,
+                patient_sex,
+                birth_date,
+                study_id,
+                study_date,
+                accession_number,
+                institution,
+                se_uid,
+                file,
+                self.tcia_dir,
+            )
+            if (
+                series_files_counter == 4
+                or series_files_counter == 12
+                or series_files_counter == 18
+                or series_files_counter == 24
+            ):
+                # Injecting 4 retrieved dicom file with canary token and honeyURL token
+                self.inject_honey_url(dataset)
+                self.inject_pdf_canary_token(dataset)
+                self.redis_handler.add_injcted_file(patient_name, modality)
+
+            tcia_util.store_retrieved_file(
+                directory,
+                modality,
+                study_files_counter,
+                patient_name,
+                dataset,
+            )
+
+    def inject_pdf_canary_token(self, dataset):
+        dataset.SOPClassUID = uid.EncapsulatedPDFStorage
+        dataset.MIMETypeOfEncapsulatedDocument = "application/pdf"
+        dataset.EncapsulatedDocument = self.get_canary_token()
+
+    def inject_honey_url(self, dataset):
+        dataset.RetrieveURL = str(self.redis_handler.get_honey_url())
+
+    def get_canary_token(self):
+        pdf_path = self.pdf_canary_path
+        try:
+            with open(pdf_path, "rb") as pdf_file:
+                pdf_data = pdf_file.read()
+                return pdf_data
+        except Exception:
+            self.exceptions_logger.exception("Canary token retrieval failed:")
+
+
+class TCIAAPI(ITCIAAPI):
+
+    def __init__(
+        self,
+        exceptions_logger,
+        username,
+        password,
+        min_series,
+        max_series,
+        modalities,
+        studies_per_mod,
+    ):
+        self.username = username
+        self.password = password
+        self.exceptions_logger = exceptions_logger
+        self.minimum_files_in_each_retrieved_serie = min_series
+        self.maximum_files_in_each_retrieved_serie = max_series
+        self.number_of_studies_in_each_retrieved_modality = studies_per_mod
+        self.modalities = modalities
+
+    def get_new_files(self, existing_studies, tcia_dir):
+        print("Calling TCIA API")
+        try:
+
+            _json = {}
+            for mod in self.modalities:
+                metadata = {}
+                _json = self.get_studies_based_on_modalities(mod)
+                if _json:
+                    study_counter = 0
+                    metadata = tcia_util.filter_retrieved_studies(
+                        existing_studies,
+                        _json,
+                        study_counter,
+                        self.number_of_studies_in_each_retrieved_modality,
+                        self.minimum_files_in_each_retrieved_serie,
+                        self.maximum_files_in_each_retrieved_serie,
+                    )
 
                     for st_uid, se_uids in metadata.items():
                         for se_uid_dict in se_uids:
@@ -127,148 +252,62 @@ class tcia_management(threading.Thread):
                             )
                             response.raise_for_status()
 
-                            with zipfile.ZipFile(
-                                io.BytesIO(response.content)
-                            ) as the_zip:
-                                the_zip.extractall(
-                                    path=f"{self.tcia_dir}/{mod}/{st_uid}/{se_uid}/"
-                                )
+                            tcia_util.extract_and_save_zip_data(
+                                mod, st_uid, se_uid, response, tcia_dir
+                            )
             metadata = {}
-        except Exception as e:
-            print("New files retrieval failed:", e)
-            pass
+        except Exception:
+            self.exceptions_logger.exception("New files retrieval failed:")
 
-    def organize_downloaded_files(self):
-        directory = os.path.join(self.storage_directory)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        files_counter = 0
-        for modality in os.listdir(self.tcia_dir):
-            for study_uid in os.listdir(os.path.join(self.tcia_dir, modality)):
-                try:
-                    redis_handler.add_TCI_study(study_uid)
-                except Exception as e:
-                    print("Study addition failed:", e)
-                    pass
-                study_files_counter = 0
-                (
-                    patient_name,
-                    patient_id,
-                    patient_sex,
-                    birth_date,
-                    study_id,
-                    study_date,
-                    accession_number,
-                ) = self.generate_patient_info()
-                institution = self.get_random_institution()
-                for se_uid in os.listdir(
-                    os.path.join(self.tcia_dir, modality, study_uid)
-                ):
-                    for file in os.listdir(
-                        os.path.join(self.tcia_dir, modality, study_uid, se_uid)
-                    ):
-                        if file != "LICENSE":
-                            study_files_counter += 1
-                            files_counter += 1
-                            dataset = dcmread(
-                                os.path.join(
-                                    self.tcia_dir, modality, study_uid, se_uid, file
-                                )
-                            )
-                            dataset.StudyInstanceUID = study_uid
-                            dataset.InstitutionName = institution
-                            dataset.SeriesInstanceUID = se_uid
-                            dataset.PatientName = patient_name
-                            dataset.PatientID = patient_id
-                            dataset.PatientSex = patient_sex
-                            dataset.PatientBirthDate = birth_date
-                            dataset.StudyID = study_id
-                            dataset.AccessionNumber = accession_number
-                            dataset.StudyDate = study_date
-                            dataset.SeriesDate = study_date
-                            if (
-                                files_counter == 4
-                                or files_counter == 12
-                                or files_counter == 18
-                                or files_counter == 24
-                            ):
-                                dataset.SOPClassUID = pydicom.uid.EncapsulatedPDFStorage
-                                dataset.MIMETypeOfEncapsulatedDocument = (
-                                    "application/pdf"
-                                )
-                                dataset.RetrieveURL = str(redis_handler.get_honey_url())
-                                dataset.EncapsulatedDocument = self.get_canary_token()
-                                redis_handler.add_injcted_file(patient_name, modality)
-
-                            filename = (
-                                f"{modality}_{patient_name}_{study_files_counter}.dcm"
-                            )
-                            filepath = os.path.join(directory, filename)
-                            try:
-                                dataset.save_as(filepath)
-                            except Exception as e:
-                                print("File save failed:", e)
-
-    def delete_temps(self):
-        if os.path.isdir("./tcia_data"):
-            try:
-                shutil.rmtree(self.tcia_dir)
-            except Exception as e:
-                print("Temp deletion failed:", e)
-
-    def get_canary_token(self):
-        pdf_path = "./dicom_files/can.pdf"
+    def get_access_token(self):
+        session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(max_retries=3)
+        session.mount("https://", adapter)
         try:
-            with open(pdf_path, "rb") as pdf_file:
-                pdf_data = pdf_file.read()
-                return pdf_data
-        except Exception as e:
-            print("Canary token retrieval failed:", e)
+            res = session.post(
+                "https://services.cancerimagingarchive.net/nbia-api/oauth/token",
+                data={
+                    "username": self.username,
+                    "password": self.password,
+                    "client_id": "NBIA",
+                    "grant_type": "password",
+                },
+                timeout=10,
+            )
+            json_object = json.loads(res.content)
+            self.access_token = json_object["access_token"]
+            self.refresh_token = json_object["refresh_token"]
 
-    def get_random_institution(self):
-        medical_institutions = [
-            "Københavns Sundhedscenter",
-            "Aarhus Kliniken",
-            "Odense Patienthus",
-            "Nordjylland Med Institut",
-        ]
+        except Exception:
+            self.exceptions_logger.exception("Access token retrieval failed:")
 
-        return random.choice(medical_institutions)
+    def refresh_access_token(self):
+        session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(max_retries=3)
+        session.mount("https://", adapter)
+        try:
+            session.post(
+                "https://services.cancerimagingarchive.net/nbia-api/oauth/token",
+                data={
+                    "refresh_token": self.refresh_token,
+                    "client_id": "nbia",
+                    "grant_type": "refresh_token",
+                },
+                timeout=10,
+            )
+        except Exception:
+            self.exceptions_logger.exception("Token refresh failed:")
 
-    def generate_patient_info(self):
-        name = ""
-        sex = ""
-
-        if random.choice([True, False]):
-            name = self.fake.first_name_male() + " " + self.fake.last_name_male()
-            sex = "M"
-        else:
-            name = self.fake.first_name_female() + " " + self.fake.last_name_female()
-            sex = "F"
-
-        start_birth_date = datetime(1955, 12, 10)
-        end_birth_date = datetime(1999, 12, 1)
-        random_birth_date = start_birth_date + timedelta(
-            days=random.randint(0, (end_birth_date - start_birth_date).days)
-        )
-        formatted_birth_date = random_birth_date.strftime("%Y%m%d")
-
-        start_study_date = datetime(2010, 12, 10)
-        end_study_date = datetime(2024, 12, 1)
-        random_study_date = start_study_date + timedelta(
-            days=random.randint(0, (end_study_date - start_study_date).days)
-        )
-        formatted_study_date = random_study_date.strftime("%Y%m%d")
-
-        return (
-            name,
-            str(random.randint(10, 7400)),
-            sex,
-            formatted_birth_date,
-            str(random.randint(35241, 567331169)),
-            formatted_study_date,
-            str(random.randint(3528941, 5673331169)),
-        )
-
-    def run(self):
-        schedule.every(1).weeks.do(self.change_dicom_files)
+    def get_studies_based_on_modalities(self, mod):
+        session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(max_retries=3)
+        session.mount("https://", adapter)
+        try:
+            res = session.get(
+                "https://services.cancerimagingarchive.net/nbia-api/services/v1/getSeries",
+                params={f"Modality": {mod}},
+            )
+            _json = json.loads(res.content)
+        except Exception:
+            self.exceptions_logger.exception("Series retrieval failed:")
+        return _json

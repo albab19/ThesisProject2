@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('/logs/simplified')
             .then(response => response.json())
             .then(logs => {
+                console.log("SSSSSSSSSSSSS", logs)
                 const tbody = document.querySelector("#logs-table tbody");
                 tbody.innerHTML = ''; // Clear existing logs
                 let connectionCount = 0; // Initialize connection count
@@ -19,15 +20,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 logs.forEach((log, index) => {
                     // Add connection header on first log or when 'Association Requested' is found
-                    if (index === 0 || log.Command === "Association Requested") {
+                    if (index === 0 || log.request_Type === "Association Requested") {
                         addConnectionHeader();
                     }
 
                     const row = document.createElement("tr");
                     const logFields = [
-                        log.ID, log.IP, log.Port, log.Version, log.Command,
-                        log.identifier, log.Matches, log.Status, log.level,
-                        log.QueryRetrieveLevel, log.timestamp
+                        log.session_id, log.ip, log.port, log.version, log.request_Type,
+                        log.session_parameters, log.matches, log.status, log.log_level,
+                        log.query_level, log.time_stamp
                     ];
 
                     // Create and append cells for each field

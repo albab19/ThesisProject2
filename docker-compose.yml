@@ -1,4 +1,4 @@
-version: '3.8'  # Use the latest version of Compose
+version: '3.8' # Use the latest version of Compose
 
 services:
   logserver:
@@ -24,14 +24,23 @@ services:
       - "3000:3000"
     environment:
       - Docker_ENV=True
-    # depends_on:
-    #   - dicomhawk
 
-  dicomhawk:
+  dicom_server:
     environment:
-      - ENABLE_LOGGING=false
       - blackhole=True
       - Docker_ENV=True
+      - blackhole_path=./storage/blackhole_list.txt
+      - REDIS_HOST=172.29.0.4
+      - tcia_username=Nawras
+      - tcia_password=mrmr@gmail.com
+      - tcia_unit=week
+      - tcia_weeks_period=1
+      - abuse_ip=95c2c4b357f46e9fb9ce626d06295c1002454709007a43ed5ea49de785a7e3bb0db670e44bb10875
+      - ip_quality_score=JyGDPZk1kg5Y6Cqqiagx4y1YBkDmJ7tP
+      - virus_total=715bccfb503dc801d1fdc5f095bb3c0c2a4412a7b81cca1a2f5c15e14361f1fa
+      - minimum_tcia_series=1
+      - maximum_tcia_series=3
+      - tcia_studies_per_modality=10
     build: ./dicom_server/.
     volumes:
       - shared_data:/app
@@ -41,17 +50,16 @@ services:
       host:
         ipv4_address: 172.29.0.3
   redis:
-      image: redis
-      ports:
-        - "6379:6379"
-      networks:
-          host:
-            ipv4_address: 172.29.0.4
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      host:
+        ipv4_address: 172.29.0.4
 
 volumes:
   shared_data:
     driver: local
-
 
 networks:
   host:
