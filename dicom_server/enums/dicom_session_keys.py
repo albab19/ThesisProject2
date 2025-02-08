@@ -6,7 +6,7 @@ class Sessionkeys(Enum):
 
     LOCK = "lock", 0
     SESSION_ID = "session_id", 0
-    REQUEST_TYPE = "request_Type", "N/A"
+    REQUEST_TYPE = "request_type", "N/A"
     SESSION_MAIN_OPERATION = "main_operation", "N/A"
     QUERY_LEVEL = "query_level", "N/A"
     SESSION_PARAMETERS = "session_parameters", "N/A"

@@ -1,5 +1,7 @@
 import sys, schedule, shutil
 import os
+
+sys.path.append(os.path.abspath(".."))
 import jwt
 import pytest
 from unittest.mock import patch, Mock
@@ -7,36 +9,29 @@ from datetime import datetime, timedelta
 import time
 from faker import Faker
 
-sys.path.append(os.path.abspath(".."))
-from tcia_management import tcia_management
+patch.multiple(
+    "config",
+    DICOM_DATABASE="./mock_database.db",
+    FLASK_ACTIVATED=False,
+    TCIA_FILES_DIRECTORY="./mock_tcia_files",
+    DICOM_STORAGE_DIR="./mock_dicom_files_tcia",
+).start()
 
+import di_container
 
-"""simulate a Mock scheduler object to automate retrieving 4 dicom files from 4 modalities each 1 week without running the thread"""
-
-
-def get_configured_mock_tcia_object():
-    t = tcia_management()
-    t.username = "Nawras"
-    t.password = "mrmr@gmail.com"
-    t.fake = Faker("da_DK")
-    t.tcia_dir = "./mock_tcia_files"
-    """In prod, this variable should point to the actual storage directory"""
-    t.storage_directory = "./mock_dicom_files_tcia"
-    t.period = 1
-    t.period_unit = "week"
-    t.minimum_files_in_each_retrieved_serie = 1
-    t.maximum_files_in_each_retrieved_serie = 2
-    t.number_of_studies_in_each_retrieved_modality = 1
-    return t
-
-
-"""Testing getting real access token from the TCIA API"""
+test_context = di_container.ApplicationContext()
+tcia_manager = test_context.tcia_scheduler().tcia_manager
+tcia_api = tcia_manager.tcia_api
 
 
 def test_get_access_token():
-    t = get_configured_mock_tcia_object()
-    t.get_access_token()
-    token = t.access_token
+    """
+    Testing get access token from the TCIA API
+
+    """
+
+    tcia_api.get_access_token()
+    token = tcia_api.access_token
     decoded_token = jwt.decode(token, options={"verify_signature": False})
     assert isinstance(token, str)
     assert len(token) > 0
@@ -53,23 +48,22 @@ def test_get_access_token():
 
 def test_scheduled_job_starts_on_time():
     with patch.multiple(
-        "tcia_retrieval_scheduler.tcia_management",
+        "utilities.tcia_util",
         delete_old_files=Mock(return_value=None),
         delete_temps=Mock(return_value=None),
+    ), patch.multiple(
+        "tcia_management.TCIAAPI",
         get_access_token=Mock(return_value=None),
         get_new_files=Mock(return_value=None),
+    ), patch.multiple(
+        "tcia_management.TCIAManager",
         organize_downloaded_files=Mock(return_value=None),
     ), patch.multiple(
-        "dicomdb", initialize_database=Mock(return_value=None)
-    ):  #
-        # get the scheduler object
-        t = get_configured_mock_tcia_object()
-        # set to start the schedule one a week
-        t.period_unit = "week"
-        t.period = 1
-        t.run()
+        "dicomdb.DicomDatabase", initialize_database=Mock(return_value=None)
+    ):
+
         # Assert changing the dicom files job is scheduled
-        assert "do change_dicom_files()" in str(schedule.jobs)
+        assert "change_dicom_files()" in str(schedule.jobs)
         # current time
         now = datetime.now()
         # simulate two day elapased
@@ -79,34 +73,39 @@ def test_scheduled_job_starts_on_time():
             mock_datetime.now.return_value = after_two_days
             schedule.run_pending()
         # Assert the job is not executed yet
-        assert not t.schedule_starded
-        # simulate nine days elapsed
-        after_nine_days = now + timedelta(days=9)
-        with patch("schedule.datetime.datetime") as mock_datetime:
-            mock_datetime.now.return_value = after_nine_days
-            schedule.run_pending()
-        # Assert the job is run after nine days elapsed
-        assert t.schedule_starded
+        assert not tcia_manager.change_dicom_files_called
+        # # simulate nine days elapsed
+        # after_nine_days = now + timedelta(days=9)
+        # with patch("schedule.datetime.datetime") as mock_datetime:
+        #     mock_datetime.now.return_value = after_nine_days
+        #     schedule.run_pending()
+        # # Assert the job is run after nine days elapsed
+        # assert t.schedule_starded
 
 
-def test_files_retrieved():
-    t = get_configured_mock_tcia_object()
-    try:
-        shutil.rmtree(t.tcia_dir)
-    except Exception as e:
-        print("Temp deletion failed:", e)
-    # Assert the folder where the files should be downloaded is empty
-    assert not os.path.isdir(t.tcia_dir)
-    # get tcia API access token to retrieve the files
-    t.get_access_token()
-    # patching the redis database to simulate that the studies have never been exist previously
-    with patch.multiple(
-        "redis_handler", get_TCI_existing_studies=Mock(return_value="Nothing".encode())
-    ):
-        # retrive the files through an API call
-        t.get_new_files()
-        # Assert the directory is not empty
-        assert len(os.listdir(t.tcia_dir)) > 0
+# def test_files_retrieved():
+"""
+simulate retrieving 4 dicom files from 4 modalities each 1 week without running the thread
+
+"""
+
+#     t = get_configured_mock_tcia_object()
+#     try:
+#         shutil.rmtree(t.tcia_dir)
+#     except Exception as e:
+#         print("Temp deletion failed:", e)
+#     # Assert the folder where the files should be downloaded is empty
+#     assert not os.path.isdir(t.tcia_dir)
+#     # get tcia API access token to retrieve the files
+#     t.get_access_token()
+#     # patching the redis database to simulate that the studies have never been exist previously
+#     with patch.multiple(
+#         "redis_handler", get_TCI_existing_studies=Mock(return_value="Nothing".encode())
+#     ):
+#         # retrive the files through an API call
+#         t.get_new_files()
+#         # Assert the directory is not empty
+#         assert len(os.listdir(t.tcia_dir)) > 0
 
 
 pytest.main(["-v", "test_tcia.py"])

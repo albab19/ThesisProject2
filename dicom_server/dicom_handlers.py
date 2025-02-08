@@ -13,7 +13,7 @@ class DICOMHandlers:
     @inject
     def __init__(
         self,
-        exceptions_logger,
+        exceptions_logger=None,
         event_collector: ISessionCollector = None,
         dicomdb: IDicomDatabase = None,
     ):
@@ -22,14 +22,17 @@ class DICOMHandlers:
         self.exceptions_logger = exceptions_logger
 
     def handle_assoc(self, event):
-        version_name = (
-            str(event.assoc.requestor.implementation_version_name)
-            if event.assoc.requestor.implementation_version_name
-            else "N/A"
-        )
-        ip = str(event.assoc.requestor.address)
-        port = event.assoc.requestor.port
-        self.event_collector.session_started(ip, port, version_name)
+        try:
+            version_name = (
+                str(event.assoc.requestor.implementation_version_name)
+                if event.assoc.requestor.implementation_version_name
+                else "N/A"
+            )
+            ip = str(event.assoc.requestor.address)
+            port = event.assoc.requestor.port
+            self.event_collector.session_started(ip, port, version_name)
+        except Exception as e:
+            self.exceptions_logger.exception("Exception while handling association")
 
     def handle_echo(self, event):
         try:
@@ -43,7 +46,7 @@ class DICOMHandlers:
             )
             return 0x0000
         except Exception as e:
-            print("Exception in handling ECHO operation", e)
+            print("Exception while handling ECHO operation", e)
             return 0xC000
 
     def handle_find(
@@ -83,8 +86,10 @@ class DICOMHandlers:
                 if query_level == "STUDY":
                     matches = self.dicomdb.query_all_studies()
                 elif query_level == "SERIES":
-                    """The pynetdicom ORM lacks for query/retreive model on SERIES level, that is why we filter here based on studies and not on series
-                    which add limitition in quering all series otherwise, we used the studyinstanceuid (STUDY model) as an identifier to retreive a specific serie
+                    """
+                    The pynetdicom ORM lacks for query/retreive model on SERIES level, that is why we filter here based on studies and not on series
+                    which add limitition in quering all series otherwise, we used the studyinstanceuid (STUDY model) as an identifier tag to then filter specific serie based on the SeriesInstanceUID tag
+
                     """
                     matches = self.dicomdb.query_all_studies()
                 elif query_level == "PATIENT":
@@ -128,46 +133,49 @@ class DICOMHandlers:
             # Final success response
             yield (0x0000, None)
 
-        except Exception as e:
-            print("Exception in handling C-find operation", e)
-            traceback.print_exc()
+        except Exception:
+            self.exceptions_logger.exception("Exception in handling C-FIND operation")
             yield (0xC001, None)  # Unable to process
 
     def handle_get(self, event) -> Generator[Tuple[int, Optional[Dataset]], None, None]:
-        assoc = event.assoc
-        identifier = event.identifier
+        try:
+            assoc = event.assoc
+            identifier = event.identifier
 
-        if dicom_util.identifier_invalid(identifier):
-            yield 0xC000, None
-            return
-        instances = dicom_util.get_instances()
-        matching = []
-        query_level = dicom_util.get_query_level(identifier)
-        matching = self.get_matching_instances(event, instances)
-        self.event_collector.collect_session_info(
-            {
-                sk.QUERY_LEVEL.key: query_level,
-                sk.LOG_LEVEL.key: "Info",
-                sk.REQUEST_TYPE.key: "C_GET",
-                sk.MATCHES.key: len(matching),
-            },
-            True,
-        )
-        print("There is a ", len(matching), " match!")
-        yield len(matching)
-        for instance in matching:
-            if event.is_cancelled:
-                yield 0xFE00, None
-            # Ensure the accepted contexts act as a SCP
-            dicom_util.assign_runtime_contexts_support(assoc)
-            if dicom_util.file_compressed(instance):
-                instance.decompress()
-                apply_modality_lut(instance.pixel_array, instance)
-            yield 0xFF00, instance
+            if dicom_util.identifier_invalid(identifier):
+                yield 0xC000, None
+                return
+            instances = dicom_util.get_instances()
+            matching = []
+            query_level = dicom_util.get_query_level(identifier)
+            matching = self.get_matching_instances(event, instances)
+            self.event_collector.collect_session_info(
+                {
+                    sk.QUERY_LEVEL.key: query_level,
+                    sk.LOG_LEVEL.key: "Info",
+                    sk.REQUEST_TYPE.key: "C_GET",
+                    sk.MATCHES.key: len(matching),
+                },
+                True,
+            )
+            yield len(matching)
+            for instance in matching:
+                if event.is_cancelled:
+                    yield 0xFE00, None
+                # Ensure the accepted contexts act as a SCP
+                dicom_util.assign_runtime_contexts_support(assoc)
+                if dicom_util.file_compressed(instance):
+                    instance.decompress()
+                    apply_modality_lut(instance.pixel_array, instance)
+                yield 0xFF00, instance
 
-        yield 0x0000, None
+            yield 0x0000, None
+        except Exception:
+            self.exceptions_logger.exception("Exception while handling C-GET operation")
+            yield (0xC001, None)
 
     def handle_store(self, event):
+
         self.event_collector.collect_session_info(
             {sk.LOG_LEVEL.key: "Info", sk.REQUEST_TYPE.key: "C_STORE"}, True
         )
@@ -200,7 +208,6 @@ class DICOMHandlers:
             },
             True,
         )
-        print("There is a ", len(matching), " match!")
         yield len(matching)
         for instance in matching:
             if event.is_cancelled:

@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('/logs/simplified')
             .then(response => response.json())
             .then(logs => {
-                console.log("SSSSSSSSSSSSS", logs)
                 const tbody = document.querySelector("#logs-table tbody");
                 tbody.innerHTML = ''; // Clear existing logs
                 let connectionCount = 0; // Initialize connection count
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const row = document.createElement("tr");
                     const logFields = [
-                        log.session_id, log.ip, log.port, log.version, log.request_Type,
+                        log.session_id, log.ip, log.port, log.version, log.request_type,
                         log.session_parameters, log.matches, log.status, log.log_level,
                         log.query_level, log.time_stamp
                     ];

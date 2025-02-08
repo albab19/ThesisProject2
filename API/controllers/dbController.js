@@ -1,38 +1,35 @@
 //db
 const sqlite3 = require('sqlite3').verbose();
-var databasePath= "./../db.db"
-if (process.env.Docker_ENV ==="True"){
+var databasePath = "./../dicom_server/storage/db.db"
+if (process.env.prod) {
     databasePath = '/app/db.db'
-
 }
-console.log(databasePath)
+
 // Connect to the SQLite database
 function connectToDB() {
     const db = new sqlite3.Database(databasePath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-    if (err) {
-        console.error('Error opening database:', err.message);
-    } else {
-        console.log('Connected to the SQLite database.');
-    }
-});
-
-db.serialize(() => {
-    console.log("ser")
-    db.each("SELECT name FROM sqlite_master WHERE type='table'", (err, table) => {
         if (err) {
-            console.error('Error running query', err.message);
-            return;
+            console.error('Error opening database:', err.message);
+        } else {
+            console.log('Connected to the SQLite database.');
         }
-        console.log(table.name);
     });
-});
+
+    db.serialize(() => {
+        db.each("SELECT name FROM sqlite_master WHERE type='table'", (err, table) => {
+            if (err) {
+                console.error('Error running query', err.message);
+                return;
+            }
+            console.log(table.name);
+        });
+    });
 
 
-return db;
+    return db;
 }
 
 
-module.exports={
+module.exports = {
     connectToDB
-  };
-  
+};

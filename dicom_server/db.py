@@ -15,6 +15,14 @@ Required Keys
 * Multiple instances may have the same value for required keys.
 * Required keys may be in a C-FIND request's Identifier
 * Required keys shall not be in a C-GET or C-MOVE request's Identifier
+
+Honeypot Adjustments
+--------------------
+* Added `PatientSex`, `InstitutionName`, and `PatientBirthDate` to the attribute
+  list at the STUDY level, allowing queries to filter by these fields.
+* Changed `InstitutionName` VR from `LO` to `DA`.
+* Changed `InstanceNumber` VR from `IS` to `UI`.
+
 """
 
 from collections import OrderedDict

@@ -1,9 +1,59 @@
+""" This module defines configuration constants and paths for the server service.
+    Many values can be overridden via environment variables 
+    
+    TCIA Serviceconstants: 
+    ---------------------
+    * TCIA_USER_NAME
+    * TCIA_ACTIVATED
+    * TCIA_PASSWORD
+    * TCIA_PERIOD_UNIT
+    * TCIA_PERIOD
+    * TCIA_FILES_DIRECTORY
+    * MODALITIES
+    * MINIMUM_TCIA_FILES_IN_SERIE
+    * MAXIMUM_TCIA_FILES_IN_SERIE
+    * TCIA_STUDIES_PER_MODALITY
+    
+    Logging Server: 
+    ---------------------
+    * FLASK_ACTIVATED
+    * MAIN_LOG_DIRECTORY
+    * SIMPLIFIED_LOG_DIRECTORY
+    * EXCEPTIONS_LOG_DIRECTORY
+    
+    Integrity Check: 
+    ---------------------
+    * INTEGRITY_CHECK
+    * HASH_STORAGE_PATH
+    
+    Threat Intelligence:
+    ---------------------
+    * ABUSE_IP_API_KEY
+    * IP_QUALITY_SCORE_API_KEY
+    * VIRUS_TOTAL_API_KEY
+    
+    Blackhole:
+    ---------------------
+    * BLOCK_SCANNERS
+    * BLACKHOLE_FILE_PATH
+    
+    DICOM server:
+    ---------------------
+    * PROD
+    * DICOM_STORAGE_DIR
+    * C_STORE_STORAGE
+    * DICOM_PORT
+    * DICOM_SERVER_HOST
+    * REDIS_HOST
+    * DICOM_DATABASE
+    * CANARY_PDF_PATH
+    
+    """
+
 import os
 
-"""Run envirnoment"""
-DOCKER_ENV = os.getenv("Docker_ENV", "False")
-
-DEBUG_MODE = os.getenv("bebug_mode", False)
+"""Envirnoment"""
+PROD = os.getenv("prod", False)
 
 """Flask server status"""
 FLASK_ACTIVATED = os.getenv("flask_active", True)
@@ -27,29 +77,25 @@ DICOM_PORT = 11112
 
 """DICOM server host ip configuration"""
 
-DICOM_SERVER_HOST = "localhost" if DOCKER_ENV == "False" else "172.29.0.3"
+DICOM_SERVER_HOST = "localhost" if not PROD else "172.29.0.3"
 
 
 """Redis host configuration"""
-REDIS_HOST = (
-    "localhost" if DOCKER_ENV == "False" else os.getenv("REDIS_HOST", "172.29.0.4")
-)
+REDIS_HOST = "localhost" if not PROD else os.getenv("REDIS_HOST", "172.29.0.4")
 
 """Logs directories"""
 MAIN_LOG_DIRECTORY, SIMPLIFIED_LOG_DIRECTORY, EXCEPTIONS_LOG_DIRECTORY = (
-    ("./app/logs", "./app/logs", "./app/logs")
-    if DOCKER_ENV == "True"
+    ("./app/logs/pynetdicom", "./app/logs/simplified", "./app/logs/exceptions")
+    if PROD
     else (
-        "../flask_logging_server/logs",
-        "../flask_logging_server/logs",
-        "../flask_logging_server/logs",
+        "../flask_logging_server/logs/pynetdicom",
+        "../flask_logging_server/logs/simplified",
+        "../flask_logging_server/logs/exceptions",
     )
 )
 
 """The sqlite file path"""
-DICOM_DATABASE = (
-    "/app/db.db" if os.getenv("Docker_ENV", "False") == "True" else "./storage/db.db"
-)
+DICOM_DATABASE = "/app/db.db" if PROD else "./storage/db.db"
 
 """TCIA username and password to use it in API calls"""
 TCIA_USER_NAME = os.getenv("tcia_username", "Nawras")

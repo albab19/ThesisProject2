@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Set
+from typing import Dict, Set, Any
 
 
 class IRedisService(ABC):
@@ -17,7 +17,7 @@ class IRedisService(ABC):
         pass
 
     @abstractmethod
-    def add_request_data(self, redis_log_data: dict) -> None:
+    def add_request_data(self, redis_log_data: str) -> None:
         pass
 
     @abstractmethod

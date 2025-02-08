@@ -1,4 +1,3 @@
-import logging
 from logging.handlers import TimedRotatingFileHandler
 from flask import Flask, jsonify, render_template, send_from_directory
 import os
@@ -17,9 +16,11 @@ else:
     host = "localhost"
 
 # Set logging files
-log_file_path = os.path.join(log_directory, "dicom_server.log")
+log_file_path = os.path.join(log_directory, "pynetdicom.log")
 
-simplified_log_file_path = os.path.join(simplified_log_directory, "simplified_logger")
+simplified_log_file_path = os.path.join(
+    simplified_log_directory, "simplified_logger.log"
+)
 exception_log_file_path = os.path.join(log_directory, "exceptions.log")
 
 

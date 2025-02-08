@@ -3,49 +3,51 @@ This module defines the ApplicationContext class using the Dependency Injector l
 
 The ApplicationContext class serves as a central configuration hub for all services on the server
 
-The design of the server followed a components-based architecture to make the product reusable, testable, and maintainable
-"""
-
-"""
 The setup includes adding the following providers:
  
- data-access agents:
+ Loggers provider
+ ------------------
  
-    - dicom_db: Manages the DICOM database service, responsible for storing/retrieving dicom files information maintained at the storage block.
+ data-access agents:
+ ------------------
+ 
+    * dicom_db: Manages the DICOM database service, responsible for storing/retrieving dicom files information maintained at the storage block.
     
-    - redis_handler: Implements a redis service responsible for storing of dicom sessions information, provides rapid access for external analysis/visualization middleware.
+    * redis_handler: Implements a redis service responsible for storing of dicom sessions information, provides rapid access for external analysis/visualization middleware.
 
  TCIA providers:
+ ------------------
  
-    - tcia_api: Responsible for handling communication between the application and The Cancer Imaging Archive API.
+    * tcia_api: Handles communication between the application and The Cancer Imaging Archive API.
     
-    - tcia_manager: Handles file exchange by removing old files, organizing new ones, injectting new files with honeytokens and initializing the database. 
+    * tcia_manager: Handles file exchange by removing old files, organizing new ones, injectting new files with honeytokens and initializing the database. 
     
-    - tcia_scheduler: Schedules the retrieval of new DICOM files on a periodic basis.
+    * tcia_scheduler: Schedules the retrieval of new DICOM files on a periodic basis.
     
  Threat Intelligence:
+ ------------------
  
-    - threat_intelligence provider: provides IP information from three Threat Intelligence services (AbuseIPdatabase, IPQualityScore, and VirusTotal).
+    * threat_intelligence: provides IP information from three Threat Intelligence services (AbuseIPdatabase, IPQualityScore, and VirusTotal).
  
  Files Integrity Checker:
-    - files_checker: compares the hashes of the dicom files stored at the dicom storage every seven hours to verify their content, detecting any unauthorized access attemp.
+ ------------------
+    * files_checker: Verifies the integrity of the dicom files stored at the dicom storage every seven hours, detecting any unauthorized access attemp.
  
  Network Management:
+ ------------------
  
-    - blackhole: responsible for null routing the requests with IP addresses that belong to one of the known mass-scanners mitigitating the potential of the heneypot been identified as a honeypot in the future
+    * blackhole: Null-route the requests with IP addresses that belong to one of the known mass-scanners mitigitating the potential of the heneypot been identified as a honeypot in the future
 
-    - session_collector: collects and manages data from dicom sessions in order to ensure consistency in data analysis and visualization 
+    * session_collector: Collects and manages data from dicom sessions in order to ensure consistency in data analysis and visualization 
  
  DICOM Services:
+ ------------------
  
-    - dicom_handler: implements the standard dicom operations, acting as a SCP (Service Provider) on C-Echo and C-Store first part of C-Get, C-Find and C-Move (receiving and responding to requests) operations
+    * dicom_handler: implements the standard dicom operations, acting as a SCP (Service Provider) on C-Echo and C-Store first part of C-Get, C-Find and C-Move (receiving and responding to requests) operations
         and as a SCU (Serive User) for the second part of C-Get, C-Find and C-Move (initiating requests) operations
  
-    - dicom_application: handles the configuration, initialization of the DICOM application entity and starts the DICOM server.
-
-
+    * dicom_application: handles the configuration, initialization of the DICOM application entity and starts the DICOM server.
 """
-
 
 from dependency_injector import containers, providers
 from sqlalchemy import create_engine
@@ -71,6 +73,7 @@ class ApplicationContext(containers.DeclarativeContainer):
     # Loggers service
     loggers = providers.Factory(
         Loggers,
+        config.PROD,
         config.MAIN_LOG_DIRECTORY,
         config.SIMPLIFIED_LOG_DIRECTORY,
         config.EXCEPTIONS_LOG_DIRECTORY,
@@ -86,6 +89,7 @@ class ApplicationContext(containers.DeclarativeContainer):
     engine = providers.Singleton(create_engine, f"sqlite:///{config.DICOM_DATABASE}")
     session_factory = providers.Singleton(sessionmaker, bind=engine)
     session = providers.Singleton(lambda sf: sf(), session_factory)
+
     # DICOM_database provider
     dicom_db = providers.Singleton(
         DicomDatabase, exceptions_logger, config.DICOM_STORAGE_DIR, session
@@ -158,7 +162,7 @@ class ApplicationContext(containers.DeclarativeContainer):
         threat_intelligence,
     )
 
-    # The implementation of the standard handlers provided through
+    # DICOM handlers provider
     dicom_handlers = providers.Singleton(
         DICOMHandlers, exceptions_logger, session_collector, dicom_db
     )
@@ -167,7 +171,6 @@ class ApplicationContext(containers.DeclarativeContainer):
     dicom_application = providers.Singleton(
         DicomStarter,
         exceptions_logger,
-        config.DEBUG_MODE,
         config.DICOM_PORT,
         config.DICOM_SERVER_HOST,
         dicom_handlers,

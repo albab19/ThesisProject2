@@ -1,14 +1,13 @@
 """
 DICOM C-FIND Handler Test Suite
 
-This test suite aims to validate the behavior of the handle_find() method 
+This test module aims to validate the behavior of the handle_find() method 
 within multiple scenarios. To ensure predictable and isolated testing, the following
 were used:
 
 1. ** Mock Data Hardcoded**:
-   - A mock database with 40 pre-defined DICOM studies was created.
+   - A mock database with 5 pre-defined DICOM files was created.
    - Each study contains a unique `StudyInstanceUID` and required DICOM attributes.
-   - This avoids dependencies on external systems.
 
 2. **Mocked Events**:
    - DICOM C-FIND events were simulated using `pydicom.Dataset` objects.
@@ -39,8 +38,7 @@ sys.path.append(os.path.abspath(".."))
 import pytest
 from unittest.mock import Mock, patch
 from pydicom import Dataset
-import global_patcher as global_patcher
-import dicom_handlers
+import global_patcher
 
 
 @pytest.fixture
@@ -113,16 +111,18 @@ def mock_dicomdb():
 """
 Before all tests we patch the real database by initialize mock one with four studies for four different patients from a mock dicom files storage
 (Oliver Møller, Amanda Larsen, Agnete Østergaard, Ronnie Nikolajsen and Jarl Frederiksen)
-We choose this approach to This approach to follow the development process as realistically as possible.
-"""
 
-global_patcher.initialize_tests()
+"""
+import di_container
+
+test_context = di_container.ApplicationContext()
+dicom_handlers = test_context.dicom_handlers()
 
 
 def test_invalid_sop_class(event_retrieve_specific_study):
     "" " Test handling of invalid  SOP Class UID" ""
     with patch.multiple(
-        "dicom_utils",
+        "utilities.dicom_util",
         model_invalid=Mock(return_value=True),
         identifier_invalid=Mock(return_value=False),
     ):
@@ -136,7 +136,7 @@ def test_invalid_sop_class(event_retrieve_specific_study):
 def test_invalid_identifier(event_retrieve_specific_study):
     """handling of invalid identifier attributes"""
     with patch.multiple(
-        "dicom_utils",
+        "utilities.dicom_util",
         model_invalid=Mock(return_value=False),
         identifier_invalid=Mock(return_value=True),
     ):
@@ -233,12 +233,14 @@ def test_response_generation_failure(event_retreive_all_patients, mock_dicomdb):
     mock_dicomdb.get_response_data.side_effect = Exception("Test error")
 
     with patch.multiple(
-        "dicom_utils",
+        "utilities.dicom_util",
         model_invalid=Mock(return_value=False),
         identifier_invalid=Mock(return_value=False),
         all_requested=Mock(return_value=True),
         get_query_level=Mock(return_value="PATIENT"),
-    ), patch.multiple("dicomdb", query_all_patients=Mock(return_value=test_matches)):
+    ), patch.multiple(
+        "dicomdb.DicomDatabase", query_all_patients=Mock(return_value=test_matches)
+    ):
         gen = dicom_handlers.handle_find(event_retreive_all_patients)
         results = list(gen)
 

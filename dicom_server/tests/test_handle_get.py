@@ -5,23 +5,25 @@ Asseretations:
 
 - The returned files contain the expected patient names.
 
-- The transfer syntax is correctly handled (compressed or uncompressed)"""
+- The transfer syntax is correctly handled (compressed or uncompressed)
 
-import global_patcher
+"""
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(".."))
+
 import pytest
 from pydicom import Dataset
 from pydicom.uid import UID
 from unittest.mock import Mock
-import dicom_handlers
-from pynetdicom.events import Event
 from pynetdicom.sop_class import CTImageStorage
+import global_patcher
+import di_container
 
-global_patcher.initialize_tests()
-
-
-@pytest.fixture(scope="session", autouse=True)
-def pre_tests():
-    global_patcher.setup_mock_db()
+test_context = di_container.ApplicationContext()
+dicom_handlers = test_context.dicom_handlers()
 
 
 @pytest.fixture
@@ -60,12 +62,14 @@ def event_compress_retrieve():
     return event
 
 
-"""Tests the retrieval of an uncompressed DICOM file using Little Endian transfer syntax"""
-
-
 def test_get_uncompressed_file_using_little_Endian(event_uncompress_retrieve: Mock):
+    """
+    Tests the retrieval of an uncompressed
+    DICOM file using Little Endian transfer syntax
 
-    gen = dicom_handlers.handle_get(event_uncompress_retrieve)
+    """
+
+    gen = test_context.dicom_handlers().handle_get(event_uncompress_retrieve)
     result = list(gen)
     print("Reees", result[3])
 
@@ -82,10 +86,13 @@ def test_get_uncompressed_file_using_little_Endian(event_uncompress_retrieve: Mo
     assert not RETURNED_FILE.file_meta.TransferSyntaxUID.is_compressed
 
 
-"""Tests the retrieval of a compressed DICOM file using JPEG 2000 transfer syntax"""
-
-
 def test_get_compressed_file_using_JPEG2000(event_compress_retrieve: Mock):
+    """
+    Tests the retrieval of a compressed DICOM
+    file using JPEG 2000 transfer syntax
+
+    """
+
     # Assert the use of compressed transfer syntax to retrieve the file
     assert UID(event_compress_retrieve.context["transfer_syntax"]).is_compressed
     gen = dicom_handlers.handle_get(event_compress_retrieve)

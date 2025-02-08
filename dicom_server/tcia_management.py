@@ -60,10 +60,11 @@ class TCIAManager(ITCIAManager):
         self.exceptions_logger = exceptions_logger
         self.tcia_api = tcia_api
         self.pdf_canary_path = pdf_canary_path
+        self.change_dicom_files_called = False
 
     def change_dicom_files(self):
         # to be used in unit testing
-        self.schedule_starded = True
+        self.change_dicom_files_called = True
         print("Scheduled change of dicom files started")
         try:
             tcia_util.delete_old_files(self.storage_directory)

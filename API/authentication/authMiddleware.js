@@ -11,11 +11,9 @@ const authenticate = (req, res, next)=>{
 
     try{
         
-        //console.log("hello access token from auth Middleware",req.cookies.accessToken);
         const decoded = jwtUtils.verifyAccessToken(token);
 
         req.username = decoded;
-        console.log("Hello",req.username)
         next();
 
     }catch(error){

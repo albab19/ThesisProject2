@@ -38,13 +38,18 @@ class SessionCollector(ISessionCollector):
             self.exceptions_logger.exception("Exception while starting a DICOM session")
 
     def get_session_requestor_reputation(self, ip):
-        rep_dat = {}
-        ip_scanned = self.redis_handler.is_ip_scanned(ip)
+        try:
+            rep_dat = {}
+            ip_scanned = self.redis_handler.is_ip_scanned(ip)
 
-        if not ip_scanned:
-            self.redis_handler.add_scanned_ip(ip)
-            rep_dat = self.threat_intelligence.get_reputation_data(ip, ip_scanned)
-            self.redis_handler.add_reputation_data(rep_dat)
+            if not ip_scanned:
+                self.redis_handler.add_scanned_ip(ip)
+                rep_dat = self.threat_intelligence.get_reputation_data(ip, ip_scanned)
+                self.redis_handler.add_reputation_data(rep_dat)
+        except Exception:
+            self.exceptions_logger.exception(
+                "Exception while getting session requestor reputation data"
+            )
 
     def initialize_session_info(self, ip, port):
         current_time = time.time()
@@ -66,8 +71,6 @@ class SessionCollector(ISessionCollector):
             self.simp_logger.info(self.session_info)
 
     def session_ended(self):
-        self.set_session_lock(0)
-        self.set_session_id(0)
         self.redis_handler.add_request_data(self.build_redis_object())
         self.reset_session()
 
@@ -81,11 +84,14 @@ class SessionCollector(ISessionCollector):
         ]
         redis_object[sk.STATUS.key] = (
             "Finished"
-            if self.session_info[sk.REQUEST_TYPE.key] == "Association released"
+            if self.session_info[sk.REQUEST_TYPE.key] == "Association Released"
             else "Aborted"
         )
+        keys_to_remove = {sk.LOCK.key, sk.SESSION_MAIN_OPERATION}
+        for key in keys_to_remove:
+            redis_object.pop(key, None)
 
-        return json.dumps(self.session_info)
+        return str(redis_object)
 
     def set_session_lock(self, value):
         self.session_info[sk.LOCK.key] = value
