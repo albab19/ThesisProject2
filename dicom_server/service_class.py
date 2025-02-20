@@ -1,5 +1,6 @@
 """Implements the supported Service Classes."""
 
+""" This module was orginally provided by """
 from io import BytesIO
 import logging
 import os

@@ -109,6 +109,6 @@ def is_known_scanner(ip):
     with open(config.BLACKHOLE_FILE_PATH, "r") as file:
         for line in file:
             if ip in line:
-                return "True"
+                return "true"
 
-    return "False"
+    return "false"

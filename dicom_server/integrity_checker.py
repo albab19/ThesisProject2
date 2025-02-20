@@ -23,9 +23,13 @@ class FilesChecker(threading.Thread, IIntegrityChecker):
         self.exceptions_logger = exceptions_logger
 
     def run(self):
-
-        schedule.every(6).hours.do(self.check_hashes)
-        print("Checking files integrity each 6 hours")
+        try:
+            schedule.every(6).hours.do(self.check_hashes)
+            print("Checking files integrity each 6 hours")
+        except Exception:
+            self.exceptions_logger.exception(
+                "Unable to schedule files integrity cheack"
+            )
         while True:
             schedule.run_pending()
             time.sleep(10300)
@@ -36,7 +40,10 @@ class FilesChecker(threading.Thread, IIntegrityChecker):
             with open(filename, "rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     hash_sha256.update(chunk)
-        except Exception as e:
+        except Exception:
+            self.exceptions_logger.exception(
+                f"Exception while generating hash value for file {filename}"
+            )
             return None
         return hash_sha256.hexdigest()
 
@@ -60,16 +67,22 @@ class FilesChecker(threading.Thread, IIntegrityChecker):
                     if path in old_hashes and old_hashes[path] != file_hash:
                         changed_files.append(path)
 
-            except Exception as e:
-                print(f"Error processing {path}: {e}")
+            except Exception:
+                self.exceptions_logger.exception(
+                    f"Exception while proccessing hashes in {full_path}"
+                )
                 pass
 
         with open(self.hash_store_path, "w") as f:
             json.dump(new_hashes, f)
 
         if changed_files:
-            self.redis_handler.update_files_integrity_state(changed_files)
-
+            try:
+                self.redis_handler.update_files_integrity_state(changed_files)
+            except Exception:
+                self.exceptions_logger.exception(
+                    "Exception while populating file integrity checks to Redis"
+                )
             print("Changed files:", changed_files)
         else:
 

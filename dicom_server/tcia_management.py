@@ -46,6 +46,7 @@ class TCIAManager(ITCIAManager):
     def __init__(
         self,
         exceptions_logger,
+        honeytoken_url,
         storage_directory,
         tcia_dir,
         pdf_canary_path,
@@ -53,6 +54,7 @@ class TCIAManager(ITCIAManager):
         redis_handler: IRedisService = None,
         tcia_api: ITCIAAPI = None,
     ):
+        self.honeytoken_url = honeytoken_url
         self.tcia_dir = tcia_dir
         self.storage_directory = storage_directory
         self.dicomdb = dicomdb or IDicomDatabase()
@@ -190,7 +192,7 @@ class TCIAManager(ITCIAManager):
         dataset.EncapsulatedDocument = self.get_canary_token()
 
     def inject_honey_url(self, dataset):
-        dataset.RetrieveURL = str(self.redis_handler.get_honey_url())
+        dataset.RetrieveURL = str(self.honeytoken_url)
 
     def get_canary_token(self):
         pdf_path = self.pdf_canary_path

@@ -1,3 +1,5 @@
+""" Implementation of the DICOM handlers """
+
 import traceback, utilities.dicom_util as dicom_util
 from dependency_injector.wiring import inject
 from services.dicom_session_service import ISessionCollector
@@ -6,7 +8,7 @@ from pydicom.dataset import Dataset
 import traceback
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 from typing import Generator, Tuple, Optional
-from enums.dicom_session_keys import Sessionkeys as sk
+from enums.dicom_session_keys import Sessionkeys as session_keys
 
 
 class DICOMHandlers:
@@ -38,9 +40,9 @@ class DICOMHandlers:
         try:
             self.event_collector.collect_session_info(
                 {
-                    sk.LOG_LEVEL.key: "Info",
-                    sk.REQUEST_TYPE.key: "C_ECHO",
-                    sk.SESSION_MAIN_OPERATION.key: "C_ECHO",
+                    session_keys.LOG_LEVEL.key: "Info",
+                    session_keys.REQUEST_TYPE.key: "C_ECHO",
+                    session_keys.SESSION_MAIN_OPERATION.key: "C_ECHO",
                 },
                 True,
             )
@@ -57,15 +59,15 @@ class DICOMHandlers:
         try:
             self.event_collector.collect_session_info(
                 {
-                    sk.LOG_LEVEL.key: "Info",
-                    sk.REQUEST_TYPE.key: "C_FIND",
-                    sk.SESSION_MAIN_OPERATION.key: "C_FIND",
+                    session_keys.LOG_LEVEL.key: "Info",
+                    session_keys.REQUEST_TYPE.key: "C_FIND",
+                    session_keys.SESSION_MAIN_OPERATION.key: "C_FIND",
                 }
             )
             model = event.request.AffectedSOPClassUID
             identifier = event.identifier
 
-            # Validate Model
+            # Validate the ORM model
             if dicom_util.model_invalid(model):
                 print("Request dataset has invaild model")
                 yield (0xA900, None)  # Identifier does not match SOP Class
@@ -79,32 +81,33 @@ class DICOMHandlers:
 
             dicom_util.filter_identifier_tags(identifier)
             query_level = dicom_util.get_query_level(identifier)
-            self.event_collector.collect_session_info({sk.QUERY_LEVEL.key: query_level})
+            self.event_collector.collect_session_info(
+                {session_keys.QUERY_LEVEL.key: query_level}
+            )
 
-            # Determine if it's a "all" request at the correct level
+            # Determine if it's a "all" request
             if dicom_util.all_requested(identifier):
                 if query_level == "STUDY":
                     matches = self.dicomdb.query_all_studies()
                 elif query_level == "SERIES":
-                    """
-                    The pynetdicom ORM lacks for query/retreive model on SERIES level, that is why we filter here based on studies and not on series
-                    which add limitition in quering all series otherwise, we used the studyinstanceuid (STUDY model) as an identifier tag to then filter specific serie based on the SeriesInstanceUID tag
 
-                    """
+                    # The pynetdicom ORM lacks query/retrieve model on SERIES level, that is why we filter here based on studies and not on series.
+                    # This add limitition in quering all series otherwise, we used the studyinstanceuid (STUDY model) as an identifier tag to then filter specific serie based on the SeriesInstanceUID tag
+
                     matches = self.dicomdb.query_all_studies()
                 elif query_level == "PATIENT":
                     matches = self.dicomdb.query_all_patients()
                 self.event_collector.collect_session_info(
                     {
-                        sk.SESSION_PARAMETERS.key: "ALL " + query_level,
-                        sk.MATCHES.key: len(matches),
+                        session_keys.SESSION_PARAMETERS.key: "ALL " + query_level,
+                        session_keys.MATCHES.key: len(matches),
                     },
                     True,
                 )
             else:
                 query_parameters = dicom_util.get_query_parameters(identifier)
                 self.event_collector.collect_session_info(
-                    {sk.SESSION_PARAMETERS.key: query_parameters}
+                    {session_keys.SESSION_PARAMETERS.key: query_parameters}
                 )
                 # Hierarchical query level determination
                 if dicom_util.is_patient_level(identifier):
@@ -115,7 +118,7 @@ class DICOMHandlers:
                     matches = self.dicomdb.query_series_level(identifier)
 
                 self.event_collector.collect_session_info(
-                    {sk.MATCHES.key: len(matches)}, True
+                    {session_keys.MATCHES.key: len(matches)}, True
                 )
 
             # Send Matching Results
@@ -151,10 +154,10 @@ class DICOMHandlers:
             matching = self.get_matching_instances(event, instances)
             self.event_collector.collect_session_info(
                 {
-                    sk.QUERY_LEVEL.key: query_level,
-                    sk.LOG_LEVEL.key: "Info",
-                    sk.REQUEST_TYPE.key: "C_GET",
-                    sk.MATCHES.key: len(matching),
+                    session_keys.QUERY_LEVEL.key: query_level,
+                    session_keys.LOG_LEVEL.key: "Info",
+                    session_keys.REQUEST_TYPE.key: "C_GET",
+                    session_keys.MATCHES.key: len(matching),
                 },
                 True,
             )
@@ -177,7 +180,11 @@ class DICOMHandlers:
     def handle_store(self, event):
 
         self.event_collector.collect_session_info(
-            {sk.LOG_LEVEL.key: "Info", sk.REQUEST_TYPE.key: "C_STORE"}, True
+            {
+                session_keys.LOG_LEVEL.key: "Info",
+                session_keys.REQUEST_TYPE.key: "C_STORE",
+            },
+            True,
         )
         dicom_util.store_received_file(event)
         return 0x0000
@@ -201,10 +208,10 @@ class DICOMHandlers:
         matching = self.get_matching_instances(event, instances)
         self.event_collector.collect_session_info(
             {
-                sk.QUERY_LEVEL.key: query_level,
-                sk.LOG_LEVEL.key: "Info",
-                sk.REQUEST_TYPE.key: "C_MOVE",
-                sk.MATCHES.key: len(matching),
+                session_keys.QUERY_LEVEL.key: query_level,
+                session_keys.LOG_LEVEL.key: "Info",
+                session_keys.REQUEST_TYPE.key: "C_MOVE",
+                session_keys.MATCHES.key: len(matching),
             },
             True,
         )
@@ -222,14 +229,20 @@ class DICOMHandlers:
 
     def handle_release(self, event):
         self.event_collector.collect_session_info(
-            {sk.LOG_LEVEL.key: "Warning", sk.REQUEST_TYPE.key: "Association Released"},
+            {
+                session_keys.LOG_LEVEL.key: "Warning",
+                session_keys.REQUEST_TYPE.key: "Association Released",
+            },
             True,
         )
         self.event_collector.session_ended()
 
     def handle_abort(self, event):
         self.event_collector.collect_session_info(
-            {sk.LOG_LEVEL.key: "Warning", sk.REQUEST_TYPE.key: "Association Aborted"},
+            {
+                session_keys.LOG_LEVEL.key: "Warning",
+                session_keys.REQUEST_TYPE.key: "Association Aborted",
+            },
             True,
         )
         self.event_collector.session_ended()
@@ -241,7 +254,10 @@ class DICOMHandlers:
             if hasattr(event.identifier, "StudyInstanceUID"):
                 study_uid = event.identifier.StudyInstanceUID
                 self.event_collector.collect_session_info(
-                    {sk.SESSION_PARAMETERS.key: "StudyInstanceUID: " + str(study_uid)}
+                    {
+                        session_keys.SESSION_PARAMETERS.key: "StudyInstanceUID: "
+                        + str(study_uid)
+                    }
                 )
                 matching = [
                     instance
@@ -253,7 +269,10 @@ class DICOMHandlers:
             if hasattr(event.identifier, "SeriesInstanceUID"):
                 series_uid = event.identifier.SeriesInstanceUID
                 self.event_collector.collect_session_info(
-                    {sk.SESSION_PARAMETERS.key: "SeriesInstanceUID: " + str(series_uid)}
+                    {
+                        session_keys.SESSION_PARAMETERS.key: "SeriesInstanceUID: "
+                        + str(series_uid)
+                    }
                 )
 
                 matching = [

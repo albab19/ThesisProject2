@@ -11,6 +11,7 @@ from faker import Faker
 
 patch.multiple(
     "config",
+    INTEGRITY_CHECK=False,
     DICOM_DATABASE="./mock_database.db",
     FLASK_ACTIVATED=False,
     TCIA_FILES_DIRECTORY="./mock_tcia_files",
@@ -74,13 +75,14 @@ def test_scheduled_job_starts_on_time():
             schedule.run_pending()
         # Assert the job is not executed yet
         assert not tcia_manager.change_dicom_files_called
-        # # simulate nine days elapsed
-        # after_nine_days = now + timedelta(days=9)
-        # with patch("schedule.datetime.datetime") as mock_datetime:
-        #     mock_datetime.now.return_value = after_nine_days
-        #     schedule.run_pending()
-        # # Assert the job is run after nine days elapsed
-        # assert t.schedule_starded
+        # simulate nine days elapsed
+        after_nine_days = now + timedelta(days=9)
+        with patch("schedule.datetime.datetime") as mock_datetime:
+            mock_datetime.now.return_value = after_nine_days
+            time.sleep(1)
+            schedule.run_pending()
+        # Assert the job is run after nine days elapsed
+        assert tcia_manager.change_dicom_files_called
 
 
 # def test_files_retrieved():

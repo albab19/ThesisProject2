@@ -1,7 +1,7 @@
 import os
 from pydicom import dcmread
 from sqlalchemy import String, delete
-from pynetdicom.apps.qrscp import db
+import db
 from sqlalchemy import cast, String
 from contextlib import contextmanager
 from services.dicom_database_service import IDicomDatabase
@@ -14,17 +14,19 @@ class DicomDatabase(IDicomDatabase):
             self.session = session
             self.storagedirectory = storagedirectory
             self.exceptions_logger = exceptions_logger
-        except Exception as e:
-            print("Exception while building DICOMDatabase instance.", e)
+        except Exception:
+            self.exceptions_logger.exception(
+                "Exception while building DICOMDatabase instance."
+            )
 
     @contextmanager
     def session_scope(self):
         try:
             yield self.session
             self.session.commit()
-        except Exception as e:
+        except Exception:
             self.session.rollback()
-            print(f"Session rollback: {e}")
+            print(f"Session rollback!")
             raise
 
     def initialize_database(self):
@@ -32,9 +34,11 @@ class DicomDatabase(IDicomDatabase):
             self.delete_database()
             self.fill_database_tables_from_dicom_files()
             print("Database initialized from DICOM storage")
-        except Exception as e:
-            print("Exception while initializing the database from dicom files", e)
-            pass
+        except Exception:
+            self.exceptions_logger.exception(
+                "Exception while initializing the database from dicom files"
+            )
+            raise
 
     def fill_database_tables_from_dicom_files(self):
         with self.session_scope() as session:
@@ -43,9 +47,9 @@ class DicomDatabase(IDicomDatabase):
                     instance = dcmread(os.path.join(self.storagedirectory, path))
                     db.add_instance(instance, session, path)
                 session.commit()
-            except Exception as e:
+            except Exception:
                 session.rollback()
-                print("Exception while filling database", e)
+                self.exceptions_logger.exception("Exception while filling database")
 
     def delete_database(self):
         with self.session_scope() as session:
@@ -54,9 +58,9 @@ class DicomDatabase(IDicomDatabase):
                 session.execute(delete_statement)
                 session.commit()
                 print("Database cleared")
-            except Exception as e:
+            except Exception:
                 session.rollback()
-                print("Exception clearing database", e)
+                self.exceptions_logger.exception("Exception clearing database")
 
     def query_all_studies(self):
 
@@ -66,8 +70,8 @@ class DicomDatabase(IDicomDatabase):
                 studyQuery = session.query(db.Study)
                 all_studies = studyQuery.all()
                 return all_studies
-        except Exception as e:
-            print("Exception querying all studies", e)
+        except Exception:
+            self.exceptions_logger.exception("Exception querying all studies")
 
     def query_all_series(self):
         all_studies = []
@@ -75,10 +79,9 @@ class DicomDatabase(IDicomDatabase):
             with self.session_scope() as session:
                 studyQuery = session.query(db.Series)
                 all_studies = studyQuery.all()
-                session.commit()
                 return all_studies
-        except Exception as e:
-            print("Exception querying all series", e)
+        except Exception:
+            self.exceptions_logger.exception("Exception querying all series")
 
     def query_all_patients(self):
         all_patients = []
@@ -87,8 +90,8 @@ class DicomDatabase(IDicomDatabase):
                 studyQuery = session.query(db.Patient)
                 all_patients = studyQuery.all()
                 return all_patients
-        except Exception as e:
-            print("Exception querying all patients", e)
+        except Exception:
+            self.exceptions_logger.exception("Exception querying all patients")
 
     def query_study_level(self, identifier):
         matches = []
@@ -105,9 +108,9 @@ class DicomDatabase(IDicomDatabase):
                 )
                 matches = studyQuery.all()
                 return matches
-            except Exception as e:
-                print("Exception in STUDY level query", e)
-                pass
+            except Exception:
+                self.exceptions_logger.exception("Exception in STUDY level query")
+                raise
 
     def query_series_level(self, identifier):
         matches = []
@@ -123,9 +126,9 @@ class DicomDatabase(IDicomDatabase):
                 )
                 matches = seriesQuery.all()
                 return matches
-            except Exception as e:
-                print("Exception in SERIES level query", e)
-                pass
+            except Exception:
+                self.exceptions_logger.exception("Exception in SERIES level query")
+                raise
 
     def query_patient_level(self, identifier):
         matches = []
@@ -141,9 +144,9 @@ class DicomDatabase(IDicomDatabase):
                 )
                 matches = patientQuery.all()
                 return matches
-            except Exception as e:
-                print("Exception in PATIENT level query", e)
-                pass
+            except Exception:
+                self.exceptions_logger.exception("Exception in PATIENT level query")
+                raise
 
     def get_response_data(self, identifier, instance, response_dataset):
 
@@ -228,10 +231,10 @@ class DicomDatabase(IDicomDatabase):
                 )
 
                 if required_tag == "NumberOfStudyRelatedInstances":
-                    return len(query.all())
+                    return query.count()
 
                 else:
-                    result = query.all()[0]
+                    result = query.first()
                     if result:
                         return getattr(result, required_tag)
             elif level == "SERIES":
@@ -239,15 +242,15 @@ class DicomDatabase(IDicomDatabase):
                     db.Instance.series_instance_uid == cast(query_identifier, String)
                 )
                 if required_tag == "NumberOfSeriesRelatedInstances":
-                    return len(query.all())
-                result = query.all()[0]
+                    return query.count()
+                result = query.first()
                 if result:
                     return getattr(result, required_tag)
             elif level == "PATIENT":
                 query = query.filter(
                     db.Instance.study_instance_uid == cast(query_identifier, String)
                 )
-                result = query.all()[0]
+                result = query.first()
                 if result:
                     return getattr(result, required_tag)
             return None

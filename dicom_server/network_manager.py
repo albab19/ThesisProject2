@@ -16,9 +16,13 @@ class Blackhole(IBlackhole):
         except Exception as e:
             pass
 
-    """Check if the ipset known_scanners exists"""
-
     def is_scanners_blocked(self, known_scanners):
+        """
+
+        Check if the ipset known_scanners exists
+
+        """
+
         try:
             result = subprocess.run(
                 ["ipset", "list", known_scanners],
@@ -28,12 +32,17 @@ class Blackhole(IBlackhole):
             )
             return result.returncode == 0
         except FileNotFoundError:
-            print("ipset command not found. Make sure ipset is installed.")
+            self.exceptions_logger.exception(
+                "ipset command not found. Make sure ipset is installed."
+            )
             return False
 
-    """Get the known scanners list"""
-
     def get_known_scanners(self, scanners_file):
+        """
+
+        Get the known scanners list
+
+        """
         knownScanners = []
         try:
             with open(scanners_file, "r") as file:
@@ -43,19 +52,22 @@ class Blackhole(IBlackhole):
                         ip_address = line.split("#")[0].strip()
                         knownScanners.append(ip_address)
         except Exception as e:
-            print(f"Error reading file: {e}")
+            self.exceptions_logger.exception(f"Error reading file: {e}")
         return knownScanners
 
-    """Create an ipset on the kernal"""
-
     def create_ipset(self, ipset_name):
+        """
+
+        Create an ipset on the kernal
+
+        """
         try:
             subprocess.run(
                 f" ipset create {ipset_name} hash:ip", shell=True, check=True
             )
             print(f"IP set '{ipset_name}' created.")
         except subprocess.CalledProcessError as e:
-            print(f"Failed to create IP set: {e}")
+            self.exceptions_logger.exception(f"Failed to create IP set: {e}")
 
     def add_ip_to_ipset(self, ipset_name, ip_address):
         try:
@@ -64,7 +76,9 @@ class Blackhole(IBlackhole):
             )
             print(f"IP address {ip_address} added to IP set '{ipset_name}'.")
         except subprocess.CalledProcessError as e:
-            print(f"Failed to add IP {ip_address} to IP set: {e}")
+            self.exceptions_logger.exception(
+                f"Failed to add IP {ip_address} to IP set: {e}"
+            )
 
     def setup_iptables_rule(self, ipset_name):
         try:
@@ -75,7 +89,7 @@ class Blackhole(IBlackhole):
             )
             print(f"iptables rule added for IP set '{ipset_name}'.")
         except subprocess.CalledProcessError as e:
-            print(f"Failed to add iptables rule: {e}")
+            self.exceptions_logger.exception(f"Failed to add iptables rule: {e}")
 
     """Null-route the known scanners IPs"""
 
@@ -87,7 +101,9 @@ class Blackhole(IBlackhole):
 
             self.setup_iptables_rule(set_name)
         except Exception as e:
-            print("Exception while blocking mass scanners", e)
+            self.exceptions_logger.exception(
+                "Exception while blocking mass scanners", e
+            )
 
     """Allow known scanners to interact with the server"""
 

@@ -1,7 +1,7 @@
 """
 This module defines the ApplicationContext class using the Dependency Injector library to manage dependencies throughout the start of the application.
 
-The ApplicationContext class serves as a central configuration hub for all services on the server
+The ApplicationContext class acts as a central configuration hub for all services on the server
 
 The setup includes adding the following providers:
  
@@ -71,7 +71,7 @@ import logging
 
 class ApplicationContext(containers.DeclarativeContainer):
     # Loggers service
-    loggers = providers.Factory(
+    loggers = providers.Singleton(
         Loggers,
         config.PROD,
         config.MAIN_LOG_DIRECTORY,
@@ -114,6 +114,7 @@ class ApplicationContext(containers.DeclarativeContainer):
     tcia_manager = providers.Singleton(
         TCIAManager,
         exceptions_logger,
+        config.WEB_HOOK_HONEY_TOKEN_URL,
         config.DICOM_STORAGE_DIR,
         config.TCIA_FILES_DIRECTORY,
         config.CANARY_PDF_PATH,

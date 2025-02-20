@@ -17,4 +17,14 @@ class Sessionkeys(Enum):
     KNOWN_SCANNER = "known_scanner", "N/A"
     MATCHES = "matches", "N/A"
     STATUS = "status", "N/A"
-    TIMESTAMP = "time_stamp", "N/A"
+    TIMESTAMP = "timestamp", "N/A"
+
+
+class RequestType(Enum):
+    ASSO_RQ = "Association Requested", 0
+    ASSO_RE = "Association Released", 0
+    C_ECHO = "C_ECHO", 0
+    C_FIND = "C_FIND", 0
+    C_GET = "C_GET", 0
+    C_STORE = "C_STORE", 0
+    C_MOVE = "C_MOVE"

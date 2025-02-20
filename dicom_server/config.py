@@ -77,7 +77,7 @@ DICOM_PORT = 11112
 
 """DICOM server host ip configuration"""
 
-DICOM_SERVER_HOST = "localhost" if not PROD else "172.29.0.3"
+DICOM_SERVER_HOST = "172.18.204.133" if not PROD else "172.29.0.3"
 
 
 """Redis host configuration"""
@@ -149,6 +149,11 @@ MAXIMUM_TCIA_FILES_IN_SERIE = os.getenv("maximum_tcia_series", 3)
 
 """Number of studies for each modality from TCIA"""
 TCIA_STUDIES_PER_MODALITY = os.getenv("tcia_studies_per_modality", 10)
+
+"""Honeytoken URL"""
+WEB_HOOK_HONEY_TOKEN_URL = (
+    "https://webhook.site/#!/view/b4a77406-3736-4637-a11d-293cc00decee"
+)
 
 """Activate DICOM files integrity checks every 6 hours"""
 INTEGRITY_CHECK = os.getenv("integrity_check", True)

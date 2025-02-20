@@ -28,8 +28,8 @@ class SimplifiedLogsFormatter(logging.Formatter):
         for key in keys_to_remove:
             log_object.pop(key, None)
         if (
-            log_object["request_Type"] == "Association Aborted"
-            or log_object["request_Type"] == "Association Released"
+            log_object["request_type"] == "Association Aborted"
+            or log_object["request_type"] == "Association Released"
         ):
             # Remove none subprocess info
             log_object["session_parameters"] = "N/A"
@@ -148,4 +148,5 @@ class Loggers(ILoggers):
         if not self.is_production:
             logger.addHandler(stream_handler)
         logger.addHandler(handler)
+        print("Logger", name, "initialized at ", log_directory)
         return logger
