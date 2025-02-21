@@ -52,17 +52,19 @@
 
 import os
 
+true_list = ["true", "1", "t", "yes"]
 """Envirnoment"""
-PROD = os.getenv("prod", False)
+PROD = os.getenv("PROD", "False").lower() in true_list
 
+print(os.getenv("PROD"), "Helllllllllllllooooooooo", PROD)
 """Flask server status"""
-FLASK_ACTIVATED = os.getenv("flask_active", True)
+FLASK_ACTIVATED = os.getenv("FLASK_ACTIVATED", "True").lower() in true_list
 
 """Null routing the incomming requests if belong a known mass scanner """
-BLOCK_SCANNERS = os.getenv("blackhole", False)
+BLOCK_SCANNERS = os.getenv("BLOCK_SCANNERS", "False").lower() in true_list
 
 """Blackhole list file"""
-BLACKHOLE_FILE_PATH = os.getenv("blackhole_path", "./storage/blackhole_list.txt")
+BLACKHOLE_FILE_PATH = os.getenv("BLACKHOLE_FILE_PATH", "./storage/blackhole_list.txt")
 
 """DICOM files storage"""
 
@@ -77,7 +79,7 @@ DICOM_PORT = 11112
 
 """DICOM server host ip configuration"""
 
-DICOM_SERVER_HOST = "172.18.204.133" if not PROD else "172.29.0.3"
+DICOM_SERVER_HOST = "localhost" if not PROD else "172.29.0.3"
 
 
 """Redis host configuration"""
@@ -98,34 +100,34 @@ MAIN_LOG_DIRECTORY, SIMPLIFIED_LOG_DIRECTORY, EXCEPTIONS_LOG_DIRECTORY = (
 DICOM_DATABASE = "/app/db.db" if PROD else "./storage/db.db"
 
 """TCIA username and password to use it in API calls"""
-TCIA_USER_NAME = os.getenv("tcia_username", "Nawras")
-TCIA_PASSWORD = os.getenv("tcia_password", "mrmr@gmail.com")
+TCIA_USER_NAME = os.getenv("TCIA_USER_NAME", "Nawras")
+TCIA_PASSWORD = os.getenv("TCIA_PASSWORD", "mrmr@gmail.com")
 
 """Time unit to schedule tcia files retrieval"""
-TCIA_PERIOD_UNIT = os.getenv("tcia_unit", "week")
+TCIA_PERIOD_UNIT = os.getenv("TCIA_PERIOD_UNIT", "week")
 
 
 """Default update dicom files from tcia API each 1 week"""
-TCIA_PERIOD = os.getenv("tcia_weeks_period", 1)
+TCIA_PERIOD = os.getenv("TCIA_PERIOD", 1)
 
 """The path where TCIA dicom files save on retrieval"""
 TCIA_FILES_DIRECTORY = "./tcia_data"
 
 """ API key Abuseipdb """
 ABUSE_IP_API_KEY = os.getenv(
-    "abuse_ip",
+    "ABUSE_IP_API_KEY",
     "95c2c4b357f46e9fb9ce626d06295c1002454709007a43ed5ea49de785a7e3bb0db670e44bb10875",
 )
 
 """ API key Abuseipdb """
 IP_QUALITY_SCORE_API_KEY = os.getenv(
-    "ip_quality_score",
+    "IP_QUALITY_SCORE_API_KEY",
     "JyGDPZk1kg5Y6Cqqiagx4y1YBkDmJ7tP",
 )
 
 """ API key Virus Total """
 VIRUS_TOTAL_API_KEY = os.getenv(
-    "virus_total",
+    "VIRUS_TOTAL_API_KEY",
     "715bccfb503dc801d1fdc5f095bb3c0c2a4412a7b81cca1a2f5c15e14361f1fa",
 )
 
@@ -134,21 +136,21 @@ CANARY_PDF_PATH = "./storage/can.pdf"
 
 
 """TCIA activated"""
-TCIA_ACTIVATED = os.getenv("tcia_activated", True)
+TCIA_ACTIVATED = os.getenv("TCIA_ACTIVATED", "True").lower() in true_list
 
 
 """ Modalities of the studies should be retrieved from TCIA """
-MODALITIES = os.getenv("modalities", ["CT", "MR", "US", "DX"])
+MODALITIES = os.getenv("MODALITIES", ["CT", "MR", "US", "DX"])
 
 """Minimum number of files in each serie retrieved from The Cancer Imaging Archeive API"""
-MINIMUM_TCIA_FILES_IN_SERIE = os.getenv("minimum_tcia_series", 1)
+MINIMUM_TCIA_FILES_IN_SERIE = os.getenv("MINIMUM_TCIA_FILES_IN_SERIE", 1)
 
 """Maximum number of files in each serie retrieved from The Cancer Imaging Archeive API"""
 
-MAXIMUM_TCIA_FILES_IN_SERIE = os.getenv("maximum_tcia_series", 3)
+MAXIMUM_TCIA_FILES_IN_SERIE = os.getenv("MAXIMUM_TCIA_FILES_IN_SERIE", 3)
 
 """Number of studies for each modality from TCIA"""
-TCIA_STUDIES_PER_MODALITY = os.getenv("tcia_studies_per_modality", 10)
+TCIA_STUDIES_PER_MODALITY = os.getenv("TCIA_STUDIES_PER_MODALITY", 10)
 
 """Honeytoken URL"""
 WEB_HOOK_HONEY_TOKEN_URL = (
@@ -156,7 +158,7 @@ WEB_HOOK_HONEY_TOKEN_URL = (
 )
 
 """Activate DICOM files integrity checks every 6 hours"""
-INTEGRITY_CHECK = os.getenv("integrity_check", True)
+INTEGRITY_CHECK = os.getenv("INTEGRITY_CHECK", "True").lower() in true_list
 
 """Integrity checker file storage path"""
 HASH_STORAGE_PATH = "./storage/hash_store.json"

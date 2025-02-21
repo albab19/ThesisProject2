@@ -16,6 +16,7 @@ class RedisClient(IRedisService):
             self.exceptions_logger.exception(
                 "Exception while retrieving IPs list from Redis"
             )
+            pass
 
     def add_scanned_ip(self, ip):
         try:
@@ -38,6 +39,7 @@ class RedisClient(IRedisService):
             self.exceptions_logger.exception(
                 "Exception while adding a request information to Redis"
             )
+            pass
 
     def get_TCI_existing_studies(
         self,

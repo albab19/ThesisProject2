@@ -119,3 +119,4 @@ class ThreatIntelligence(IThreatIntelligence):
             self.exceptions_logger.exception(
                 "Exception while building IP reputation object"
             )
+            pass

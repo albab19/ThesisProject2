@@ -18,10 +18,10 @@ patch.multiple(
     DICOM_STORAGE_DIR="./mock_dicom_files_tcia",
 ).start()
 
-import di_container
+import app_container
 
-test_context = di_container.ApplicationContext()
-tcia_manager = test_context.tcia_scheduler().tcia_manager
+test_container = app_container.ApplicationContext()
+tcia_manager = test_container.tcia_scheduler().tcia_manager
 tcia_api = tcia_manager.tcia_api
 
 

@@ -1,46 +1,50 @@
 version: '3.8' # Use the latest version of Compose
 
 services:
-  logserver:
-    build: ./flask_logging_server/.
-    volumes:
-      - shared_data:/app
-    environment:
-      - Docker_ENV=True
-    networks:
-      host:
-        ipv4_address: 172.29.0.5
-    ports:
-      - "5000:5000"
+  # logserver:
+  #   build: ./flask_logging_server/.
+  #   volumes:
+  #     - shared_data:/app
+  #   environment:
+  #     - Docker_ENV="True"
+  #   networks:
+  #     host:
+  #       ipv4_address: 172.29.0.5
+  #   ports:
+  #     - "5000:5000"
 
-  api:
-    build: ./API/.
-    volumes:
-      - shared_data:/app
-    networks:
-      host:
-        ipv4_address: 172.29.0.2
-    ports:
-      - "3000:3000"
-    environment:
-      - Docker_ENV=True
+  # api:
+  #   build: ./API/.
+  #   volumes:
+  #     - shared_data:/app
+  #   networks:
+  #     host:
+  #       ipv4_address: 172.29.0.2
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - Docker_ENV="True"
 
   dicom_server:
     environment:
-      - blackhole=True
-      - Docker_ENV=True
-      - blackhole_path=./storage/blackhole_list.txt
-      - REDIS_HOST=172.29.0.4
-      - tcia_username=Nawras
-      - tcia_password=mrmr@gmail.com
-      - tcia_unit=week
-      - tcia_weeks_period=1
-      - abuse_ip=95c2c4b357f46e9fb9ce626d06295c1002454709007a43ed5ea49de785a7e3bb0db670e44bb10875
-      - ip_quality_score=JyGDPZk1kg5Y6Cqqiagx4y1YBkDmJ7tP
-      - virus_total=715bccfb503dc801d1fdc5f095bb3c0c2a4412a7b81cca1a2f5c15e14361f1fa
-      - minimum_tcia_series=1
-      - maximum_tcia_series=3
-      - tcia_studies_per_modality=10
+      - PROD="True"
+      - FLASK_ACTIVATED="True"
+      - BLOCK_SCANNERS="False"
+      - BLACKHOLE_FILE_PATH=./storage/blackhole_list.txt
+      - REDIS_HOST=localhost
+      - TCIA_USER_NAME=Nawras
+      - TCIA_PASSWORD=mrmr@gmail.com
+      - TCIA_PERIOD_UNIT=week
+      - TCIA_PERIOD=1
+      - ABUSE_IP_API_KEY=95c2c4b357f46e9fb9ce626d06295c1002454709007a43ed5ea49de785a7e3bb0db670e44bb10875
+      - IP_QUALITY_SCORE_API_KEY=JyGDPZk1kg5Y6Cqqiagx4y1YBkDmJ7tP
+      - VIRUS_TOTAL_API_KEY=715bccfb503dc801d1fdc5f095bb3c0c2a4412a7b81cca1a2f5c15e14361f1fa
+      - TCIA_ACTIVATED="True"
+      - MODALITIES=["CT", "MR", "US", "DX"]
+      - MINIMUM_TCIA_FILES_IN_SERIE=1
+      - MAXIMUM_TCIA_FILES_IN_SERIE=3
+      - TCIA_STUDIES_PER_MODALITY=10
+      - INTEGRITY_CHECK="True"
     build: ./dicom_server/.
     volumes:
       - shared_data:/app
@@ -49,13 +53,13 @@ services:
     networks:
       host:
         ipv4_address: 172.29.0.3
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
-    networks:
-      host:
-        ipv4_address: 172.29.0.4
+  # redis:
+  #   image: redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     host:
+  #       ipv4_address: 172.29.0.4
 
 volumes:
   shared_data:

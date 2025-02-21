@@ -59,6 +59,7 @@ class SessionCollector(ISessionCollector):
             self.exceptions_logger.exception(
                 "Exception while getting session requestor reputation data"
             )
+            pass
 
     def initialize_session_info(self, ip, port):
         """

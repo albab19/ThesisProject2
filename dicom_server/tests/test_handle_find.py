@@ -34,7 +34,7 @@ were used:
 import sys
 import os
 
-sys.path.append(os.path.abspath(".."))
+sys.path.append(os.path.abspath("../core/"))
 import pytest
 from unittest.mock import Mock, patch
 from pydicom import Dataset
@@ -113,10 +113,10 @@ Before all tests we patch the real database by initialize mock one with four stu
 (Oliver Møller, Amanda Larsen, Agnete Østergaard, Ronnie Nikolajsen and Jarl Frederiksen)
 
 """
-import di_container
+import app_container
 
-test_context = di_container.ApplicationContext()
-dicom_handlers = test_context.dicom_handlers()
+test_container = app_container.ApplicationContainer()
+dicom_handlers = test_container.dicom_handlers()
 
 
 def test_invalid_sop_class(event_retrieve_specific_study):

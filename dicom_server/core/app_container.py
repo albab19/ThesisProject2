@@ -49,6 +49,8 @@ The setup includes adding the following providers:
     * dicom_application: handles the configuration, initialization of the DICOM application entity and starts the DICOM server.
 """
 
+import sys, os
+
 from dependency_injector import containers, providers
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -57,19 +59,20 @@ import config
 from loggers import Loggers
 from dicomdb import DicomDatabase
 from redis_handler import RedisClient
-from integrity_checker import FilesChecker
 from dicom_session_manager import SessionCollector
 from dicom_handlers import DICOMHandlers
 from dicom_application import DicomStarter
 from threat_intelligence_handler import ThreatIntelligence
-from tcia_management import TCIAAPI
-from tcia_management import TCIAManager
-from tcia_management import TCIAScheduler
-from network_manager import Blackhole
 import logging
+from custom_units.integrity_checker import FilesChecker
+from custom_units.tcia_management import TCIAAPI
+from custom_units.tcia_management import TCIAManager
+from custom_units.tcia_management import TCIAScheduler
+from custom_units.network_manager import Blackhole
 
 
-class ApplicationContext(containers.DeclarativeContainer):
+class ApplicationContainer(containers.DeclarativeContainer):
+
     # Loggers service
     loggers = providers.Singleton(
         Loggers,
@@ -97,6 +100,14 @@ class ApplicationContext(containers.DeclarativeContainer):
 
     # Redis provider
     redis_client = providers.Singleton(redis.Redis, config.REDIS_HOST, 6379)
+    try:
+        redis_client().client_list()
+    except ConnectionError:
+        print(
+            f"No Redis database is running on {config.REDIS_HOST}, port 6379. Please start the Redis service.",
+        )
+        sys.exit(1)
+
     redis_handler = providers.Singleton(RedisClient, exceptions_logger, redis_client)
 
     # TCIA providers

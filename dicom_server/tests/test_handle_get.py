@@ -12,7 +12,7 @@ Asseretations:
 import sys
 import os
 
-sys.path.append(os.path.abspath(".."))
+sys.path.append(os.path.abspath("../core"))
 
 import pytest
 from pydicom import Dataset
@@ -20,10 +20,10 @@ from pydicom.uid import UID
 from unittest.mock import Mock
 from pynetdicom.sop_class import CTImageStorage
 import global_patcher
-import di_container
+import app_container
 
-test_context = di_container.ApplicationContext()
-dicom_handlers = test_context.dicom_handlers()
+test_container = app_container.ApplicationContainer()
+dicom_handlers = test_container.dicom_handlers()
 
 
 @pytest.fixture
@@ -69,7 +69,7 @@ def test_get_uncompressed_file_using_little_Endian(event_uncompress_retrieve: Mo
 
     """
 
-    gen = test_context.dicom_handlers().handle_get(event_uncompress_retrieve)
+    gen = test_container.dicom_handlers().handle_get(event_uncompress_retrieve)
     result = list(gen)
     print("Reees", result[3])
 
