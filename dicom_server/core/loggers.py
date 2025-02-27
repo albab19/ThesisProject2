@@ -6,17 +6,8 @@ import traceback
 
 
 class SimplifiedLogsFormatter(logging.Formatter):
-    def __init__(
-        self,
-        is_production,
-        fmt=None,
-        datefmt=None,
-        style="%",
-        validate=True,
-        *,
-        defaults=None
-    ):
-        super().__init__(fmt, datefmt, style, validate, defaults=defaults)
+    def __init__(self, is_production):
+        super().__init__(style="%")
         self.is_production = is_production
 
     def format(self, record):
@@ -40,17 +31,8 @@ class SimplifiedLogsFormatter(logging.Formatter):
 
 
 class ExceptionFormatter(logging.Formatter):
-    def __init__(
-        self,
-        is_production,
-        fmt=None,
-        datefmt=None,
-        style="%",
-        validate=True,
-        *,
-        defaults=None
-    ):
-        super().__init__(fmt, datefmt, style, validate, defaults=defaults)
+    def __init__(self, is_production):
+        super().__init__(style="%")
         self.is_production = is_production
 
     def format(self, record):
@@ -94,7 +76,6 @@ class ExceptionFormatter(logging.Formatter):
             + "Traceback :\n ............\n"
             + trace
         )
-
         return excep
 
 

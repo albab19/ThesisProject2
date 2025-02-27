@@ -16,7 +16,7 @@ class DicomDatabase(IDicomDatabase):
             self.exceptions_logger = exceptions_logger
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while building DICOMDatabase instance."
+                "Unexpected error while building DICOMDatabase instance."
             )
 
     @contextmanager
@@ -27,7 +27,6 @@ class DicomDatabase(IDicomDatabase):
         except Exception:
             self.session.rollback()
             print(f"Session rollback!")
-            raise
 
     def initialize_database(self):
         try:
@@ -36,9 +35,8 @@ class DicomDatabase(IDicomDatabase):
             print("Database initialized from DICOM storage")
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while initializing the database from dicom files"
+                "Unexpected error while initializing the database from dicom files"
             )
-            raise
 
     def fill_database_tables_from_dicom_files(self):
         with self.session_scope() as session:
@@ -49,7 +47,7 @@ class DicomDatabase(IDicomDatabase):
                 session.commit()
             except Exception:
                 session.rollback()
-                self.exceptions_logger.exception("Exception while filling database")
+                self.exceptions_logger.exception("Exception filling database")
 
     def delete_database(self):
         with self.session_scope() as session:
@@ -110,9 +108,9 @@ class DicomDatabase(IDicomDatabase):
                 return matches
             except Exception:
                 self.exceptions_logger.exception("Exception in STUDY level query")
-                raise
 
     def query_series_level(self, identifier):
+
         matches = []
         with self.session_scope() as session:
             try:
@@ -128,7 +126,6 @@ class DicomDatabase(IDicomDatabase):
                 return matches
             except Exception:
                 self.exceptions_logger.exception("Exception in SERIES level query")
-                raise
 
     def query_patient_level(self, identifier):
         matches = []
@@ -146,7 +143,6 @@ class DicomDatabase(IDicomDatabase):
                 return matches
             except Exception:
                 self.exceptions_logger.exception("Exception in PATIENT level query")
-                raise
 
     def get_response_data(self, identifier, instance, response_dataset):
 
@@ -163,33 +159,43 @@ class DicomDatabase(IDicomDatabase):
         response_dataset.PatientName = getattr(instance, "patient_name")
 
     def get_seriesRoot_dataset(self, identifier, instance, response_dataset):
-        if len(identifier) == 1:
-            response_dataset.Modality = self.get_other_levels_tags(
-                "STUDY", "modality", getattr(instance, "study_instance_uid")
+        try:
+            if len(identifier) == 1:
+
+                response_dataset.Modality = self.get_other_levels_tags(
+                    "STUDY", "modality", getattr(instance, "study_instance_uid")
+                )
+                response_dataset.SeriesInstanceUID = self.get_other_levels_tags(
+                    "STUDY",
+                    "series_instance_uid",
+                    getattr(instance, "study_instance_uid"),
+                )
+                response_dataset.SeriesNumber = self.get_other_levels_tags(
+                    "STUDY", "series_number", getattr(instance, "study_instance_uid")
+                )
+            else:
+                response_dataset.Modality = getattr(instance, "modality")
+                response_dataset.SeriesInstanceUID = getattr(
+                    instance, "series_instance_uid"
+                )
+                response_dataset.SeriesNumber = getattr(instance, "series_number")
+            response_dataset.PatientName = self.get_other_levels_tags(
+                "SERIES", "patient_name", getattr(instance, "series_instance_uid")
             )
-            response_dataset.SeriesInstanceUID = self.get_other_levels_tags(
-                "STUDY", "series_instance_uid", getattr(instance, "study_instance_uid")
+            response_dataset.PatientID = self.get_other_levels_tags(
+                "SERIES", "patient_id", getattr(instance, "series_instance_uid")
             )
-            response_dataset.SeriesNumber = self.get_other_levels_tags(
-                "STUDY", "series_number", getattr(instance, "study_instance_uid")
+            response_dataset.NumberOfSeriesRelatedInstances = (
+                self.get_other_levels_tags(
+                    "SERIES",
+                    "NumberOfSeriesRelatedInstances",
+                    getattr(instance, "series_instance_uid"),
+                )
             )
-        else:
-            response_dataset.Modality = getattr(instance, "modality")
-            response_dataset.SeriesInstanceUID = getattr(
-                instance, "series_instance_uid"
+        except Exception:
+            self.exceptions_logger.exception(
+                "Unexpected error while getting series data sets"
             )
-            response_dataset.SeriesNumber = getattr(instance, "series_number")
-        response_dataset.PatientName = self.get_other_levels_tags(
-            "SERIES", "patient_name", getattr(instance, "series_instance_uid")
-        )
-        response_dataset.PatientID = self.get_other_levels_tags(
-            "SERIES", "patient_id", getattr(instance, "series_instance_uid")
-        )
-        response_dataset.NumberOfSeriesRelatedInstances = self.get_other_levels_tags(
-            "SERIES",
-            "NumberOfSeriesRelatedInstances",
-            getattr(instance, "series_instance_uid"),
-        )
 
     def get_studyRoot_dataset(self, instance, response_dataset):
 
@@ -256,29 +262,29 @@ class DicomDatabase(IDicomDatabase):
             return None
 
     def get_uniqueStudies(self, li):
-        uniqueSt = []
+        unique_st = []
         for a in li:
             sUID = getattr(a, "study_instance_uid")
-            if sUID not in uniqueSt:
-                uniqueSt.append(sUID)
-        return uniqueSt
+            if sUID not in unique_st:
+                unique_st.append(sUID)
+        return unique_st
 
     def get_uniqueSeries(self, li, identifier):
-        uniqueSt = []
+        unique_st = []
         for a in li:
             serieUID = getattr(a, "series_instance_uid")
             studyUID = getattr(a, "study_instance_uid")
-            if serieUID not in uniqueSt and studyUID == identifier.StudyInstanceUID:
-                uniqueSt.append(serieUID)
+            if serieUID not in unique_st and studyUID == identifier.StudyInstanceUID:
+                unique_st.append(serieUID)
 
-        return uniqueSt
+        return unique_st
 
     def get_unique_patients(self, li):
-        uniqueSt = []
+        unique_st = []
         for a in li:
             sUID = getattr(a, "patient_id")
-            if sUID not in uniqueSt:
-                uniqueSt.append(sUID)
-        # print("MatchedInstancesPatient",uniqueSt)
+            if sUID not in unique_st:
+                unique_st.append(sUID)
+        # print("MatchedInstancesPatient",unique_st)
 
-        return uniqueSt
+        return unique_st

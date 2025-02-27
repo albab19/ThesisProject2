@@ -41,7 +41,9 @@ def generate_patient_info():
         )
         formatted_study_date = random_study_date.strftime("%Y%m%d")
     except Exception:
-        exceptions_logger.exception("Exception while generating random patient data")
+        exceptions_logger.exception(
+            "Unexpected error while generating random patient data"
+        )
     return (
         name,
         str(random.randint(10, 7400)),
@@ -51,22 +53,6 @@ def generate_patient_info():
         formatted_study_date,
         str(random.randint(3528941, 5673331169)),
     )
-
-
-def delete_old_files(storage_directory):
-    try:
-        for file in os.listdir(storage_directory):
-            os.remove(os.path.join(storage_directory, file))
-    except Exception:
-        exceptions_logger.exception("Old files deletion failed:")
-
-
-def delete_temps(tcia_dir):
-    if os.path.isdir(tcia_dir):
-        try:
-            shutil.rmtree(tcia_dir)
-        except Exception:
-            exceptions_logger.exception("Temp deletion failed:")
 
 
 def filter_retrieved_studies(
@@ -86,7 +72,7 @@ def filter_retrieved_studies(
 
         if satisfies_series_count_per_study(image_count, minimum_files, maximum_files):
             if never_downloaded_study(
-                existing_studies, study_counter, study_uid
+                existing_studies, study_uid
             ) and studies_count_satisfied(
                 study_counter, number_of_studies_in_each_retrieved_modality
             ):
@@ -132,14 +118,14 @@ def get_random_institution():
 
 
 def store_retrieved_file(
-    self, directory, modality, study_files_counter, patient_name, dataset
+    directory, modality, study_files_counter, patient_name, dataset
 ):
     filename = f"{modality}_{patient_name}_{study_files_counter}.dcm"
     filepath = os.path.join(directory, filename)
     try:
         dataset.save_as(filepath)
     except Exception:
-        self.exceptions_logger.exception("File save failed:")
+        exceptions_logger.exception("File save failed:")
 
 
 def get_series_per_study(modality, study_uid, se_uid, tcia_dir):
@@ -151,7 +137,6 @@ def get_downloaded_studies_per_modality(modality, study_uid, tcia_dir):
 
 
 def build_file_dataset(
-    self,
     modality,
     study_uid,
     patient_name,
@@ -198,3 +183,52 @@ def initialize_dicom_directory_if_not_exist(storage_directory):
 
 def is_licience_file(file):
     return file == "LICENSE"
+
+
+def stage_old_files(storage_dir, tcia_dir, stagger_dir):
+
+    for filename in os.listdir(storage_dir):
+        full_file_path = os.path.join(storage_dir, filename)
+        if os.path.isfile(full_file_path):
+            shutil.move(full_file_path, os.path.join(stagger_dir, "DICOM"))
+    for folder in os.listdir(tcia_dir):
+        full_folder_path = os.path.join(tcia_dir, folder)
+        print("Fooolder", full_folder_path)
+        if os.path.isdir(full_folder_path):
+            shutil.move(full_folder_path, os.path.join(stagger_dir, "TCIA"))
+
+
+def restore_old_files(storage_dir, tcia_dir, stagger_dir):
+
+    for filename in os.listdir(os.path.join(stagger_dir, "DICOM")):
+
+        full_file_path = os.path.join(stagger_dir, "DICOM", filename)
+        if os.path.isfile(full_file_path):
+            shutil.move(full_file_path, storage_dir)
+    for folder in os.listdir((os.path.join(stagger_dir, "TCIA"))):
+        full_folder_path = os.path.join(stagger_dir, "TCIA", folder)
+        if os.path.isdir(full_folder_path):
+            shutil.move(full_folder_path, tcia_dir)
+
+
+def delete_staged_files(stage_dir):
+    try:
+        for root, dirs, files in os.walk(os.path.join(stage_dir, "DICOM")):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if not file.endswith(".py"):
+                    os.remove(file_path)
+        path_to_remove = os.path.join(stage_dir, "TCIA")
+        if os.path.isdir(path_to_remove):
+            if not file.endswith(".py"):
+                shutil.rmtree(path_to_remove)
+
+    except Exception:
+        exceptions_logger.exception("Unexpected error while removing stagged files")
+
+
+def delete_downloded_files_if_exist(tcia_dir):
+
+    for dir in os.listdir(tcia_dir):
+        print("AAAAAAAAAAA", dir)
+        shutil.rmtree(os.path.join(tcia_dir, dir))

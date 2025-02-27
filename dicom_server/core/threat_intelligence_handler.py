@@ -41,7 +41,7 @@ class ThreatIntelligence(IThreatIntelligence):
                 )
         except Exception:
             self.exceptions_logger.exception(
-                f'Exception while getting IP security score from "abuseipdb.com"'
+                f'Unexpected error while getting IP security score from "abuseipdb.com"'
             )
 
     # Get IP security score from IPQUALITYSCORE
@@ -66,7 +66,7 @@ class ThreatIntelligence(IThreatIntelligence):
             return {"service": "IPQualityScore", "error": response.text}
         except Exception:
             self.exceptions_logger.exception(
-                f'Exception while getting IP quality score from "ipqualityscore.com"'
+                f'Unexpected error while getting IP quality score from "ipqualityscore.com"'
             )
 
     # Get IP security score from VIRUSTOTAL
@@ -74,7 +74,7 @@ class ThreatIntelligence(IThreatIntelligence):
     def getVirusTotalScore(self, ip):
         try:
             url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}"
-            headers = {"x-apikey:", self.virus_total_api_key}
+            headers = {"x-apikey:": self.virus_total_api_key}
             response = requests.get(url, headers=headers)
             if response.status_code == 200:
                 data = response.json()["data"]
@@ -84,11 +84,10 @@ class ThreatIntelligence(IThreatIntelligence):
                 for analysis in data["attributes"]["last_analysis_results"].values():
                     result = analysis["result"]
                     result_counts[result] = result_counts.get(result, 0) + 1
-                print(result_counts)
                 return result_counts
         except Exception:
             self.exceptions_logger.exception(
-                f'Exception while getting IP information from "virustotal.com"'
+                f'Unexpected error while getting IP information from "virustotal.com"'
             )
 
     # Build reputation object
@@ -117,6 +116,5 @@ class ThreatIntelligence(IThreatIntelligence):
             return rep_dat
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while building IP reputation object"
+                "Unexpected error while building IP reputation object"
             )
-            pass

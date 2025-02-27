@@ -14,32 +14,32 @@ class RedisClient(IRedisService):
             return ip.encode() in self.redis_client.lrange("scannedIPs", 0, -1)
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while retrieving IPs list from Redis"
+                "Unexpected error while retrieving IPs list from Redis"
             )
-            pass
 
     def add_scanned_ip(self, ip):
         try:
             self.redis_client.rpush("scannedIPs", ip)
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while adding a scanned IP to the scanned list"
+                "Unexpected error while adding a scanned IP to the scanned list"
             )
 
     def add_reputation_data(self, rep_dat):
         try:
             self.redis_client.rpush("reputation", json.dumps(rep_dat))
         except Exception:
-            self.exceptions_logger.exception("Exception while pushing repution object")
+            self.exceptions_logger.exception(
+                "Unexpected error while pushing repution object"
+            )
 
     def add_request_data(self, redis_log_data):
         try:
             self.redis_client.rpush("requests", redis_log_data)
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while adding a request information to Redis"
+                "Unexpected error while adding a request information to Redis"
             )
-            pass
 
     def get_TCI_existing_studies(
         self,
@@ -47,14 +47,16 @@ class RedisClient(IRedisService):
         try:
             return set(self.redis_client.lrange("TCIA_studies", 0, -1))
         except Exception:
-            self.exceptions_logger.exception("Exception while checking TCIA studies")
+            self.exceptions_logger.exception(
+                "Unexpected error while checking TCIA studies"
+            )
 
     def add_TCI_study(self, study_uid):
         try:
             self.redis_client.rpush("TCIA_studies", study_uid)
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while adding a TCIA studyInstanceUID"
+                "Unexpected error while adding a TCIA studyInstanceUID"
             )
 
     def add_injected_file(self, patient_name, modality):
@@ -65,7 +67,7 @@ class RedisClient(IRedisService):
             )
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while adding injected file identifiers to redis"
+                "Unexpected error while adding injected file identifiers to redis"
             )
 
     def get_honey_url(
@@ -74,12 +76,14 @@ class RedisClient(IRedisService):
         try:
             self.redis_client.get("webhook")
         except Exception:
-            self.exceptions_logger.exception("Exception while getting webhook key")
+            self.exceptions_logger.exception(
+                "Unexpected error while getting webhook key"
+            )
 
     def update_files_integrity_state(self, changed_files):
         try:
             self.redis_client.rpush("fileChange", json.dumps(changed_files))
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while adding integrity check identifier"
+                "Unexpected error while adding integrity check identifier"
             )

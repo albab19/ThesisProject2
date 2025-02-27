@@ -128,6 +128,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         config.WEB_HOOK_HONEY_TOKEN_URL,
         config.DICOM_STORAGE_DIR,
         config.TCIA_FILES_DIRECTORY,
+        config.TCIA_FILES_STAGGER_DIRECTORY,
         config.CANARY_PDF_PATH,
         dicom_db,
         redis_handler,

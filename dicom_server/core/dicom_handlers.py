@@ -34,7 +34,9 @@ class DICOMHandlers:
             port = event.assoc.requestor.port
             self.event_collector.session_started(ip, port, version_name)
         except Exception as e:
-            self.exceptions_logger.exception("Exception while handling association")
+            self.exceptions_logger.exception(
+                "Unexpected error while handling association"
+            )
 
     def handle_echo(self, event):
         try:
@@ -48,7 +50,7 @@ class DICOMHandlers:
             )
             return 0x0000
         except Exception as e:
-            print("Exception while handling ECHO operation", e)
+            print("Unexpected error while handling ECHO operation", e)
             return 0xC000
 
     def handle_find(
@@ -64,11 +66,11 @@ class DICOMHandlers:
                     session_keys.SESSION_MAIN_OPERATION.key: "C_FIND",
                 }
             )
-            model = event.request.AffectedSOPClassUID
+            sop_class_uid = event.request.AffectedSOPClassUID
             identifier = event.identifier
 
-            # Validate the ORM model
-            if dicom_util.model_invalid(model):
+            # Validate the SOPClassUID
+            if dicom_util.is_sopclassuid_valid(sop_class_uid):
                 print("Request dataset has invaild model")
                 yield (0xA900, None)  # Identifier does not match SOP Class
                 return
@@ -156,6 +158,7 @@ class DICOMHandlers:
                 {
                     session_keys.QUERY_LEVEL.key: query_level,
                     session_keys.LOG_LEVEL.key: "Info",
+                    session_keys.SESSION_MAIN_OPERATION.key: "C_GET",
                     session_keys.REQUEST_TYPE.key: "C_GET",
                     session_keys.MATCHES.key: len(matching),
                 },
@@ -174,7 +177,9 @@ class DICOMHandlers:
 
             yield 0x0000, None
         except Exception:
-            self.exceptions_logger.exception("Exception while handling C-GET operation")
+            self.exceptions_logger.exception(
+                "Unexpected error while handling C-GET operation"
+            )
             yield (0xC001, None)
 
     def handle_store(self, event):
@@ -183,6 +188,7 @@ class DICOMHandlers:
             {
                 session_keys.LOG_LEVEL.key: "Info",
                 session_keys.REQUEST_TYPE.key: "C_STORE",
+                session_keys.SESSION_MAIN_OPERATION.key: "C_STORE",
             },
             True,
         )

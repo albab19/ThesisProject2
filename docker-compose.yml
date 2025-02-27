@@ -27,11 +27,13 @@ services:
 
   dicom_server:
     environment:
-      - PROD="True"
-      - FLASK_ACTIVATED="True"
-      - BLOCK_SCANNERS="False"
+      - PROD=yes
+      - FLASK_ACTIVATED=yes
+      - BLOCK_SCANNERS=no
+      - INTEGRITY_CHECK=yes
+      - TCIA_ACTIVATED=yes
       - BLACKHOLE_FILE_PATH=./storage/blackhole_list.txt
-      - REDIS_HOST=localhost
+      - REDIS_HOST=host.docker.internal
       - TCIA_USER_NAME=Nawras
       - TCIA_PASSWORD=mrmr@gmail.com
       - TCIA_PERIOD_UNIT=week
@@ -39,12 +41,10 @@ services:
       - ABUSE_IP_API_KEY=95c2c4b357f46e9fb9ce626d06295c1002454709007a43ed5ea49de785a7e3bb0db670e44bb10875
       - IP_QUALITY_SCORE_API_KEY=JyGDPZk1kg5Y6Cqqiagx4y1YBkDmJ7tP
       - VIRUS_TOTAL_API_KEY=715bccfb503dc801d1fdc5f095bb3c0c2a4412a7b81cca1a2f5c15e14361f1fa
-      - TCIA_ACTIVATED="True"
       - MODALITIES=["CT", "MR", "US", "DX"]
       - MINIMUM_TCIA_FILES_IN_SERIE=1
       - MAXIMUM_TCIA_FILES_IN_SERIE=3
       - TCIA_STUDIES_PER_MODALITY=10
-      - INTEGRITY_CHECK="True"
     build: ./dicom_server/.
     volumes:
       - shared_data:/app

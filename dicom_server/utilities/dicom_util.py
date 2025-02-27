@@ -63,8 +63,8 @@ def filter_identifier_tags(identifier):
                 delattr(identifier, raw.keyword)
 
 
-def model_invalid(model):
-    return model.keyword in (
+def is_sopclassuid_valid(sop_class_uid):
+    return sop_class_uid.keyword in (
         "UnifiedProcedureStepPull",
         "ModalityWorklistInformationModelFind",
     )

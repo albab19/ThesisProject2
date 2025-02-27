@@ -9,6 +9,7 @@ from services.tci_services import ITCIAAPI
 from services.tci_services import ITCIAScheduler
 from services.tci_services import ITCIAManager
 from dependency_injector.wiring import inject
+import logging
 
 
 class TCIAScheduler(threading.Thread, ITCIAScheduler):
@@ -23,10 +24,11 @@ class TCIAScheduler(threading.Thread, ITCIAScheduler):
         self.exceptions_logger = exceptions_logger
         self.tcia_manager = tcia_manager or ITCIAManager()
         self.start()
+        self.logger = logging.getLogger(__name__)
 
     def run(self):
         self.schedule_files_retrieval()
-        print(
+        self.logger.debug(
             "TCIA retrieving schedule is started, DICOM files storage and database will be directly updated from The Cancer Imaging Archeive each",
             self.period,
             self.period_unit,
@@ -34,11 +36,12 @@ class TCIAScheduler(threading.Thread, ITCIAScheduler):
 
     def schedule_files_retrieval(self):
         try:
-            schedule_unit = getattr(schedule.every(self.period), self.period_unit)
+            schedule_unit = getattr(schedule.every(self.period), str(self.period_unit))
             schedule_unit.do(self.tcia_manager.change_dicom_files)
+
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while running TCIA files retriev schedular"
+                "Unexpected error while running TCIA files retrieve scheduler"
             )
 
 
@@ -49,6 +52,7 @@ class TCIAManager(ITCIAManager):
         honeytoken_url,
         storage_directory,
         tcia_dir,
+        stagger_dir,
         pdf_canary_path,
         dicomdb: IDicomDatabase = None,
         redis_handler: IRedisService = None,
@@ -56,10 +60,12 @@ class TCIAManager(ITCIAManager):
     ):
         self.honeytoken_url = honeytoken_url
         self.tcia_dir = tcia_dir
+        self.stagger_dir = stagger_dir
         self.storage_directory = storage_directory
         self.dicomdb = dicomdb or IDicomDatabase()
         self.redis_handler = redis_handler or IRedisService()
         self.exceptions_logger = exceptions_logger
+        self.logger = logging.getLogger(__name__)
         self.tcia_api = tcia_api
         self.pdf_canary_path = pdf_canary_path
         self.change_dicom_files_called = False
@@ -67,31 +73,58 @@ class TCIAManager(ITCIAManager):
     def change_dicom_files(self):
         # to be used in unit testing
         self.change_dicom_files_called = True
-        print("Scheduled change of dicom files started")
+
+        self.logger.info("Scheduled change of dicom files started")
         try:
-            tcia_util.delete_old_files(self.storage_directory)
-            tcia_util.delete_temps(self.tcia_dir)
-            self.tcia_api.get_access_token()
-            self.tcia_api.get_new_files(
-                self.redis_handler.get_TCI_existing_studies(), self.tcia_dir
+            self.logger.debug("Stagging existing files")
+            tcia_util.stage_old_files(
+                self.storage_directory, self.tcia_dir, self.stagger_dir
             )
+            self.logger.debug("Getting access token from TCIA")
+            self.tcia_api.get_access_token()
+
+            self.logger.debug("New files retrieval")
+            exist_studies = self.redis_handler.get_TCI_existing_studies()
+
+            self.tcia_api.get_new_files(exist_studies, self.tcia_dir)
+
+            self.logger.debug("Organizing downloaded files")
             self.organize_downloaded_files()
+
+            self.logger.debug("Cleaning up staged files")
+            tcia_util.delete_staged_files(self.stagger_dir)
+
+            self.logger.debug("Updating DICOM database")
             self.dicomdb.initialize_database()
+
         except Exception:
             self.exceptions_logger.exception(
-                "Changing Dicom files with TCIA files failed:"
+                "Changing Dicom files with TCIA files failed: Rolling back changes"
             )
 
+            self.roll_back_changes()
+
+    def roll_back_changes(self):
+        self.logger.debug("Roll-back: Deleting downloaded files")
+        tcia_util.delete_downloded_files_if_exist(self.tcia_dir)
+        self.logger.debug("Roll-back: restorring old files")
+        tcia_util.restore_old_files(
+            self.storage_directory, self.tcia_dir, self.stagger_dir
+        )
+
     def organize_downloaded_files(self):
+        self.logger.info("Organizing TCIA retrieved files")
         directory = tcia_util.initialize_dicom_directory_if_not_exist(
             self.storage_directory
         )
         series_files_counter = 0
+        self.logger.debug("Parsing files based on modalities")
         for modality in tcia_util.get_downloaded_modalitis(self.tcia_dir):
             for study_uid in tcia_util.get_studies_from_modality(
                 modality, self.tcia_dir
             ):
                 try:
+                    self.logger.debug("Adding StudyInstanceUID to Redis")
                     self.redis_handler.add_TCI_study(study_uid)
                 except Exception:
                     self.exceptions_logger.exception("Study addition failed:")
@@ -174,8 +207,11 @@ class TCIAManager(ITCIAManager):
                 or series_files_counter == 24
             ):
                 # Injecting 4 retrieved dicom file with canary token and honeyURL token
+                self.logger.debug("Injecting dicom files with honeyURL token")
                 self.inject_honey_url(dataset)
+                self.logger.debug("Injecting dicom files with pdf canary token")
                 self.inject_pdf_canary_token(dataset)
+                self.logger.debug("Adding injected files meta-data to Redis")
                 self.redis_handler.add_injcted_file(patient_name, modality)
 
             tcia_util.store_retrieved_file(
@@ -187,9 +223,14 @@ class TCIAManager(ITCIAManager):
             )
 
     def inject_pdf_canary_token(self, dataset):
-        dataset.SOPClassUID = uid.EncapsulatedPDFStorage
-        dataset.MIMETypeOfEncapsulatedDocument = "application/pdf"
-        dataset.EncapsulatedDocument = self.get_canary_token()
+        try:
+            dataset.SOPClassUID = uid.EncapsulatedPDFStorage
+            dataset.MIMETypeOfEncapsulatedDocument = "application/pdf"
+            dataset.EncapsulatedDocument = self.get_canary_token()
+        except Exception:
+            self.exceptions_logger.exeption(
+                "Unexpected error while injecting canary token"
+            )
 
     def inject_honey_url(self, dataset):
         dataset.RetrieveURL = str(self.honeytoken_url)
@@ -223,9 +264,10 @@ class TCIAAPI(ITCIAAPI):
         self.maximum_files_in_each_retrieved_serie = max_series
         self.number_of_studies_in_each_retrieved_modality = studies_per_mod
         self.modalities = modalities
+        self.logger = logging.getLogger(__name__)
 
     def get_new_files(self, existing_studies, tcia_dir):
-        print("Calling TCIA API")
+        self.logger.debug("Calling TCIA API")
         try:
 
             _json = {}

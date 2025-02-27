@@ -15,8 +15,8 @@ from pynetdicom.sop_class import (
     PatientRootQueryRetrieveInformationModelGet,
     StudyRootQueryRetrieveInformationModelFind,
     StudyRootQueryRetrieveInformationModelGet,
+    PatientRootQueryRetrieveInformationModelMove,
 )
-from pydicom.uid import CTImageStorage, JPEG2000
 from pynetdicom import (
     AE,
     AllStoragePresentationContexts,
@@ -53,18 +53,24 @@ class DicomStarter:
         List of event-handler tuples for the DICOM server.
 
         """
+        try:
+            handlers = [
+                (evt.EVT_ACSE_RECV, self.handlers.handle_assoc),
+                (evt.EVT_RELEASED, self.handlers.handle_release),
+                (evt.EVT_C_FIND, self.handlers.handle_find),
+                (evt.EVT_C_STORE, self.handlers.handle_store),
+                (evt.EVT_C_ECHO, self.handlers.handle_echo),
+                (evt.EVT_C_MOVE, self.handlers.handle_move),
+                (evt.EVT_C_GET, self.handlers.handle_get),
+                (evt.EVT_ABORTED, self.handlers.handle_abort),
+            ]
 
-        handlers = [
-            (evt.EVT_ACSE_RECV, self.handlers.handle_assoc),
-            (evt.EVT_RELEASED, self.handlers.handle_release),
-            (evt.EVT_C_FIND, self.handlers.handle_find),
-            (evt.EVT_C_STORE, self.handlers.handle_store),
-            (evt.EVT_C_ECHO, self.handlers.handle_echo),
-            (evt.EVT_C_MOVE, self.handlers.handle_move),
-            (evt.EVT_C_GET, self.handlers.handle_get),
-            (evt.EVT_ABORTED, self.handlers.handle_abort),
-        ]
-        return handlers
+            return handlers
+
+        except Exception as e:
+            self.exceptions_logger.exception(
+                "Unexpected error while registering the DICOM handlers"
+            )
 
     def start_the_application(self):
         """
@@ -72,13 +78,20 @@ class DicomStarter:
         Sets up the Application Entity and registers event handlers if the port is not already used.
 
         """
-        ae = self.initialize_application_entity()
-        handlers = self.register_dicom_handlers()
-        print("DICOM Server Started")
-        if not self.is_port_in_use():
-            ae.start_server(
-                (self.ip, self.port),
-                evt_handlers=handlers,
+        try:
+            ae = self.initialize_application_entity()
+            handlers = self.register_dicom_handlers()
+            if not self.is_port_in_use():
+                print("DICOM Server Started")
+                ae.start_server(
+                    (self.ip, self.port),
+                    evt_handlers=handlers,
+                )
+            else:
+                print(f"port {self.port} is in use")
+        except Exception:
+            self.exceptions_logger.exception(
+                "Unexpected error starting the application"
             )
 
     def initialize_application_entity(self):
@@ -86,9 +99,7 @@ class DicomStarter:
         Create and configure the Application Entity (AE).
         Registers supported and requested presentation contexts
         for storage, query/retrieve, and verification services.
-
         """
-
         try:
             ae = AE()
             ae.supported_contexts = AllStoragePresentationContexts
@@ -98,13 +109,14 @@ class DicomStarter:
             ae.add_supported_context(StudyRootQueryRetrieveInformationModelGet)
             ae.add_supported_context(StudyRootQueryRetrieveInformationModelFind)
             ae.add_supported_context(StudyRootQueryRetrieveInformationModelMove)
+            ae.add_supported_context(PatientRootQueryRetrieveInformationModelMove)
             ae.add_supported_context(Verification)
-            ae.add_supported_context(CTImageStorage, JPEG2000)
-
             self.initialize_storage_contexts(StoragePresentationContexts)
             return ae
-        except Exception as e:
-            print("Exception while initializing AE", e)
+        except Exception:
+            self.exceptions_logger.exception(
+                "Unexpected error while initializing the application entity object"
+            )
 
     # Ensure the presentation context used when initializing the server can act as SCU to handle STORE operation
 

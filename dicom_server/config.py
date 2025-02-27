@@ -16,7 +16,7 @@
     
     Logging Server: 
     ---------------------
-    * FLASK_ACTIVATED
+    * FLASK_ACTIVATED (Important to avoid logging on test environment)
     * MAIN_LOG_DIRECTORY
     * SIMPLIFIED_LOG_DIRECTORY
     * EXCEPTIONS_LOG_DIRECTORY
@@ -39,7 +39,7 @@
     
     DICOM server:
     ---------------------
-    * PROD
+    * PROD (environment will be production if this constant is true and development if it is false)
     * DICOM_STORAGE_DIR
     * C_STORE_STORAGE
     * DICOM_PORT
@@ -50,18 +50,17 @@
     
     """
 
-import os
+import os, json
 
-true_list = ["true", "1", "t", "yes"]
+TRUE_LIST = ["true", "1", "t", "yes"]
 """Envirnoment"""
-PROD = os.getenv("PROD", "False").lower() in true_list
+PROD = os.getenv("PROD", "False").lower() in TRUE_LIST
 
-print(os.getenv("PROD"), "Helllllllllllllooooooooo", PROD)
 """Flask server status"""
-FLASK_ACTIVATED = os.getenv("FLASK_ACTIVATED", "True").lower() in true_list
+FLASK_ACTIVATED = os.getenv("FLASK_ACTIVATED", "True").lower() in TRUE_LIST
 
 """Null routing the incomming requests if belong a known mass scanner """
-BLOCK_SCANNERS = os.getenv("BLOCK_SCANNERS", "False").lower() in true_list
+BLOCK_SCANNERS = os.getenv("BLOCK_SCANNERS", "False").lower() in TRUE_LIST
 
 """Blackhole list file"""
 BLACKHOLE_FILE_PATH = os.getenv("BLACKHOLE_FILE_PATH", "./storage/blackhole_list.txt")
@@ -87,7 +86,7 @@ REDIS_HOST = "localhost" if not PROD else os.getenv("REDIS_HOST", "172.29.0.4")
 
 """Logs directories"""
 MAIN_LOG_DIRECTORY, SIMPLIFIED_LOG_DIRECTORY, EXCEPTIONS_LOG_DIRECTORY = (
-    ("./app/logs/pynetdicom", "./app/logs/simplified", "./app/logs/exceptions")
+    ("/app/logs/pynetdicom", "/app/logs/simplified", "/app/logs/exceptions")
     if PROD
     else (
         "../flask_logging_server/logs/pynetdicom",
@@ -104,15 +103,16 @@ TCIA_USER_NAME = os.getenv("TCIA_USER_NAME", "Nawras")
 TCIA_PASSWORD = os.getenv("TCIA_PASSWORD", "mrmr@gmail.com")
 
 """Time unit to schedule tcia files retrieval"""
-TCIA_PERIOD_UNIT = os.getenv("TCIA_PERIOD_UNIT", "week")
+TCIA_PERIOD_UNIT = os.getenv("TCIA_PERIOD_UNIT", "minutes")
 
 
 """Default update dicom files from tcia API each 1 week"""
-TCIA_PERIOD = os.getenv("TCIA_PERIOD", 1)
+TCIA_PERIOD = int(os.getenv("TCIA_PERIOD", 10))
 
 """The path where TCIA dicom files save on retrieval"""
 TCIA_FILES_DIRECTORY = "./tcia_data"
-
+"""Files stagger directory"""
+TCIA_FILES_STAGGER_DIRECTORY = "./storage/stagger"
 """ API key Abuseipdb """
 ABUSE_IP_API_KEY = os.getenv(
     "ABUSE_IP_API_KEY",
@@ -136,21 +136,21 @@ CANARY_PDF_PATH = "./storage/can.pdf"
 
 
 """TCIA activated"""
-TCIA_ACTIVATED = os.getenv("TCIA_ACTIVATED", "True").lower() in true_list
+TCIA_ACTIVATED = os.getenv("TCIA_ACTIVATED", "True").lower() in TRUE_LIST
 
 
 """ Modalities of the studies should be retrieved from TCIA """
-MODALITIES = os.getenv("MODALITIES", ["CT", "MR", "US", "DX"])
+MODALITIES = json.loads(os.getenv("MODALITIES", '["CT", "MR", "US", "DX"]'))
 
 """Minimum number of files in each serie retrieved from The Cancer Imaging Archeive API"""
-MINIMUM_TCIA_FILES_IN_SERIE = os.getenv("MINIMUM_TCIA_FILES_IN_SERIE", 1)
+MINIMUM_TCIA_FILES_IN_SERIE = int(os.getenv("MINIMUM_TCIA_FILES_IN_SERIE", 1))
 
 """Maximum number of files in each serie retrieved from The Cancer Imaging Archeive API"""
 
-MAXIMUM_TCIA_FILES_IN_SERIE = os.getenv("MAXIMUM_TCIA_FILES_IN_SERIE", 3)
+MAXIMUM_TCIA_FILES_IN_SERIE = int(os.getenv("MAXIMUM_TCIA_FILES_IN_SERIE", 3))
 
 """Number of studies for each modality from TCIA"""
-TCIA_STUDIES_PER_MODALITY = os.getenv("TCIA_STUDIES_PER_MODALITY", 10)
+TCIA_STUDIES_PER_MODALITY = int(os.getenv("TCIA_STUDIES_PER_MODALITY", 10))
 
 """Honeytoken URL"""
 WEB_HOOK_HONEY_TOKEN_URL = (
@@ -158,7 +158,7 @@ WEB_HOOK_HONEY_TOKEN_URL = (
 )
 
 """Activate DICOM files integrity checks every 6 hours"""
-INTEGRITY_CHECK = os.getenv("INTEGRITY_CHECK", "True").lower() in true_list
+INTEGRITY_CHECK = os.getenv("INTEGRITY_CHECK", "True").lower() in TRUE_LIST
 
 """Integrity checker file storage path"""
 HASH_STORAGE_PATH = "./storage/hash_store.json"

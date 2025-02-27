@@ -42,7 +42,7 @@ class FilesChecker(threading.Thread, IIntegrityChecker):
                     hash_sha256.update(chunk)
         except Exception:
             self.exceptions_logger.exception(
-                f"Exception while generating hash value for file {filename}"
+                f"Unexpected error while generating hash value for file {filename}"
             )
             return None
         return hash_sha256.hexdigest()
@@ -56,6 +56,9 @@ class FilesChecker(threading.Thread, IIntegrityChecker):
             with open(self.hash_store_path, "r") as f:
                 old_hashes = json.load(f)
         except FileNotFoundError:
+            self.exceptions_logger.exception(
+                "Unexpected error while retrieving hashes from the hash storage file "
+            )
             old_hashes = {}
 
         for path in os.listdir(self.storage_directory):
@@ -69,9 +72,8 @@ class FilesChecker(threading.Thread, IIntegrityChecker):
 
             except Exception:
                 self.exceptions_logger.exception(
-                    f"Exception while proccessing hashes in {full_path}"
+                    f"Unexpected error while proccessing hashes in {full_path}"
                 )
-                pass
 
         with open(self.hash_store_path, "w") as f:
             json.dump(new_hashes, f)
@@ -81,7 +83,7 @@ class FilesChecker(threading.Thread, IIntegrityChecker):
                 self.redis_handler.update_files_integrity_state(changed_files)
             except Exception:
                 self.exceptions_logger.exception(
-                    "Exception while populating file integrity checks to Redis"
+                    "Unexpected error while populating file integrity checks to Redis"
                 )
             print("Changed files:", changed_files)
         else:

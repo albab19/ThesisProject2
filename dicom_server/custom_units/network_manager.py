@@ -102,7 +102,7 @@ class Blackhole(IBlackhole):
             self.setup_iptables_rule(set_name)
         except Exception as e:
             self.exceptions_logger.exception(
-                "Exception while blocking mass scanners", e
+                "Unexpected error while blocking mass scanners", e
             )
 
     """Allow known scanners to interact with the server"""

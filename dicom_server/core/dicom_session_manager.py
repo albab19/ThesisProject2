@@ -40,7 +40,9 @@ class SessionCollector(ISessionCollector):
             else:
                 self.session_info[sk.VERSION.key] = v_name
         except Exception:
-            self.exceptions_logger.exception("Exception while starting a DICOM session")
+            self.exceptions_logger.exception(
+                "Unexpected error while starting a DICOM session"
+            )
 
     def get_session_requestor_reputation(self, ip):
         """
@@ -57,9 +59,8 @@ class SessionCollector(ISessionCollector):
                 self.redis_handler.add_reputation_data(rep_dat)
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while getting session requestor reputation data"
+                "Unexpected error while getting session requestor reputation data"
             )
-            pass
 
     def initialize_session_info(self, ip, port):
         """
@@ -78,7 +79,7 @@ class SessionCollector(ISessionCollector):
             self.collect_session_info({}, True)
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while initializing DICOM session"
+                "Unexpected error while initializing DICOM session"
             )
 
     def collect_session_info(self, params, sub_process_finished=False):
@@ -96,7 +97,7 @@ class SessionCollector(ISessionCollector):
                 self.simp_logger.info(self.session_info)
         except Exception:
             self.exceptions_logger.exception(
-                "Exception while collecting DICOM session information"
+                "Unexpected error while collecting DICOM session information"
             )
 
     def session_ended(self):
@@ -108,7 +109,9 @@ class SessionCollector(ISessionCollector):
             self.redis_handler.add_request_data(self.build_redis_object())
             self.reset_session()
         except Exception:
-            self.exceptions_logger.exception("Exception while ending a DICOM session")
+            self.exceptions_logger.exception(
+                "Unexpected error while ending a DICOM session"
+            )
 
     def reset_session(self):
         self.session_info = {key.key: key.default for key in sk}
@@ -135,7 +138,9 @@ class SessionCollector(ISessionCollector):
 
             return str(redis_object)
         except Exception:
-            self.exceptions_logger.exception("Exception while building Redis object")
+            self.exceptions_logger.exception(
+                "Unexpected error while building Redis object"
+            )
 
     def set_session_lock(self, value):
         self.session_info[sk.LOCK.key] = value

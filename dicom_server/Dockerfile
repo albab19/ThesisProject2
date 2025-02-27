@@ -3,16 +3,21 @@ USER root
 
 COPY ./storage/db.db app/
 
-COPY . .
+RUN mkdir -p app/logs/pynetdicom app/logs/simplified app/logs/exceptions && \
+    touch app/logs/pynetdicom/pynetdicom.log app/logs/simplified/simplified_logger.log app/logs/exceptions/exceptions.log
+
+
+COPY . dicom_server/
 
 
 
-WORKDIR /.
+WORKDIR /dicom_server/.
+
 RUN pip install --upgrade pip  && pip install -r requirements.txt && apt-get update &&  apt-get -qq install iptables ipset
 
 
-COPY ./core//service_class.py   /usr/local/lib/python3.9/site-packages/pynetdicom/service_class.py
-COPY ./core/db.py ./usr/local/lib/python3.9/site-packages/pynetdicom/apps/qrscp/db.py
+COPY ./core/service_class.py   /usr/local/lib/python3.9/site-packages/pynetdicom/service_class.py
+COPY ./core/db.py /usr/local/lib/python3.9/site-packages/pynetdicom/apps/qrscp/db.py
 COPY ./core/valuerep.py /usr/local/lib/python3.9/site-packages/pydicom/valuerep.py
 EXPOSE 11112
 CMD ["python","-u" ,"main.py"]
