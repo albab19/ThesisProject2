@@ -1,0 +1,15 @@
+pydicom==2.4.4
+pynetdicom==2.0.1
+pylibjpeg
+pylibjpeg-libjpeg
+pylibjpeg-openjpeg
+sqlalchemy
+requests
+redis
+schedule
+faker
+jwt
+dependency-injector
+aenum
+pytest
+pytz
