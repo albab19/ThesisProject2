@@ -121,7 +121,7 @@ An overview of the deployment process is shown bellow
 To deploy DICOMHawk using Docker Compose, use the following command which clone the repository, navigates to the project directory, and launches the required services. Note that cloning the repository may take a significant amount of time due to the large size of the real DICOM files from various modalities stored in it
 
 ```bash
-git clone https://github.com/albab19/ThesisProject2.git && cd ./ThesisProject2 && docker-compose up -d
+git clone https://github.com/albab19/ThesisProject2.git && cd ./ThesisProject2/DICOMHawk_thesis_project/ && docker-compose up -d
 ```
 
 ## Running DICOMHawk Locally
@@ -248,12 +248,12 @@ Get all studies for a specific patient using the PatientRootQueryRetrieveInforma
 
 ## Access the kibana dashbord
 
-    To accss the Kibana dashbord after running the monitoring stack, navicate to "http://localhost:5601/app/dashboards" then click on DICOMHawk
+    To accss the Kibana dashbord after running the monitoring stack, navigate to "http://localhost:5601/app/dashboards" then click on DICOMHawk
 
 ## Access the flask logging server
 
-     To accss the  flask logging server, navicate to "http://localhost:5000"
+     To accss the  flask logging server, navigate to "http://localhost:5000"
 
 ## Access the Web API user interface
 
-     To accss the Web API user interface, navicate to "http://localhost:3000" and use username and password test, test to login
+     To accss the Web API user interface, navigate to "http://localhost:3000" and use username and password test, test to login
