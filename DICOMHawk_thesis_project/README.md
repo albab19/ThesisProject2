@@ -4,23 +4,21 @@ DICOMHawk honeypot is a diception tool that allows attackers to interact with wh
 
 # Key Features
 
-- \*\*DICOMHawk enables potential attackers to perform DICOM operations on the two standard DICOM information models (STUDYROOT and PATIENTROOT) through its DICOM port.
+- DICOMHawk enables potential attackers to perform DICOM operations on the two standard DICOM information models (STUDYROOT and PATIENTROOT) through its DICOM port.
 
-- \*\*DICOMHawk provides an API service enabling attackers to interact with the DICOM server content. Using the API endpoints, an attacker can serach and download studies, series, patient and images data. Moreover, they can upload files to the web api server.
+- DICOMHawk provides an API service enabling attackers to interact with the DICOM server content. Using the API endpoints, an attacker can serach and download studies, series, patient and images data. Moreover, they can upload files to the web api server.
 
-- \*\*DICOMHawk stores real DICOM files that are updated periodically through "The Cancer Imaging Archive (TCIA)" API and formed in a way that resembles real patient data of Danish citizens and in the Danish settings.
+- DICOMHawk stores real DICOM files that are updated periodically through "The Cancer Imaging Archive (TCIA)" API and formed in a way that resembles real patient data of Danish citizens and in the Danish settings.
 
-- \*\*DICOMHawk supports a dynamic data rotation mechanism that automatically replaces the stored DICOM files with the ones downloaded from TCIA.
+- DICOMHawk supports a dynamic data rotation mechanism that automatically replaces the stored DICOM files with the ones downloaded from TCIA.
 
-- \*\*DICOMHawk employs different types of honeytoken in both the DICOM server and the web API including encapsulated PDF canary tokens, honeyURLs (Fake URLs that is seeded into the DICOM data-sets), CredentialsHoneytokens, hidden endpoints and hidden credentials in the source code.
+- DICOMHawk employs different types of honeytoken in both the DICOM server and the web API including encapsulated PDF canary tokens, honeyURLs (Fake URLs that is seeded into the DICOM data-sets), CredentialsHoneytokens, hidden endpoints and hidden credentials in the source code.
 
-- DICOMHawk provides automatic threat intelligence chack on each unique IP address interacts with honeypot. here we have to talk about IPQualityscore, VTOTAL.....
+- DICOMHawk provides automatic threat intelligence chack on each unique IP address interacts with honeypot.
 
-- \*\*An optional Blackhole service is integrated to DICOMHawk blocking traffic on kernel level for the known mass-scanner services
+- An optional Blackhole service is integrated to DICOMHawk blocking traffic on kernel level for the known mass-scanner services
 
-- \*\*DICOMHawk uses centralized monitoring to track attackers activities. IT employs a loosely coupled Elastic Stack where Logstash only needs the honeypot's IP address to retrieve staged data from the Redis server.
-
--
+- DICOMHawk uses centralized monitoring to track attackers activities. IT employs a loosely coupled Elastic Stack where Logstash only needs the honeypot's IP address to retrieve staged data from the Redis server
 
 # DICOMHawk Monitoring System
 
@@ -147,10 +145,13 @@ docker run -p 6379:6379 --name redis-db -d redis
 #### DICOM Server
 
 - Navigate to the DICOM server directory from the project root:
+
   ```bash
   cd /dicom_server
   ```
+
 - Run the DICOM server using Python:
+
   ```bash
   python main.py  # Use python3 main.py if your environment defaults to Python 3
   ```
@@ -166,6 +167,7 @@ docker run -p 6379:6379 --name redis-db -d redis
   ```
 
 - Run the API using Node.js:
+
   ```bash
   node app.js
   ```
@@ -197,16 +199,15 @@ docker-compose up -d
 
 # Usage Examples
 
-Users can interact with the DICOM server utilizing DCMTK tools and DICOM client applications suck as Sante DICOM Viewer.
-
-## Using DCMTK
+Users can interact with the DICOM server utilizing DCMTK tools and DICOM client applications such as Sante DICOM Viewer.
+To download SANTE DICOM viewer click onthis link
 
 Example commands to interact with the server using DCMTK are:
 
 - verify the connection to the server using this command.
 
 ```bash
-echoscu.exe  localhost 11112
+    echoscu.exe  localhost 11112
 ```
 
 - Find all patients using the PatientRootQueryRetrieveInformationModelFind
@@ -215,10 +216,10 @@ echoscu.exe  localhost 11112
     findscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen" localhost 104
 ```
 
-- Find a specific patient using the PatientRootQueryRetrieveInformationModelFind
+- Find a specific patient using the PatientRootQueryRetrieveInformationModelFind attributes
 
 ```bash
- findscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen" localhost 104
+    findscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen" localhost 104
 ```
 
 - Find all studies using the StudyRootQueryRetrieveInformationModelFind
@@ -227,20 +228,32 @@ echoscu.exe  localhost 11112
     findscu -v -S -k QueryRetrieveLevel=STUDY  localhost 104
 ```
 
-- Find a specific study using the StudyRootQueryRetrieveInformationModelFind
+- Find a specific study using the StudyRootQueryRetrieveInformationModelFind attributes
 
 ```bash
- findscu -v -S -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=1.3.6.1.4.1.14519.5.2.1.6279.6001.142460980973539163820236983184  localhost 104
+    findscu -v -S -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=1.3.6.1.4.1.14519.5.2.1.6279.6001.142460980973539163820236983184  localhost 104
 ```
 
-- Get a specific study using the StudyRootQueryRetrieveInformationModelGet
+- Get a specific study using the StudyRootQueryRetrieveInformationModelGet attributes
 
 ```bash
- getscu -v -S -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=1.3.6.1.4.1.14519.5.2.1.6279.6001.142460980973539163820236983184  localhost 104
+    getscu -v -S -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=1.3.6.1.4.1.14519.5.2.1.6279.6001.142460980973539163820236983184  localhost 104
 ```
 
-Get all studies for a specific patient using the PatientRootQueryRetrieveInformationModelGet
+Get all studies for a specific patient using the PatientRootQueryRetrieveInformationModelGet attributes
 
 ```bash
- getscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen"  localhost 104
+    getscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen"  localhost 104
 ```
+
+## Access the kibana dashbord
+
+    To accss the Kibana dashbord after running the monitoring stack, navicate to "http://localhost:5601/app/dashboards" then click on DICOMHawk
+
+## Access the flask logging server
+
+     To accss the  flask logging server, navicate to "http://localhost:5000"
+
+## Access the Web API user interface
+
+     To accss the Web API user interface, navicate to "http://localhost:3000" and use username and password test, test to login
