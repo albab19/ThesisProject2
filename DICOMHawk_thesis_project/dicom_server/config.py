@@ -91,7 +91,7 @@ MAIN_LOG_DIRECTORY, SIMPLIFIED_LOG_DIRECTORY, EXCEPTIONS_LOG_DIRECTORY = (
     else (
         "../flask_logging_server/logs/pynetdicom",
         "../flask_logging_server/logs/simplified",
-        "../flask_logging_server/logs/exceptions",
+        "./exceptions",
     )
 )
 
@@ -153,9 +153,7 @@ MAXIMUM_TCIA_FILES_IN_SERIE = int(os.getenv("MAXIMUM_TCIA_FILES_IN_SERIE", 3))
 TCIA_STUDIES_PER_MODALITY = int(os.getenv("TCIA_STUDIES_PER_MODALITY", 10))
 
 """Honeytoken URL"""
-WEB_HOOK_HONEY_TOKEN_URL = (
-    "https://webhook.site/#!/view/b4a77406-3736-4637-a11d-293cc00decee"
-)
+HONEY_URL = "https://52.6.96.126:3000/"
 
 """Activate DICOM files integrity checks every 6 hours"""
 INTEGRITY_CHECK = os.getenv("INTEGRITY_CHECK", "True").lower() in TRUE_LIST

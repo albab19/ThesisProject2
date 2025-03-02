@@ -1,4 +1,4 @@
-""" This module validates the functionality of the dicom_handlers handle_get() function for retrieving both uncompressed and compressed DICOM files.
+""" This module tests the functionality of the dicom_handlers handle_get() function for retrieving both uncompressed and compressed DICOM files.
 Asseretations: 
 
 - The correct number of datasets is returned.
@@ -13,6 +13,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath("../core"))
+sys.path.append(os.path.abspath("../pydicom_and_pynetdicom_libs/"))
 
 import pytest
 from pydicom import Dataset

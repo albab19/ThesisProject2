@@ -6,8 +6,9 @@ within multiple scenarios. To ensure predictable and isolated testing, the follo
 were used:
 
 1. ** Mock Data Hardcoded**:
-   - A mock database with 5 pre-defined DICOM files was created.
-   - Each study contains a unique `StudyInstanceUID` and required DICOM attributes.
+   - A mock DICOM files storages with 5 pre-defined DICOM files was created.
+   - A mock database was initialized from the mock files storage.
+   - Mock events were created using pytest.fixture.
 
 2. **Mocked Events**:
    - DICOM C-FIND events were simulated using `pydicom.Dataset` objects.
@@ -30,11 +31,11 @@ were used:
    - Logging is suppressed focus on functional validation (Other tests will take the logging) .
 """
 
-# Note: "The actual implementation of the handle_echo method is provided by the pynetdicom library and is handled by the SCP (Service Class Provider) when a DICOM C-ECHO request is received."
 import sys
 import os
 
 sys.path.append(os.path.abspath("../core/"))
+sys.path.append(os.path.abspath("../pydicom_and_pynetdicom_libs/"))
 import pytest
 from unittest.mock import Mock, patch
 from pydicom import Dataset
@@ -103,16 +104,18 @@ def event_retrieve_series_for_specific_study():
     return event
 
 
-@pytest.fixture
-def mock_dicomdb():
-    return Mock()
-
-
 """
 Before all tests we patch the real database by initialize mock one with four studies for four different patients from a mock dicom files storage
 (Oliver Møller, Amanda Larsen, Agnete Østergaard, Ronnie Nikolajsen and Jarl Frederiksen)
 
 """
+
+
+@pytest.fixture
+def mock_dicomdb():
+    return Mock()
+
+
 import app_container
 
 test_container = app_container.ApplicationContainer()
@@ -123,7 +126,7 @@ def test_invalid_sop_class(event_retrieve_specific_study):
     "" " Test handling of invalid  SOP Class UID" ""
     with patch.multiple(
         "utilities.dicom_util",
-        model_invalid=Mock(return_value=True),
+        is_sopclassuid_valid=Mock(return_value=True),
         identifier_invalid=Mock(return_value=False),
     ):
         gen = dicom_handlers.handle_find(event_retrieve_specific_study)
@@ -137,7 +140,7 @@ def test_invalid_identifier(event_retrieve_specific_study):
     """handling of invalid identifier attributes"""
     with patch.multiple(
         "utilities.dicom_util",
-        model_invalid=Mock(return_value=False),
+        is_sopclassuid_valid=Mock(return_value=False),
         identifier_invalid=Mock(return_value=True),
     ):
         gen = dicom_handlers.handle_find(event_retrieve_specific_study)
@@ -234,7 +237,7 @@ def test_response_generation_failure(event_retreive_all_patients, mock_dicomdb):
 
     with patch.multiple(
         "utilities.dicom_util",
-        model_invalid=Mock(return_value=False),
+        is_sopclassuid_valid=Mock(return_value=False),
         identifier_invalid=Mock(return_value=False),
         all_requested=Mock(return_value=True),
         get_query_level=Mock(return_value="PATIENT"),
@@ -246,7 +249,7 @@ def test_response_generation_failure(event_retreive_all_patients, mock_dicomdb):
 
     assert (
         len(results) == 3
-    )  #  the failure state indicate the handle_find yild (generate) three failures responses one for each dataset and a failure status
+    )  #  the failure state indicate thatt handle_find yilds (generate) three failures responses one on each returned dataset and a failure response
     assert results[0][0] == 0xC001
 
 

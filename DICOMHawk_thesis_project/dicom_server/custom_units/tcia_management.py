@@ -242,10 +242,17 @@ class TCIAManager(ITCIAManager):
             )
 
     def inject_honey_url(self, dataset):
-        self.logger.debug(
-            f"DICOM file for Patient {dataset.PatientName}, modality: {dataset.Modality}  injected with honeyURL"
-        )
-        dataset.RetrieveURL = str(self.honeytoken_url)
+        try:
+            dataset.RetrieveURL = (
+                f"{str(self.honeytoken_url)}/{dataset.StudyInstanceUID}"
+            )
+            self.logger.debug(
+                f"DICOM file for Patient {dataset.PatientName}, modality: {dataset.Modality}  injected with honeyURL"
+            )
+        except Exception:
+            self.exceptions_logger.exception(
+                f"Unexpected error while injecting HoneyURL for Patient {dataset.PatientName}, modality: {dataset.Modality}"
+            )
 
     def get_canary_token(self):
         pdf_path = self.pdf_canary_path
@@ -367,5 +374,5 @@ class TCIAAPI(ITCIAAPI):
             )
             _json = json.loads(res.content)
         except Exception:
-            self.exceptions_logger.exception("Series retrieval failed:")
+            self.exceptions_logger.exception("Studies retrieval failed:")
         return _json

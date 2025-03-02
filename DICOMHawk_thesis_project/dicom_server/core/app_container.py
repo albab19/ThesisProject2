@@ -129,7 +129,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         TCIAManager,
         app_logger,
         exceptions_logger,
-        config.WEB_HOOK_HONEY_TOKEN_URL,
+        config.HONEY_URL,
         config.DICOM_STORAGE_DIR,
         config.TCIA_FILES_DIRECTORY,
         config.TCIA_FILES_STAGGER_DIRECTORY,

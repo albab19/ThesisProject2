@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const logFields = [
                         log.session_id, log.ip, log.port, log.version, log.request_type,
                         log.session_parameters, log.matches, log.status, log.log_level,
-                        log.query_level, log.time_stamp
+                        log.query_level, log.timestamp
                     ];
 
                     // Create and append cells for each field
