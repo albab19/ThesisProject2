@@ -52,6 +52,7 @@ services:
       - MINIMUM_TCIA_FILES_IN_SERIE=1
       - MAXIMUM_TCIA_FILES_IN_SERIE=3
       - TCIA_STUDIES_PER_MODALITY=10
+      - DOCKER=yes
     build: ./dicom_server/.
     volumes:
       - shared_data:/app

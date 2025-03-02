@@ -56,6 +56,7 @@ TRUE_LIST = ["true", "1", "t", "yes"]
 """Envirnoment"""
 PROD = os.getenv("PROD", "False").lower() in TRUE_LIST
 
+DOCKER = os.getenv("DOCKER", "False").lower() in TRUE_LIST
 """Flask server status"""
 FLASK_ACTIVATED = os.getenv("FLASK_ACTIVATED", "True").lower() in TRUE_LIST
 
@@ -78,16 +79,16 @@ DICOM_PORT = 11112
 
 """DICOM server host ip configuration"""
 
-DICOM_SERVER_HOST = "localhost" if not PROD else "172.29.0.3"
+DICOM_SERVER_HOST = "172.29.0.3" if DOCKER else "0.0.0.0"
 
 
 """Redis host configuration"""
-REDIS_HOST = "localhost" if not PROD else os.getenv("REDIS_HOST", "172.29.0.4")
+REDIS_HOST = os.getenv("REDIS_HOST", "172.29.0.4") if DOCKER else "localhost"
 
 """Logs directories"""
 MAIN_LOG_DIRECTORY, SIMPLIFIED_LOG_DIRECTORY, EXCEPTIONS_LOG_DIRECTORY = (
     ("/app/logs/pynetdicom", "/app/logs/simplified", "/app/logs/exceptions")
-    if PROD
+    if DOCKER
     else (
         "../flask_logging_server/logs/pynetdicom",
         "../flask_logging_server/logs/simplified",
@@ -96,7 +97,7 @@ MAIN_LOG_DIRECTORY, SIMPLIFIED_LOG_DIRECTORY, EXCEPTIONS_LOG_DIRECTORY = (
 )
 
 """The sqlite file path"""
-DICOM_DATABASE = "/app/db.db" if PROD else "./storage/db.db"
+DICOM_DATABASE = "/app/db.db" if DOCKER else "./storage/db.db"
 
 """TCIA username and password to use it in API calls"""
 TCIA_USER_NAME = os.getenv("TCIA_USER_NAME", "Nawras")
