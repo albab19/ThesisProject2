@@ -115,6 +115,11 @@ netstat -tuln | grep -E '104|3000|5000|6379'
 
 If any of these ports are in use, you will need to free them or configure DICOMHawk to use different ports.
 
+### Deployment Architecture
+
+An overview of the deployment process is shown bellow
+![DICOMHawk Deployment Architecture](cover_images/deployment.png)
+
 To deploy DICOMHawk using Docker Compose, use the following command which clone the repository, navigates to the project directory, and launches the required services. Note that cloning the repository may take a significant amount of time due to the large size of the real DICOM files from various modalities stored in it
 
 ```bash
@@ -123,7 +128,7 @@ git clone https://github.com/albab19/ThesisProject2.git && cd ./ThesisProject2 &
 
 ## Running DICOMHawk Locally
 
-To run DICOMHawk locally, each service should be launched separately in its respective directory. It is crucial to ensure that a Redis service is operational on port 6379 before starting the other services, as they depend on Redis for various functionalities.
+To run DICOMHawk locally, each service should be run separately in its directory. It is important to ensure that a Redis service is running on port 6379 before starting the other services.
 
 ### Pre-requisites
 
@@ -156,11 +161,14 @@ docker run -p 6379:6379 --name redis-db -d redis
   ´´´bash
   cd /API
 
-````
+  ```
+
+  ```
+
 - Run the API using Node.js:
-```bash
- node app.js
-````
+  ```bash
+  node app.js
+  ```
 
 #### Flask Logging Server
 
@@ -189,6 +197,50 @@ docker-compose up -d
 
 # Usage Examples
 
-# Deployment Architecture
+Users can interact with the DICOM server utilizing DCMTK tools and DICOM client applications suck as Sante DICOM Viewer.
 
-![DICOMHawk Deployment Architecture](cover_images/deployment.png)
+## Using DCMTK
+
+Example commands to interact with the server using DCMTK are:
+
+- verify the connection to the server using this command.
+
+```bash
+echoscu.exe  localhost 11112
+```
+
+- Find all patients using the PatientRootQueryRetrieveInformationModelFind
+
+```bash
+    findscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen" localhost 104
+```
+
+- Find a specific patient using the PatientRootQueryRetrieveInformationModelFind
+
+```bash
+ findscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen" localhost 104
+```
+
+- Find all studies using the StudyRootQueryRetrieveInformationModelFind
+
+```bash
+    findscu -v -S -k QueryRetrieveLevel=STUDY  localhost 104
+```
+
+- Find a specific study using the StudyRootQueryRetrieveInformationModelFind
+
+```bash
+ findscu -v -S -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=1.3.6.1.4.1.14519.5.2.1.6279.6001.142460980973539163820236983184  localhost 104
+```
+
+- Get a specific study using the StudyRootQueryRetrieveInformationModelGet
+
+```bash
+ getscu -v -S -k QueryRetrieveLevel=STUDY -k StudyInstanceUID=1.3.6.1.4.1.14519.5.2.1.6279.6001.142460980973539163820236983184  localhost 104
+```
+
+Get all studies for a specific patient using the PatientRootQueryRetrieveInformationModelGet
+
+```bash
+ getscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen"  localhost 104
+```
