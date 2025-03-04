@@ -40,7 +40,7 @@ services:
       - INTEGRITY_CHECK=yes
       - TCIA_ACTIVATED=yes
       - BLACKHOLE_FILE_PATH=./storage/blackhole_list.txt
-      - REDIS_HOST=host.docker.internal
+      - REDIS_HOST=172.29.0.4
       - TCIA_USER_NAME=Nawras
       - TCIA_PASSWORD=mrmr@gmail.com
       - TCIA_PERIOD_UNIT=week
