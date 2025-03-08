@@ -79,6 +79,7 @@ class SessionCollector(ISessionCollector):
             current_time = time.time()
             known_scanner = dicom_util.is_known_scanner(ip)
             self.session_info[sk.KNOWN_SCANNER.key] = known_scanner
+            self.session_info[sk.SESSION_MAIN_OPERATION.key] = "Association Requested"
             self.session_info[sk.REQUEST_TYPE.key] = "Association Requested"
             self.session_info[sk.IP.key] = str(ip)
             self.session_info[sk.PORT.key] = port
