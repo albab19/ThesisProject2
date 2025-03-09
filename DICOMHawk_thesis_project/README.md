@@ -215,7 +215,7 @@ Example commands to interact with the server using DCMTK are:
 - Find all patients using the PatientRootQueryRetrieveInformationModelFind.
 
 ```bash
-    findscu -v -S -k QueryRetrieveLevel=PATIENT -k PatientName="Jim Madsen" localhost 104
+    findscu -v -S -k QueryRetrieveLevel=PATIENT localhost 104
 ```
 
 - Find a specific patient using the PatientRootQueryRetrieveInformationModelFind attributes.
