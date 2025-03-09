@@ -90,7 +90,6 @@
     <script type="module">
          import { getAllStudies } from '/dbcontroller.mjs';
          window.onload = function(){
-            console.log("ddddddddddd")
             const popdata = getAllStudies();
             console.log(popdata)
          };
@@ -110,7 +109,7 @@
                     <th>Patient Name</th>
                     <th>Study Instance UID</th>
                     <th>Study Date</th>
-                    <th>Study Time</th>
+                    <!-- <th>Study Time</th> -->
                     <th>Accession Number</th>
                     <th>Study ID</th>
                     <th>Series Instance UID</th>
@@ -144,6 +143,9 @@
 
 
     <script>
+        function formatDate(dateStr) {
+            return dateStr.slice(0, 4) + '-' + dateStr.slice(4, 6) + '-' + dateStr.slice(6);
+        }
         document.addEventListener('DOMContentLoaded', () =>{
             fetch('/main/instances')
                 .then(response => response.json())
@@ -159,8 +161,7 @@
                         <th>${row.patient_id}</th>
                         <th>${row.patient_name}</th>
                         <th>${row.study_instance_uid}</th>
-                        <th>${row.study_date}</th>
-                        <th>${row.study_time}</th>
+                        <th>${formatDate(row.study_date)}</th>
                         <th>${row.accession_number}</th>
                         <th>${row.study_id}</th>
                         <th>${row.series_instance_uid}</th>

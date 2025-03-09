@@ -2,16 +2,11 @@
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
-
-//uploading 
 const multer = require('multer');
-const redisClient = require("./redisLogger");
-//require('dotenv').config();
-//expressjs app
+logger = require("./logger.js")
 const app = express();
 app.set('trust proxy', true);
 app.use(favicon(path.join(__dirname, 'static', 'favicon.ico')));
-//app.use(express.static('static'));
 
 
 //middleware
@@ -41,8 +36,8 @@ const USERS = {
   username: 'test', password: 'test',
 }
 
-const cors = require('cors');
-const { verifyCSRFToken } = require('./middleware/csrfMiddleware.js');
+// const cors = require('cors');
+// const { verifyCSRFToken } = require('./middleware/csrfMiddleware.js');
 
 
 //Routes
@@ -110,14 +105,14 @@ app.post('/login', async (req, res) => {
       const refreshToken = jwtUtils.generateRefreshToken({ username: req.body.username });
       res.cookie("accessToken", accessToken, { httpOnly: true, secure: false, sameSite: "Strict" });
       res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false, sameSite: "Strict" });
-      logEvent("Hidden credintials accessed", req)
+      logger.logEvent("Hidden credintials accessed", req)
       res.status(200).json({ message: 'Login dev' });
       // Convert JSON object to a string
 
     }
 
     else if (req.body.username === USERS.username && req.body.password === USERS.password) {
-      logEvent(`Successful login User ${req.body.username} and password ${req.body.password} `, req)
+      logger.logEvent(`Successful login User ${req.body.username} and password ${req.body.password} `, req)
       req.session.user = { username: req.body.username };
       // console.log('User ','"',req.body.username,'"',' logged in. Session ID:', req.sessionID); // Log the session ID
 
@@ -137,7 +132,7 @@ app.post('/login', async (req, res) => {
 
     } else {
       //it has been "invalid credentials before"
-      logEvent(`Fail login User ${req.body.username} and password ${req.body.password}`, req)
+      logger.logEvent(`Fail login User ${req.body.username} and password ${req.body.password}`, req)
 
       return res.status(401).json({ message: 'Invalid username or password!' });
     }
@@ -233,6 +228,7 @@ app.get('/downloadInstance', (req, res) => {
 
 // See all studies table has the option to download a zip folder
 app.get('/downloadStudyFiles', (req, res) => {
+  logger.logEvent("StudyFilesDownloaded",req)
   const file = path.join(__dirname, './static/hf/StudyFiles.zip');
   res.download(file, 'StudyFiles.zip', (err) => {
     if (err) {
@@ -251,33 +247,3 @@ try {
   console.error("Error. Server did not start", error);
 }
 
-function logEvent(e, req, parameter = "") {
-  let ip = getClientIp(req)
-  
-  const r_port = req.connection.remotePort
-  try {
-
-    const jsonObject = {
-      ip: ip,
-      timestamp: new Date().toISOString().slice(0, 19),
-      messevent: e,
-      sessionId: process.env.SESSION_SECRET.substring(0, 4) + Date.now().toString().substring(0, 10),
-      port: r_port,
-      report: "N/A"
-    };
-
-    const jsonString = JSON.stringify(jsonObject);
-
-    redisClient.rPush('API_logs', jsonString);
-    return;
-  } catch (error) {
-    console.error('Error:', error);
-  }
-  // console.log("")
-}
-
-
-function getClientIp(req) {
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || '';
-  return ip.includes('::ffff:') ? ip.replace('::ffff:', '') : ip;
-}

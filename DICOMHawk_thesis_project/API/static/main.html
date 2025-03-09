@@ -295,7 +295,7 @@
                         <th>Patient Name</th>
                         <th>Study Instance UID</th>
                         <th>Study Date</th>
-                        <th>Study Time</th>
+                        <!-- <th>Study Time</th> -->
                         <th>Accession Number</th>
                         <th>Study ID</th>
                         <th>Series Instance UID</th>
@@ -316,7 +316,9 @@
 
     <script>
         const tableBody = document.getElementById('table-body');
-
+        function formatDate(dateStr) {
+            return dateStr.slice(0, 4) + '-' + dateStr.slice(4, 6) + '-' + dateStr.slice(6);
+        }
         // Function to append data rows to the table
         function appendTableRows(data) {
             tableBody.querySelectorAll('tr').forEach(row => row.remove()); // Clear existing rows
@@ -336,8 +338,7 @@
                 <td>${row.patient_id || "N/A"}</td>
                 <td>${row.patient_name || "N/A"}</td>
                 <td>${row.study_instance_uid || "N/A"}</td>
-                <td>${row.study_date || "N/A"}</td>
-                <td>${formatTimeString(row.study_time) || "N/A"}</td>
+                <td>${formatDate(row.study_date)} || "N/A"}</td>
                 <td>${row.accession_number || "N/A"}</td>
                 <td>${row.study_id || "N/A"}</td>
                 <td>${row.series_instance_uid || "N/A"}</td>

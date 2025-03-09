@@ -86,7 +86,6 @@
     <script type="module">
          import { getAllStudies } from '/dbcontroller.mjs';
          window.onload = function(){
-            console.log("ddddddddddd")
             const popdata = getAllStudies();
             console.log(popdata)
          };
@@ -99,7 +98,7 @@
             <thead>
                 <tr>
                     <th>Study Date</th>
-                    <th>Study Time</th>
+                    <!-- <th>Study Time</th> -->
                     <th>Accession Number</th>
                     <th>Study ID</th>
                     <th>Download</th>
@@ -153,7 +152,9 @@
         // document.getElementById('return-button').addEventListener('click', () => {
         //     window.history.back();
         // });
-
+        function formatDate(dateStr) {
+            return dateStr.slice(0, 4) + '-' + dateStr.slice(4, 6) + '-' + dateStr.slice(6);
+        }
         document.addEventListener('DOMContentLoaded', async () => {
         try {
             // Fetch data from the studies endpoint
@@ -172,8 +173,7 @@
             data.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row.study_date}</td>
-                    <td>${row.study_time}</td>
+                    <td>${formatDate(row.study_date)}</td>
                     <td>${row.accession_number}</td>
                     <td>${row.study_id}</td>
                     <a href="/downloadStudyFiles">Download Study Files</a>

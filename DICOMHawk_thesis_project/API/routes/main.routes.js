@@ -6,23 +6,11 @@ router.use(express.urlencoded({ extended: true }));
 const path = require('path');
 const FormData = require('form-data');
 const fs = require('fs');
-const cookieParser = require("cookie-parser");
-
-//Midddleware
 const authMiddleware = require("./../authentication/authMiddleware.js");
-
-
-
-//DB Connection
-const { connectToDB } = require('../controllers/dbController.js');
+const { connectToDB } = require('../dbConnectors/sqliteConnector');
 db = connectToDB();
 
 
-
-const { json } = require('body-parser');
-//const redisLogger = require("../redisLogger.js");
-const redisClient = require("../redisLogger");
-const { report } = require("process");
 
 
 //main
@@ -46,7 +34,7 @@ router.get('/searchStudies', authMiddleware.authenticate, async (req, res) => {
 //see all studies - populate the table
 router.get('/studies', authMiddleware.authenticate, (req, res) => {
 
-  logEvent('Search all studies', req)
+  logger.logEvent('Search all studies', req)
   db.all('SELECT * FROM study', (err, rows) => {
     if (rows) {
 
@@ -67,7 +55,7 @@ router.get('/searchPatients', authMiddleware.authenticate, async (req, res) => {
 
 //see all patients - populate the table
 router.get('/patients', async (req, res) => {
-  logEvent('Search all patients', req)
+  logger.logEvent('Search all patients', req)
 
   db.all('SELECT * FROM patient', (err, rows) => {
     try {
@@ -93,7 +81,7 @@ router.get('/searchImages', authMiddleware.authenticate, async (req, res) => {
 });
 
 router.get('/images', authMiddleware.authenticate, async (req, res) => {
-  logEvent('Search all images', req)
+  logger.logEvent('Search all images', req)
 
 
   db.all('SELECT * FROM image', (err, rows) => {
@@ -117,7 +105,7 @@ router.get('/searchInstances', authMiddleware.authenticate, async (req, res) => 
 
 //Query the db for instances and load the results into the table
 router.get('/instances', authMiddleware.authenticate, async (req, res) => {
-  logEvent('Search all instances', req)
+  logger.logEvent('Search all instances', req)
 
   db.all('SELECT * FROM instance', (err, rows) => {
     if (rows.length === 0) {
@@ -136,7 +124,7 @@ router.get('/searchSeries', authMiddleware.authenticate, async (req, res) => {
 
 router.get('/series', authMiddleware.authenticate, async (req, res) => {
 
-  logEvent('Search all series', req, req.body["searchInput"])
+  logger.logEvent('Search all series', req, req.body["searchInput"])
 
   db.all('SELECT * FROM series', (err, rows) => {
     if (rows.length === 0) {
@@ -157,9 +145,10 @@ router.post('/searchBy', authMiddleware.authenticate, (req, res) => {
   // console.log("request",req.body["searchInput"]);
 
   if (req.body["searchType"] === "name") {
-    logEvent('Search by name', req, req.body["searchInput"])
 
-    db.all('SELECT patient_id, patient_name, study_instance_uid, study_date, study_time, accession_number, study_id, transfer_syntax_uid, sop_class_uid, series_instance_uid,modality,series_number, sop_instance_uid, instance_number FROM instance WHERE patient_name = ?', [req.body["searchInput"]], (err, rows) => {
+    logger.logEvent(`Search PatientName ${req.body["searchInput"]}`, req, req.body["searchInput"])
+
+    db.all('SELECT patient_id, patient_name, study_instance_uid, study_date, accession_number, study_id, transfer_syntax_uid, sop_class_uid, series_instance_uid,modality,series_number, sop_instance_uid, instance_number FROM instance WHERE patient_name = ?', [req.body["searchInput"]], (err, rows) => {
       if (err) {
         return res.send(500).json({ message: "Internal server error" });
       }
@@ -170,11 +159,11 @@ router.post('/searchBy', authMiddleware.authenticate, (req, res) => {
     });
   } else {
 
-    logEvent('Search by id', req, req.body["searchInput"])
+    logger.logEvent(`Search PatientID ${req.body["searchInput"]}`, req, req.body["searchInput"])
 
 
     db.all(
-      'SELECT patient_id, patient_name, study_instance_uid, study_date, study_time, accession_number, study_id, transfer_syntax_uid, sop_class_uid, series_instance_uid,modality,series_number, sop_instance_uid, instance_number FROM instance WHERE  patient_id = ?  COLLATE BINARY', [req.body["searchInput"]], (err, rows) => {
+      'SELECT patient_id, patient_name, study_instance_uid, study_date, accession_number, study_id, transfer_syntax_uid, sop_class_uid, series_instance_uid,modality,series_number, sop_instance_uid, instance_number FROM instance WHERE  patient_id = ?  COLLATE BINARY', [req.body["searchInput"]], (err, rows) => {
         if (err) {
           return res.sendStatus(500).json({ message: "Internal server error" });
         }
@@ -234,7 +223,7 @@ async function checkAnalysis(analysisId, APIKey, req, ip, port) {
       console.log('File analysis status:', result.data.data.attributes.status);
       setTimeout(() => checkAnalysis(analysisId, APIKey), 10000);
     } else {
-      logEvent(`FileUploaded`, req, JSON.stringify(result.data.data.attributes.stats), ip, port)
+      logger.logEvent(`FileUploaded`, req, JSON.stringify(result.data.data.attributes.stats), ip, port)
 
       console.log('Analysis completed. Results:', result.data.data.attributes.stats);
     }
@@ -249,63 +238,6 @@ router.get('/upload', authMiddleware.authenticate, async (req, res) => {
 
   res.sendFile((path.join(__dirname, '../static', 'upload.html')));
 });
-
-function logEvent(e, req, parameter = "", ip = "", port = 0) {
-  // console.log("poo",port)
-
-
-
-  if (parameter === "" || e === "Search by id" || e === "Search by name") {
-    try {
-      let ip = req.socket.remoteAddress
-      if (ip.substr(0, 7) === "::ffff:") {
-        ip = ip.split(':').pop();
-      }
-      let r_port = req.connection.remotePort
-      const jsonObject = {
-        id: new Date().toISOString().slice(0, 19),
-        ip: ip,
-        timestamp: new Date().toISOString().slice(0, 19),
-        sessionId: process.env.SESSION_SECRET.substring(0, 4) + Date.now().toString().substring(0, 10),
-        messevent: e,
-        port: r_port,
-        report: "N/A"
-      };
-
-      const jsonString = JSON.stringify(jsonObject);
-
-      redisClient.rPush('API_logs', jsonString);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-  else if (parameter != "" && e == "FileUploaded") {
-
-    try {
-
-      const jsonObject = {
-        ip: ip,
-        timestamp: new Date().toISOString().slice(0, 19),
-        messevent: e,
-        port: port,
-        sessionId: process.env.SESSION_SECRET.substring(0, 4) + Date.now().toString().substring(0, 10),
-
-        report: parameter
-      };
-
-      const jsonString = JSON.stringify(jsonObject);
-
-      redisClient.rPush('API_logs', jsonString);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-    console.log("")
-
-
-  }
-
-
-}
 
 
 
